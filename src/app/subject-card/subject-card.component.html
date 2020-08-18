@@ -1,15 +1,22 @@
 <div class="card mt-3">
-  <div class="card-body">
+  <div class="card-body pr-5">
+
     <!-- Subject Name -->
     <h5 class="card-title subject-name mt-2">{{name}}</h5>
 
     <!-- Checkboxes -->
     <div class="d-flex flex-wrap">
-      <div *ngFor="let type of classesTypes; let i = index; let first = first"
-           class="custom-control custom-checkbox mb-2" [ngClass]="{'ml-3': !first}">
+      <div *ngFor="let type of classesTypes; let i = index; let last = last"
+           class="custom-control custom-checkbox mb-2" [ngClass]="{'mr-3': !last}">
         <input type="checkbox" [checked]="true" class="custom-control-input" id="checkTypeClass-{{name}}-{{i}}">
         <label class="custom-control-label" for="checkTypeClass-{{name}}-{{i}}">{{type}}</label>
       </div>
     </div>
+
+    <!-- Remove btn -->
+    <button class="btn btn-danger btn-remove" (click)="removeBtnClicked()">
+      <fa-icon [icon]="faTimes" class="fa-md"></fa-icon>
+    </button>
   </div>
+
 </div>

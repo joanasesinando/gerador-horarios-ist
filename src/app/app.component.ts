@@ -39,6 +39,16 @@ export class AppComponent implements OnInit {
       document.getElementById('subj#' + subjIndex).remove();
     }
 
-    console.log(this.selectedSubjects);
+    console.log(this.selectedSubjects); // FIXME: remove
+  }
+
+  removeSubject(index: number): void {
+    const subjToRemove = this.selectedSubjects[index];
+
+    this.subjects.push(subjToRemove);
+    this.subjects.sort((a, b) => a.name.localeCompare(b.name));
+    this.selectedSubjects.splice(index, 1);
+
+    console.log(this.selectedSubjects); // FIXME: remove
   }
 }

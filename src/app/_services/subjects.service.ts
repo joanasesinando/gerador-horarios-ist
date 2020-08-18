@@ -21,6 +21,6 @@ export class SubjectsService {
       new Subject('Compiladores', [TypeOfClass.T, TypeOfClass.PB]),
       new Subject('Sistemas Operativos', [TypeOfClass.T, TypeOfClass.L]),
       new Subject('Teoria da Computação', [TypeOfClass.T, TypeOfClass.PB, TypeOfClass.L])
-    ]; // TODO: demo yet
+    ].sort((a, b) => a.name.localeCompare(b.name)); // TODO: demo yet
   }
 }

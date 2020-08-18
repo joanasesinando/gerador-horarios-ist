@@ -1,3 +1,25 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+
+
+.btn-about {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: transparent;
+  border: none;
+  @include media-breakpoint-down(sm) { color: white; }
+  z-index: 5;
+
+  &:hover, &:focus {
+    color: darken($primary, 10);
+    text-decoration: underline;
+    box-shadow: none;
+    @include media-breakpoint-down(sm) { color: white; }
+  }
+}
+
 .btn-generate {
   letter-spacing: 1px;
 }

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 
 import {Subject} from './subject';
 
@@ -11,9 +11,15 @@ export class SubjectsBannerComponent implements OnInit {
 
   @Input() subjects: Subject[];
 
+  @Output() removeBtn = new EventEmitter<number>();
+
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  removeBtnClicked(index: number): void {
+    this.removeBtn.emit(index);
   }
 
 }
