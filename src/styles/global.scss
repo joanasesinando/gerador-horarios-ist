@@ -1,0 +1,35 @@
+@import "fonts.css";
+@import "colors";
+
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+
+
+body {
+  font-family: 'poppins-regular', sans-serif;
+}
+
+h3, .h3 { font-family: 'poppins-semiBold', sans-serif; }
+h5, .h5 { font-family: 'poppins-medium', sans-serif; }
+
+.content,
+.sidebar {
+  min-height: 100vh;
+}
+
+.sidebar {
+  background-image: url('https://source.unsplash.com/WEQbe2jBg40/600x1200');
+  background-size: cover;
+  background-position: center;
+}
+
+.content {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+
+  @include media-breakpoint-down(md) {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}

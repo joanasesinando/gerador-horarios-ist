@@ -1,0 +1,52 @@
+/* ===================================================================
+ *  Poppins
+ *
+ * ------------------------------------------------------------------- */
+
+@font-face {
+  font-family: "poppins-bold";
+  /* loads local fonts if present */
+  src: local('Poppins-Bold'),
+  url('src/assets/fonts/Poppins/Poppins-Bold.woff2') format('woff2'),
+  url('src/assets/fonts/Poppins/Poppins-Bold.woff') format('woff');
+  font-style: normal;
+  font-weight: normal;
+  font-display: swap;
+  unicode-range: U+000-5FF; /* load only latin glyphs */
+}
+
+@font-face {
+  font-family: "poppins-medium";
+  /* loads local fonts if present */
+  src: local('Poppins-Medium'),
+  url('src/assets/fonts/Poppins/Poppins-Medium.woff2') format('woff2'),
+  url('src/assets/fonts/Poppins/Poppins-Medium.woff') format('woff');
+  font-style: normal;
+  font-weight: normal;
+  font-display: swap;
+  unicode-range: U+000-5FF; /* load only latin glyphs */
+}
+
+@font-face {
+  font-family: "poppins-regular";
+  /* loads local fonts if present */
+  src: local('Poppins-Regular'),
+  url('src/assets/fonts/Poppins/Poppins-Regular.woff2') format('woff2'),
+  url('src/assets/fonts/Poppins/Poppins-Regular.woff') format('woff');
+  font-style: normal;
+  font-weight: normal;
+  font-display: swap;
+  unicode-range: U+000-5FF; /* load only latin glyphs */
+}
+
+@font-face {
+  font-family: "poppins-semiBold";
+  /* loads local fonts if present */
+  src: local('Poppins-SemiBold'),
+  url('src/assets/fonts/Poppins/Poppins-SemiBold.woff2') format('woff2'),
+  url('src/assets/fonts/Poppins/Poppins-SemiBold.woff') format('woff');
+  font-style: normal;
+  font-weight: normal;
+  font-display: swap;
+  unicode-range: U+000-5FF; /* load only latin glyphs */
+}

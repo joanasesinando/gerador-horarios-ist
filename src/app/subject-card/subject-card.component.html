@@ -1,0 +1,15 @@
+<div class="card mt-3">
+  <div class="card-body">
+    <!-- Subject Name -->
+    <h5 class="card-title subject-name mt-2">{{name}}</h5>
+
+    <!-- Checkboxes -->
+    <div class="d-flex flex-wrap">
+      <div *ngFor="let type of classesTypes; let i = index; let first = first"
+           class="custom-control custom-checkbox mb-2" [ngClass]="{'ml-3': !first}">
+        <input type="checkbox" [checked]="true" class="custom-control-input" id="checkTypeClass-{{name}}-{{i}}">
+        <label class="custom-control-label" for="checkTypeClass-{{name}}-{{i}}">{{type}}</label>
+      </div>
+    </div>
+  </div>
+</div>
