@@ -2,6 +2,11 @@ import {Component, OnInit} from '@angular/core';
 import {Subject} from './subjects-banner/subject';
 import {SubjectsService} from './_services/subjects.service';
 
+import {faGithub} from '@fortawesome/free-brands-svg-icons';
+import {faCommentAlt} from '@fortawesome/free-solid-svg-icons';
+
+import * as $ from 'jquery';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -13,11 +18,18 @@ export class AppComponent implements OnInit {
   subjects: Subject[];
   selectedSubjects: Subject[] = [];
 
+  faGithub = faGithub;
+  faCommentAlt = faCommentAlt;
+
   constructor(private subjectService: SubjectsService) {}
 
   ngOnInit(): void {
     // FIXME: get subjects only after academic year and course selected
     this.subjects = this.getSubjects('fo', 'fo');
+
+    $(() => {
+      $('[data-toggle="tooltip"]').tooltip();
+    });
   }
 
   getSubjects(academicYear: string, course: string): Subject[] {
@@ -28,7 +40,7 @@ export class AppComponent implements OnInit {
     // @ts-ignore
     const subjIndex = document.getElementById('inputSubject').value;
 
-    if (subjIndex) {
+    if (subjIndex && subjIndex !== -1) {
       const subjToAdd = this.subjects[subjIndex];
 
       // update arrays

@@ -3,7 +3,18 @@
   <div class="row no-gutter">
 
     <!-- Sidebar -->
-    <div class="d-flex col-md-4 sidebar"></div>
+    <div class="d-flex col-md-4 sidebar">
+      <img class="logo" src="assets/imgs/logo.svg" alt="">
+
+      <div class="widgets d-flex">
+        <a class="icon-wrapper github mr-2" href="" data-toggle="tooltip" data-placement="top" title="Repositório">
+          <fa-icon [icon]="faGithub" class="fa-lg"></fa-icon>
+        </a>
+        <a class="icon-wrapper feedback" href="" data-toggle="tooltip" data-placement="top" title="Feedback">
+          <fa-icon [icon]="faCommentAlt" class="fa-lg"></fa-icon>
+        </a>
+      </div>
+    </div>
 
     <!-- About -->
     <button class="btn btn-outline-primary btn-about" data-toggle="modal" data-target="#exampleModal">Sobre</button>
@@ -71,14 +82,16 @@
                 <!-- Subject -->
                 <label for="inputSubject">Cadeira</label>
                 <div class="input-group w-100">
-                  <select class="custom-select" id="inputSubject" required autofocus>
-                    <option disabled selected>Escolher cadeira...</option>
+                  <select class="custom-select" id="inputSubject" [disabled]="subjects.length === 0">
+                    <option disabled selected value="-1">Escolher cadeira...</option>
                     <option *ngFor="let subj of subjects; let i = index" id="subj#{{i}}" value="{{i}}">{{subj.name}}</option>
                   </select>
                   <div class="input-group-append">
-                    <button class="btn btn-primary" type="button" (click)="addSubject()">Adicionar</button>
+                    <button class="btn btn-primary" type="button" [disabled]="subjects.length === 0"
+                            (click)="addSubject()">Adicionar</button>
                   </div>
                 </div>
+                <p *ngIf="subjects.length === 0" class="text-danger"><small>Não existem mais cadeiras.</small></p>
               </form>
 
               <!-- Selected subjects -->
