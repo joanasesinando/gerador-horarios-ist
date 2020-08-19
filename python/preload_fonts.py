@@ -2,10 +2,9 @@ import os
 import json
 
 project_name = ""
-with open('../package.json') as json_file:
+with open('package.json') as json_file:
     data = json.load(json_file)
     project_name = data['name']
-    print(project_name)
 
 CURRENT_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
 
