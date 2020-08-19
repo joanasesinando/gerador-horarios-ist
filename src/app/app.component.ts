@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {Subject} from './subjects-banner/subject';
 import {SubjectsService} from './_services/subjects.service';
 
 import {faGithub} from '@fortawesome/free-brands-svg-icons';
-import {faCommentAlt} from '@fortawesome/free-solid-svg-icons';
+import {faCommentAlt, faChevronDown} from '@fortawesome/free-solid-svg-icons';
 
 declare let $;
 
@@ -15,15 +15,21 @@ declare let $;
 export class AppComponent implements OnInit {
   title = 'gerador-horarios-ist';
 
+  mobileView = false;
+  featuresHorizontal = false;
+
   subjects: Subject[];
   selectedSubjects: Subject[] = [];
 
   faGithub = faGithub;
   faCommentAlt = faCommentAlt;
+  faChevronDown = faChevronDown;
 
   constructor(private subjectService: SubjectsService) {}
 
   ngOnInit(): void {
+    this.onWindowResize();
+
     // FIXME: get subjects only after academic year and course selected
     this.subjects = this.getSubjects('fo', 'fo');
 
@@ -63,5 +69,15 @@ export class AppComponent implements OnInit {
     this.selectedSubjects.splice(index, 1);
 
     console.log(this.selectedSubjects); // FIXME: remove
+  }
+
+  showScrollDown(): boolean {
+    return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
+  }
+
+  @HostListener('window:resize', [])
+  onWindowResize(): void {
+    this.mobileView = window.innerWidth <= 991.98; // phones & tablets
+    this.featuresHorizontal = window.innerWidth >= 1400 || (window.innerWidth >= 550 && window.innerWidth <= 767) ;
   }
 }
