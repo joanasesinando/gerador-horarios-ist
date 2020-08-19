@@ -88,3 +88,36 @@ h5, .h5 { font-family: 'poppins-medium', sans-serif; }
     }
   }
 }
+
+
+
+/* ===================================================================
+ *  Scrollbar
+ *
+ * ------------------------------------------------------------------- */
+
+$scrollbarColor: #B0BEC5;
+$scrollbarBgColor: #f5f5f5;
+$scrollbarWidth: 10px;
+
+@include media-breakpoint-up(lg) {
+  ::-webkit-scrollbar {
+    width: $scrollbarWidth;
+    background-color: $scrollbarBgColor;
+  }
+
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    background-color: $scrollbarBgColor;
+    @include border-radius($scrollbarWidth);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @include border-radius($scrollbarWidth);
+    background-color: $scrollbarColor;
+
+    &:hover {
+      background-color: darken($scrollbarColor, 10%);
+    }
+  }
+}
