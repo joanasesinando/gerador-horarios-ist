@@ -5,7 +5,7 @@ import {SubjectsService} from './_services/subjects.service';
 import {faGithub} from '@fortawesome/free-brands-svg-icons';
 import {faCommentAlt} from '@fortawesome/free-solid-svg-icons';
 
-import * as $ from 'jquery';
+declare let $;
 
 @Component({
   selector: 'app-root',
@@ -40,7 +40,8 @@ export class AppComponent implements OnInit {
     // @ts-ignore
     const subjIndex = document.getElementById('inputSubject').value;
 
-    if (subjIndex && subjIndex !== -1) {
+    // tslint:disable-next-line:triple-equals
+    if (subjIndex && subjIndex != -1) {
       const subjToAdd = this.subjects[subjIndex];
 
       // update arrays

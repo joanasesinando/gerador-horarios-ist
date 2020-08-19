@@ -72,12 +72,19 @@ h5, .h5 { font-family: 'poppins-medium', sans-serif; }
   }
 }
 
-.content {
-  padding-top: 5rem;
-  padding-bottom: 5rem;
+.main-content {
+  @include media-breakpoint-up(md) {
+    height: 100vh;
+    overflow-y: auto;
+  }
 
-  @include media-breakpoint-down(md) {
-    padding-top: 3rem;
-    padding-bottom: 3rem;
+  .content {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+
+    @include media-breakpoint-down(md) {
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+    }
   }
 }
