@@ -123,7 +123,7 @@
   z-index: 5;
 
   &:hover, &:focus {
-    color: darken($primary, 10);
+    color: darken($gh-blue, 10);
     text-decoration: underline;
     box-shadow: none;
     @include media-breakpoint-down(sm) { color: white; }
@@ -131,7 +131,7 @@
 
   &:not(:disabled):not(.disabled).active,
   &:not(:disabled):not(.disabled):active {
-    color: darken($primary, 10);
+    color: darken($gh-blue, 10);
     background: transparent;
     border: none;
   }

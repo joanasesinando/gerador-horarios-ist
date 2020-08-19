@@ -3,7 +3,7 @@ import {Subject} from './subjects-banner/subject';
 import {SubjectsService} from './_services/subjects.service';
 
 import {faGithub} from '@fortawesome/free-brands-svg-icons';
-import {faCommentAlt, faChevronDown} from '@fortawesome/free-solid-svg-icons';
+import {faCommentAlt, faChevronDown, faSmileBeam, faThLarge, faThumbtack} from '@fortawesome/free-solid-svg-icons';
 
 declare let $;
 
@@ -24,6 +24,9 @@ export class AppComponent implements OnInit {
   faGithub = faGithub;
   faCommentAlt = faCommentAlt;
   faChevronDown = faChevronDown;
+  faSmileBeam = faSmileBeam;
+  faThumbtack = faThumbtack;
+  faThLarge = faThLarge;
 
   constructor(private subjectService: SubjectsService) {}
 
