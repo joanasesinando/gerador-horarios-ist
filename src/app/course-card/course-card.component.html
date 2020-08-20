@@ -2,9 +2,9 @@
   <div class="card-body pr-5">
 
     <!-- Course Name -->
-    <h5 class="card-title course-name mt-2">{{acronym}} {{name}}</h5>
+    <h5 class="card-title course-name mt-2">[{{acronym}}] {{name}}</h5>
 
-    <!-- Checkboxes -->
+    <!-- Types of classes -->
     <div class="d-flex flex-wrap">
       <div *ngFor="let type of types; let i = index; let last = last"
            class="custom-control custom-checkbox mb-2" [ngClass]="{'mr-3': !last}">

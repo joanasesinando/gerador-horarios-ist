@@ -4,11 +4,12 @@
 
     <!-- Sidebar -->
     <div class="sidebar d-flex col-md-4 justify-content-center px-4">
-      <img class="logo" src="assets/imgs/logo.svg" alt="">
+      <img class="logo" src="assets/imgs/logo.svg" alt="logo">
 
       <div class="sidebar-text text-white d-flex flex-column align-items-center">
         <h4 class="text-center px-4">Gera todos os horários possíveis e escolhe o melhor</h4>
 
+        <!-- Features Horizontal -->
         <div *ngIf="featuresHorizontal" class="features features-horizontal d-flex justify-content-center mt-4">
           <div class="item d-flex flex-column align-items-center text-dark text-center p-3 mr-3 mb-3 shadow">
             <fa-icon [icon]="faSmileBeam" class="fa-lg mb-2"></fa-icon>
@@ -16,7 +17,7 @@
           </div>
 
           <div class="item d-flex flex-column align-items-center text-dark text-center p-3 mr-3 mb-3 shadow">
-            <fa-icon [icon]="faThLarge" class="fa-lg mb-2"></fa-icon>
+            <fa-icon [icon]="faTh" class="fa-lg mb-2"></fa-icon>
             <span>Horários compactos</span>
           </div>
 
@@ -26,6 +27,7 @@
           </div>
         </div>
 
+        <!-- Features Vertical -->
         <div *ngIf="!featuresHorizontal" class="features features-vertical mt-4 px-3 w-100">
           <div class="item text-dark p-3 mb-3 shadow">
             <fa-icon [icon]="faSmileBeam" class="fa-lg mr-3"></fa-icon>
@@ -33,7 +35,7 @@
           </div>
 
           <div class="item text-dark p-3 mb-3 shadow">
-            <fa-icon [icon]="faThLarge" class="fa-lg mr-3"></fa-icon>
+            <fa-icon [icon]="faTh" class="fa-lg mr-3"></fa-icon>
             <span>Horários compactos</span>
           </div>
 
@@ -65,7 +67,7 @@
 
         <a class="icon-wrapper help"
            href=""
-           data-toggle="tooltip" data-placement="top" title="Help">
+           data-toggle="tooltip" data-placement="top" title="Ajuda">
           <fa-icon [icon]="faQuestion" class="fa-md"></fa-icon>
         </a>
       </div>
@@ -95,17 +97,17 @@
               <form id="generateForm" class="mb-5" [formGroup]="generateForm">
                 <div class="d-lg-flex align-items-center justify-content-between mb-3">
 
-                  <!-- Academic Year -->
+                  <!-- Academic Term -->
                   <div class="position-relative w-100 mr-lg-3 mb-4 mb-lg-2">
                     <div class="form-label-group">
-                      <label for="inputAcademicYear">Ano letivo</label>
-                      <select class="custom-select" id="inputAcademicYear" autofocus formControlName="academicYear"
+                      <label for="inputAcademicTerm">Ano letivo</label>
+                      <select class="custom-select" id="inputAcademicTerm" autofocus formControlName="academicTerm"
                               (change)="loadDegrees($event.target.value)">
                         <option disabled selected value="null">Escolher ano letivo...</option>
-                        <option *ngFor="let year of academicYears" value="{{year}}">{{year}}</option>
+                        <option *ngFor="let term of academicTerms" value="{{term}}">{{term}}</option>
                       </select>
                     </div>
-                    <div *ngIf="academicYearsSpinner" class="spinner-border spinner-border-sm text-primary" role="status">
+                    <div *ngIf="academicTermsSpinner" class="spinner-border spinner-border-sm text-primary" role="status">
                       <span class="sr-only">Loading...</span>
                     </div>
                   </div>
@@ -115,7 +117,7 @@
                     <div class="form-label-group">
                       <label for="inputDegree">Curso</label>
                       <select class="custom-select" id="inputDegree" formControlName="degree"
-                              (change)="loadCourses(academicYearFormControl.value, $event.target.value)">
+                              (change)="loadCourses(academicTermFormControl.value, $event.target.value)">
                         <option disabled selected value="null">Escolher curso...</option>
                         <option *ngFor="let degree of degrees" value="{{degree.id}}">{{degree.acronym}} - {{degree.name}}</option>
                       </select>
@@ -136,14 +138,14 @@
                     </select>
                     <div class="input-group-append">
                       <button class="btn btn-primary" type="button"
-                              [disabled]="!hasAcademicYearSelected() || !hasDegreeSelected() || !hasDegreeSelected()"
+                              [disabled]="hasAcademicTermSelected() && hasDegreeSelected() && courses.length === 0 && !coursesSpinner"
                               (click)="addCourse()">Adicionar</button>
                     </div>
                   </div>
                   <div *ngIf="coursesSpinner" class="spinner-border spinner-border-sm text-primary" role="status">
                     <span class="sr-only">Loading...</span>
                   </div>
-                  <p *ngIf="hasAcademicYearSelected() && hasDegreeSelected() && courses.length === 0 && !coursesSpinner"
+                  <p *ngIf="hasAcademicTermSelected() && hasDegreeSelected() && courses.length === 0 && !coursesSpinner"
                      class="text-danger"><small>Não existem mais cadeiras</small></p>
                 </div>
               </form>

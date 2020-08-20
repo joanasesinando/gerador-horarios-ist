@@ -1,12 +1,16 @@
 import {Component, HostListener, OnInit} from '@angular/core';
-import {Course, Degree} from './_model/course';
-import {FenixService} from './_services/fenix.service';
-
-import {faGithub} from '@fortawesome/free-brands-svg-icons';
-import {faCommentAlt, faChevronDown, faSmileBeam, faThLarge, faThumbtack, faQuestion} from '@fortawesome/free-solid-svg-icons';
 import {AbstractControl, FormControl, FormGroup, Validators} from '@angular/forms';
 
+import {Course} from './_domain/course';
+import {Degree} from './_domain/degree';
+import {FenixService} from './_services/fenix.service';
+import {GenerateSchedulesService} from './_services/generate-schedules.service';
+
+import {faGithub} from '@fortawesome/free-brands-svg-icons';
+import {faCommentAlt, faChevronDown, faSmileBeam, faTh, faThumbtack, faQuestion} from '@fortawesome/free-solid-svg-icons';
+
 declare let $;
+
 
 @Component({
   selector: 'app-root',
@@ -19,22 +23,22 @@ export class AppComponent implements OnInit {
   mobileView = false;
   featuresHorizontal = false;
 
-  academicYears: string[] = [];
+  academicTerms: string[] = [];
   degrees: Degree[] = [];
   courses: Course[] = [];
   selectedCourses: Course[] = [];
 
   generateForm = new FormGroup({
-    academicYear: new FormControl({value: null, disabled: true}),
+    academicTerm: new FormControl({value: null, disabled: true}),
     degree: new FormControl({value: null, disabled: true}),
     course: new FormControl({value: null, disabled: true}),
   });
 
-  get academicYearFormControl(): AbstractControl { return this.generateForm.get('academicYear'); }
+  get academicTermFormControl(): AbstractControl { return this.generateForm.get('academicTerm'); }
   get degreeFormControl(): AbstractControl { return this.generateForm.get('degree'); }
   get courseFormControl(): AbstractControl { return this.generateForm.get('course'); }
 
-  academicYearsSpinner = true;
+  academicTermsSpinner = true;
   degreesSpinner = false;
   coursesSpinner = false;
 
@@ -44,15 +48,15 @@ export class AppComponent implements OnInit {
   faChevronDown = faChevronDown;
   faSmileBeam = faSmileBeam;
   faThumbtack = faThumbtack;
-  faThLarge = faThLarge;
+  faTh = faTh;
   faQuestion = faQuestion;
 
-  constructor(private fenixService: FenixService) {
-    this.fenixService.getAcademicYears().then(academicYears => {
+  constructor(private fenixService: FenixService, private generateSchedulesService: GenerateSchedulesService) {
+    this.fenixService.getAcademicTerms().then(academicTerms => {
       // @ts-ignore
-      this.academicYears = academicYears;
-      this.academicYearFormControl.enable();
-      this.academicYearsSpinner = false;
+      this.academicTerms = academicTerms;
+      this.academicTermFormControl.enable();
+      this.academicTermsSpinner = false;
     });
   }
 
@@ -64,9 +68,9 @@ export class AppComponent implements OnInit {
     });
   }
 
-  hasAcademicYearSelected(): boolean {
+  hasAcademicTermSelected(): boolean {
     // tslint:disable-next-line:triple-equals
-    return this.academicYearFormControl.value != null;
+    return this.academicTermFormControl.value != null;
   }
 
   hasDegreeSelected(): boolean {
@@ -79,9 +83,9 @@ export class AppComponent implements OnInit {
     return this.courseFormControl.value != null;
   }
 
-  loadDegrees(academicYear: string): void {
+  loadDegrees(academicTerm: string): void {
     this.degreesSpinner = true;
-    this.fenixService.getDegrees(academicYear).then(degrees => {
+    this.fenixService.getDegrees(academicTerm).then(degrees => {
       // @ts-ignore
       this.degrees = degrees;
       this.degreeFormControl.enable();
@@ -89,10 +93,10 @@ export class AppComponent implements OnInit {
     });
   }
 
-  loadCourses(academicYear: string, courseId: string): void {
+  loadCourses(academicTerm: string, courseId: string): void {
     console.log('Loading courses...');
     this.coursesSpinner = true;
-    this.fenixService.getCourses(academicYear, courseId).then(courses => {
+    this.fenixService.getCourses(academicTerm, courseId).then(courses => {
       // @ts-ignore
       this.courses = courses;
       this.courseFormControl.enable();
@@ -140,6 +144,7 @@ export class AppComponent implements OnInit {
   generateSchedules(): void {
     if (this.selectedCourses.length > 0) {
       console.log('Generating...');
+      // this.generateSchedulesService().generate();
     }
   }
 

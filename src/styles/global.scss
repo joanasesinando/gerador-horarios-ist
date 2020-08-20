@@ -1,11 +1,27 @@
+/* ===================================================================
+ *
+ *   TOC:
+ *    1. Basic styles
+ *    2. Buttons
+ *    3. Checkboxes
+ *    4. Scrollbar
+ *
+ * =================================================================== */
+
 @import "fonts.css";
 @import "colors";
-@import "animation";
+@import "animations";
 
 @import "~bootstrap/scss/functions";
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/mixins";
 
+
+
+/* ===================================================================
+ *  1. Basic styles
+ *
+ * ------------------------------------------------------------------- */
 
 body {
   font-family: 'poppins-regular', sans-serif;
@@ -15,10 +31,14 @@ h3, .h3 { font-family: 'poppins-semiBold', sans-serif; }
 h5, .h5 { font-family: 'poppins-medium', sans-serif; }
 
 .text-primary { color: $gh-blue !important; }
+a { color: $gh-blue; }
 
-a {
-  color: $gh-blue;
-}
+
+
+/* ===================================================================
+ *  2. Buttons
+ *
+ * ------------------------------------------------------------------- */
 
 .btn-primary {
   background-color: $gh-blue;
@@ -40,13 +60,22 @@ a {
   &:hover, &:focus { color: $gh-blue; }
 }
 
+
+
+/* ===================================================================
+ *  3. Checkboxes
+ *
+ * ------------------------------------------------------------------- */
+
 .custom-control-input:checked~.custom-control-label::before {
   background-color: $gh-blue;
   border-color: $gh-blue;
 }
 
+
+
 /* ===================================================================
- *  Scrollbar
+ *  4. Scrollbar
  *
  * ------------------------------------------------------------------- */
 
