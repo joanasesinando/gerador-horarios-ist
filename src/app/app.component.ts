@@ -5,7 +5,6 @@ import { TranslateService } from '@ngx-translate/core';
 import {Course} from './_domain/course';
 import {Degree} from './_domain/degree';
 import {FenixService} from './_services/fenix.service';
-import {GenerateSchedulesService} from './_services/generate-schedules.service';
 
 import {faGithub} from '@fortawesome/free-brands-svg-icons';
 import {
@@ -64,7 +63,6 @@ export class AppComponent implements OnInit {
   faGlobeEurope = faGlobeEurope;
 
   constructor(private fenixService: FenixService,
-              private generateSchedulesService: GenerateSchedulesService,
               public translateService: TranslateService) {
 
     // Translation
