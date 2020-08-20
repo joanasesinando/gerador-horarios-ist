@@ -1,9 +1,10 @@
 import {Component, HostListener, OnInit} from '@angular/core';
-import {Subject} from './subjects-banner/subject';
-import {SubjectsService} from './_services/subjects.service';
+import {Course, Degree} from './_model/course';
+import {FenixService} from './_services/fenix.service';
 
 import {faGithub} from '@fortawesome/free-brands-svg-icons';
-import {faCommentAlt, faChevronDown, faSmileBeam, faThLarge, faThumbtack} from '@fortawesome/free-solid-svg-icons';
+import {faCommentAlt, faChevronDown, faSmileBeam, faThLarge, faThumbtack, faQuestion} from '@fortawesome/free-solid-svg-icons';
+import {AbstractControl, FormControl, FormGroup, Validators} from '@angular/forms';
 
 declare let $;
 
@@ -18,64 +19,128 @@ export class AppComponent implements OnInit {
   mobileView = false;
   featuresHorizontal = false;
 
-  subjects: Subject[];
-  selectedSubjects: Subject[] = [];
+  academicYears: string[] = [];
+  degrees: Degree[] = [];
+  courses: Course[] = [];
+  selectedCourses: Course[] = [];
 
+  generateForm = new FormGroup({
+    academicYear: new FormControl({value: null, disabled: true}),
+    degree: new FormControl({value: null, disabled: true}),
+    course: new FormControl({value: null, disabled: true}),
+  });
+
+  get academicYearFormControl(): AbstractControl { return this.generateForm.get('academicYear'); }
+  get degreeFormControl(): AbstractControl { return this.generateForm.get('degree'); }
+  get courseFormControl(): AbstractControl { return this.generateForm.get('course'); }
+
+  academicYearsSpinner = true;
+  degreesSpinner = false;
+  coursesSpinner = false;
+
+  // FontAwesome icons
   faGithub = faGithub;
   faCommentAlt = faCommentAlt;
   faChevronDown = faChevronDown;
   faSmileBeam = faSmileBeam;
   faThumbtack = faThumbtack;
   faThLarge = faThLarge;
+  faQuestion = faQuestion;
 
-  constructor(private subjectService: SubjectsService) {}
+  constructor(private fenixService: FenixService) {
+    this.fenixService.getAcademicYears().then(academicYears => {
+      // @ts-ignore
+      this.academicYears = academicYears;
+      this.academicYearFormControl.enable();
+      this.academicYearsSpinner = false;
+    });
+  }
 
   ngOnInit(): void {
     this.onWindowResize();
-
-    // FIXME: get subjects only after academic year and course selected
-    this.subjects = this.getSubjects('fo', 'fo');
 
     $(() => {
       $('[data-toggle="tooltip"]').tooltip();
     });
   }
 
-  getSubjects(academicYear: string, course: string): Subject[] {
-    return this.subjectService.getSubjects(academicYear, course);
+  hasAcademicYearSelected(): boolean {
+    // tslint:disable-next-line:triple-equals
+    return this.academicYearFormControl.value != null;
   }
 
-  addSubject(): void {
+  hasDegreeSelected(): boolean {
+    // tslint:disable-next-line:triple-equals
+    return this.degreeFormControl.value != null;
+  }
+
+  hasCourseSelected(): boolean {
+    // tslint:disable-next-line:triple-equals
+    return this.courseFormControl.value != null;
+  }
+
+  loadDegrees(academicYear: string): void {
+    this.degreesSpinner = true;
+    this.fenixService.getDegrees(academicYear).then(degrees => {
+      // @ts-ignore
+      this.degrees = degrees;
+      this.degreeFormControl.enable();
+      this.degreesSpinner = false;
+    });
+  }
+
+  loadCourses(academicYear: string, courseId: string): void {
+    console.log('Loading courses...');
+    this.coursesSpinner = true;
+    this.fenixService.getCourses(academicYear, courseId).then(courses => {
+      // @ts-ignore
+      this.courses = courses;
+      this.courseFormControl.enable();
+      this.coursesSpinner = false;
+      console.log('Loaded courses:');
+      console.log(courses);
+    });
+  }
+
+  addCourse(): void {
     // @ts-ignore
-    const subjIndex = document.getElementById('inputSubject').value;
+    const courseIndex = document.getElementById('inputCourse').value;
 
     // tslint:disable-next-line:triple-equals
-    if (subjIndex && subjIndex != -1) {
-      const subjToAdd = this.subjects[subjIndex];
+    if (courseIndex && courseIndex != 'null') {
+      const courseToAdd = this.courses[courseIndex];
 
       // update arrays
-      this.selectedSubjects.push(subjToAdd);
-      this.subjects.splice(subjIndex, 1);
+      this.selectedCourses.push(courseToAdd);
+      this.courses.splice(courseIndex, 1);
 
-      // remove subject from select
-      document.getElementById('subj#' + subjIndex).remove();
+      // remove course from select
+      document.getElementById('course#' + courseIndex).remove();
     }
 
-    console.log(this.selectedSubjects); // FIXME: remove
+    console.log('Selected courses:'); // FIXME: remove
+    console.log(this.selectedCourses); // FIXME: remove
   }
 
-  removeSubject(index: number): void {
-    const subjToRemove = this.selectedSubjects[index];
+  removeCourse(index: number): void {
+    const courseToRemove = this.selectedCourses[index];
 
-    this.subjects.push(subjToRemove);
-    this.subjects.sort((a, b) => a.name.localeCompare(b.name));
-    this.selectedSubjects.splice(index, 1);
+    this.courses.push(courseToRemove);
+    this.courses.sort((a, b) => a.name.localeCompare(b.name));
+    this.selectedCourses.splice(index, 1);
 
-    console.log(this.selectedSubjects); // FIXME: remove
+    console.log('Selected courses:'); // FIXME: remove
+    console.log(this.selectedCourses); // FIXME: remove
   }
 
   showScrollDown(): boolean {
     return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
+  }
+
+  generateSchedules(): void {
+    if (this.selectedCourses.length > 0) {
+      console.log('Generating...');
+    }
   }
 
   @HostListener('window:resize', [])

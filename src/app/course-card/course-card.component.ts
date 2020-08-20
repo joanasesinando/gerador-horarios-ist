@@ -3,15 +3,16 @@ import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
-  selector: 'app-subject-card',
-  templateUrl: './subject-card.component.html',
-  styleUrls: ['./subject-card.component.scss']
+  selector: 'app-course-card',
+  templateUrl: './course-card.component.html',
+  styleUrls: ['./course-card.component.scss']
 })
-export class SubjectCardComponent implements OnInit {
+export class CourseCardComponent implements OnInit {
 
   @Input() index: number;
   @Input() name: string;
-  @Input() classesTypes: string[];
+  @Input() acronym: string;
+  @Input() types: string[];
 
   @Output() removeBtn = new EventEmitter<number>();
 

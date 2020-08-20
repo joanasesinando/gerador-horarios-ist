@@ -1,12 +1,12 @@
 <div class="card mt-3">
   <div class="card-body pr-5">
 
-    <!-- Subject Name -->
-    <h5 class="card-title subject-name mt-2">{{name}}</h5>
+    <!-- Course Name -->
+    <h5 class="card-title course-name mt-2">{{acronym}} {{name}}</h5>
 
     <!-- Checkboxes -->
     <div class="d-flex flex-wrap">
-      <div *ngFor="let type of classesTypes; let i = index; let last = last"
+      <div *ngFor="let type of types; let i = index; let last = last"
            class="custom-control custom-checkbox mb-2" [ngClass]="{'mr-3': !last}">
         <input type="checkbox" [checked]="true" class="custom-control-input" id="checkTypeClass-{{name}}-{{i}}">
         <label class="custom-control-label" for="checkTypeClass-{{name}}-{{i}}">{{type}}</label>

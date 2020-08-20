@@ -78,6 +78,7 @@
       z-index: 5;
       &.github { background-color: $gh-darkGray; }
       &.feedback { background-color: $gh-blue; }
+      &.help { background-color: $gray-600; }
       transition: transform .15s ease-in-out;
 
       &:hover {
@@ -111,6 +112,12 @@
       padding-bottom: 3rem;
     }
   }
+}
+
+.spinner-border {
+  position: absolute;
+  top: 61%;
+  left: -1.5rem;
 }
 
 .btn-about {

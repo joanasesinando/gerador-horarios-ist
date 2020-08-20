@@ -1,8 +1,0 @@
-<div id="selected-subjects">
-  <app-subject-card *ngFor="let subj of subjects; let i = index"
-                    [index]="i"
-                    [name]="subj.name"
-                    [classesTypes]="subj.classesTypes"
-                    (removeBtn)="removeBtnClicked($event)">
-  </app-subject-card>
-</div>

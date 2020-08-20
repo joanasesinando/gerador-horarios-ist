@@ -14,6 +14,8 @@ body {
 h3, .h3 { font-family: 'poppins-semiBold', sans-serif; }
 h5, .h5 { font-family: 'poppins-medium', sans-serif; }
 
+.text-primary { color: $gh-blue !important; }
+
 a {
   color: $gh-blue;
 }
@@ -26,6 +28,11 @@ a {
     background-color: darken($gh-blue, 10);
     border-color: darken($gh-blue, 10);
   }
+}
+
+.btn-primary.disabled, .btn-primary:disabled {
+  background-color: $gh-blue;
+  border-color: $gh-blue;
 }
 
 .btn-outline-primary {

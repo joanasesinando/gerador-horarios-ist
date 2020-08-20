@@ -1,15 +1,15 @@
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 
-import {Subject} from './subject';
+import {Course} from '../_model/course';
 
 @Component({
-  selector: 'app-subjects-banner',
-  templateUrl: './subjects-banner.component.html',
-  styleUrls: ['./subjects-banner.component.scss']
+  selector: 'app-course-banner',
+  templateUrl: './courses-banner.component.html',
+  styleUrls: ['./courses-banner.component.scss']
 })
-export class SubjectsBannerComponent implements OnInit {
+export class CoursesBannerComponent implements OnInit {
 
-  @Input() subjects: Subject[];
+  @Input() courses: Course[];
 
   @Output() removeBtn = new EventEmitter<number>();
 
