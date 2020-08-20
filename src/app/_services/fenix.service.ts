@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
 
 import {Course, Type} from '../_domain/course';
 import {Degree} from '../_domain/degree';
@@ -9,13 +10,10 @@ import {Degree} from '../_domain/degree';
 })
 export class FenixService {
 
-  constructor() { }
+  // FIXME: take server out
+  url = 'https://cors-anywhere.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/';
 
-  private static httpGet(url: string): Promise<Response> {
-    return fetch(url, {
-      method: 'GET'
-    });
-  }
+  constructor(public translateService: TranslateService) { }
 
   /* ------------------------------------------------------------
    * Returns true if academicTerm is bigger or equal to 2003/2004
@@ -31,19 +29,23 @@ export class FenixService {
   /* ------------------------------------------------------------
    * Formats the type of class to one that's more readable
    * ------------------------------------------------------------ */
-  private static formatType(type: string): Type | string {
+  private formatType(type: string): Type | string {
     switch (type) {
       case 'TEORICA':
-        return Type.TEORICA;
+        if (this.translateService.currentLang === 'pt-PT') { return Type.THEORY_PT; }
+        return Type.THEORY_EN;
 
       case 'LABORATORIAL':
-        return Type.LABORATORIAL;
+        if (this.translateService.currentLang === 'pt-PT') { return Type.LAB_PT; }
+        return Type.LAB_EN;
 
       case 'PROBLEMS':
-        return Type.PROBLEMAS;
+        if (this.translateService.currentLang === 'pt-PT') { return Type.PROBLEMS_PT; }
+        return Type.PROBLEMS_EN;
 
       case 'SEMINARY':
-        return Type.SEMINARY;
+        if (this.translateService.currentLang === 'pt-PT') { return Type.SEMINARY_PT; }
+        return Type.SEMINARY_EN;
 
       case 'TUTORIAL_ORIENTATION':
         return Type.TUTORIAL_ORIENTATION;
@@ -57,9 +59,18 @@ export class FenixService {
     }
   }
 
+  private getLanguage(): string {
+    return this.translateService.currentLang;
+  }
+
+  private httpGet(path: string): Promise<Response> {
+    return fetch(this.url + path, {
+      method: 'GET'
+    });
+  }
+
   getAcademicTerms(): Promise<string[]> {
-    // FIXME: take server out
-    return FenixService.httpGet('https://cors-anywhere.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/academicterms')
+    return this.httpGet('academicterms?lang=' + this.getLanguage())
       .then(r => r.json())
       .then(json => {
         return Object.keys(json).sort().reverse().filter((value) => FenixService.validAcademicTerm(value));
@@ -67,8 +78,7 @@ export class FenixService {
   }
 
   getDegrees(academicTerm: string): Promise<Degree[]> {
-    // FIXME: take server out
-    return FenixService.httpGet('https://cors-anywhere.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees?academicTerm=' + academicTerm)
+    return this.httpGet('degrees?academicTerm=' + academicTerm + '&lang=' + this.getLanguage())
       .then(r => r.json())
       .then(json => {
         const degrees: Degree[] = [];
@@ -80,8 +90,7 @@ export class FenixService {
   }
 
   getCourses(academicTerm: string, degreeId: string): Promise<Course[]> {
-    // FIXME: take server out
-    return FenixService.httpGet('https://cors-anywhere.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/degrees/' + degreeId + '/courses?academicTerm=' + academicTerm)
+    return this.httpGet('degrees/' + degreeId + '/courses?academicTerm=' + academicTerm + '&lang=' + this.getLanguage())
       .then(r => r.json())
       .then(coursesJson => {
         const courses: Course[] = [];
@@ -92,12 +101,12 @@ export class FenixService {
 
           // Get types of classes for a given course
           let types = [];
-          FenixService.httpGet('https://cors-anywhere.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/courses/' + course.id + '/schedule')
+          this.httpGet('courses/' + course.id + '/schedule' + '?lang=' + this.getLanguage())
             .then(r => r.json())
             .then(scheduleJson => {
 
               for (const cl of scheduleJson.courseLoads) {
-                const type = FenixService.formatType(cl.type);
+                const type = this.formatType(cl.type);
                 types.push(type);
               }
               types = types.reverse();

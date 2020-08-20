@@ -1,5 +1,6 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, Validators} from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 
 import {Course} from './_domain/course';
 import {Degree} from './_domain/degree';
@@ -7,7 +8,15 @@ import {FenixService} from './_services/fenix.service';
 import {GenerateSchedulesService} from './_services/generate-schedules.service';
 
 import {faGithub} from '@fortawesome/free-brands-svg-icons';
-import {faCommentAlt, faChevronDown, faSmileBeam, faTh, faThumbtack, faQuestion} from '@fortawesome/free-solid-svg-icons';
+import {
+  faCommentAlt,
+  faChevronDown,
+  faSmileBeam,
+  faTh,
+  faThumbtack,
+  faQuestion,
+  faGlobeEurope
+} from '@fortawesome/free-solid-svg-icons';
 
 declare let $;
 
@@ -52,8 +61,34 @@ export class AppComponent implements OnInit {
   faThumbtack = faThumbtack;
   faTh = faTh;
   faQuestion = faQuestion;
+  faGlobeEurope = faGlobeEurope;
 
-  constructor(private fenixService: FenixService, private generateSchedulesService: GenerateSchedulesService) {
+  constructor(private fenixService: FenixService,
+              private generateSchedulesService: GenerateSchedulesService,
+              public translateService: TranslateService) {
+
+    // Translation
+    translateService.addLangs(['pt-PT', 'en-GB']);
+    translateService.setDefaultLang('pt-PT');
+    const browserLang = translateService.getBrowserLang();
+    translateService.use(browserLang.match(/pt-PT|en-GB/) ? browserLang : 'pt-PT');
+
+    // Widgets translation subscription
+    this.translateService.stream('sidebar.widgets.repo').subscribe(value => {
+      const widget = $('#widget-github');
+      widget.attr('title', value);
+      widget.tooltip('dispose');
+      widget.tooltip();
+    });
+
+    this.translateService.stream('sidebar.widgets.help').subscribe(value => {
+      const widget = $('#widget-help');
+      widget.attr('title', value);
+      widget.tooltip('dispose');
+      widget.tooltip();
+    });
+
+    // Get terms
     this.fenixService.getAcademicTerms().then(academicTerms => {
       // @ts-ignore
       this.academicTerms = academicTerms;
@@ -64,10 +99,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.onWindowResize();
-
-    $(() => {
-      $('[data-toggle="tooltip"]').tooltip();
-    });
+    $('[data-toggle="tooltip"]').tooltip();
   }
 
   hasAcademicTermSelected(): boolean {
@@ -83,6 +115,10 @@ export class AppComponent implements OnInit {
   hasCourseSelected(): boolean {
     // tslint:disable-next-line:triple-equals
     return this.courseFormControl.value != null;
+  }
+
+  lowercase(s: string): string {
+    return s.toLowerCase();
   }
 
   loadDegrees(academicTerm: string): void {

@@ -1,0 +1,32 @@
+{
+  "sidebar": {
+    "header": "Gera todos os horários possíveis e escolhe o melhor",
+    "features": {
+      "f1": "Fácil de usar",
+      "f2": "Horários compactos",
+      "f3": "Slots de aulas fixas"
+    },
+    "widgets": {
+      "repo": "Repositório",
+      "help": "Ajuda"
+    }
+  },
+
+  "main-content": {
+    "about": "Sobre",
+    "headers": {
+      "pick-courses": "Escolher cadeiras",
+      "selected-courses": "Cadeiras selecionadas"
+    },
+    "labels": {
+      "term": "Ano letivo",
+      "degree": "Curso",
+      "course": "Cadeira",
+      "placeholder": "Escolher"
+    },
+    "add-btn": "Adicionar",
+    "generate-btn": "Gerar Horários",
+    "no-course-selected": "Nenhuma cadeira selecionada",
+    "no-more-courses": "Não existem mais cadeiras"
+  }
+}

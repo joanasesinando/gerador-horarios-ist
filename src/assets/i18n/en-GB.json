@@ -1,0 +1,32 @@
+{
+  "sidebar": {
+    "header": "Generate all possible schedules and pick the best one",
+    "features": {
+      "f1": "Easy to use",
+      "f2": "Compact schedules",
+      "f3": "Pinned courses"
+    },
+    "widgets": {
+      "repo": "Repository",
+      "help": "Help"
+    }
+  },
+
+  "main-content": {
+    "about": "About",
+    "headers": {
+      "pick-courses": "Pick courses",
+      "selected-courses": "Selected courses"
+    },
+    "labels": {
+      "term": "Academic term",
+      "degree": "Degree",
+      "course": "Course",
+      "placeholder": "Select"
+    },
+    "add-btn": "Add",
+    "generate-btn": "Generate Schedules",
+    "no-course-selected": "No course selected",
+    "no-more-courses": "No more courses available"
+  }
+}

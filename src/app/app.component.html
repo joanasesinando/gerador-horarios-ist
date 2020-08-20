@@ -7,23 +7,23 @@
       <img class="logo" src="assets/imgs/logo.svg" alt="logo">
 
       <div class="sidebar-text text-white d-flex flex-column align-items-center">
-        <h4 class="text-center px-4">Gera todos os horários possíveis e escolhe o melhor</h4>
+        <h4 class="text-center px-4">{{'sidebar.header' | translate}}</h4>
 
         <!-- Features Horizontal -->
         <div *ngIf="featuresHorizontal" class="features features-horizontal d-flex justify-content-center mt-4">
           <div class="item d-flex flex-column align-items-center text-dark text-center p-3 mr-3 mb-3 shadow">
             <fa-icon [icon]="faSmileBeam" class="fa-lg mb-2"></fa-icon>
-            <span>Fácil<br>de usar</span>
+            <span>{{'sidebar.features.f1' | translate}}</span>
           </div>
 
           <div class="item d-flex flex-column align-items-center text-dark text-center p-3 mr-3 mb-3 shadow">
             <fa-icon [icon]="faTh" class="fa-lg mb-2"></fa-icon>
-            <span>Horários compactos</span>
+            <span>{{'sidebar.features.f2' | translate}}</span>
           </div>
 
           <div class="item d-flex flex-column align-items-center text-dark text-center p-3 mb-3 shadow">
             <fa-icon [icon]="faThumbtack" class="fa-lg mb-2"></fa-icon>
-            <span>Slots de aulas fixas</span>
+            <span>{{'sidebar.features.f3' | translate}}</span>
           </div>
         </div>
 
@@ -31,17 +31,17 @@
         <div *ngIf="!featuresHorizontal" class="features features-vertical mt-4 px-3 w-100">
           <div class="item text-dark p-3 mb-3 shadow">
             <fa-icon [icon]="faSmileBeam" class="fa-lg mr-3"></fa-icon>
-            <span>Fácil de usar</span>
+            <span>{{'sidebar.features.f1' | translate}}</span>
           </div>
 
           <div class="item text-dark p-3 mb-3 shadow">
             <fa-icon [icon]="faTh" class="fa-lg mr-3"></fa-icon>
-            <span>Horários compactos</span>
+            <span>{{'sidebar.features.f2' | translate}}</span>
           </div>
 
           <div class="item text-dark p-3 mb-3 shadow">
             <fa-icon [icon]="faThumbtack" class="fa-lg mr-3"></fa-icon>
-            <span>Slots de aulas fixas</span>
+            <span>{{'sidebar.features.f3' | translate}}</span>
           </div>
         </div>
       </div>
@@ -53,9 +53,9 @@
 
       <!-- Widgets -->
       <div class="widgets d-flex">
-        <a class="icon-wrapper github mr-2"
+        <a class="icon-wrapper github mr-2" id="widget-github"
            href="https://github.com/joanasesinando/gerador-horarios-ist"
-           data-toggle="tooltip" data-placement="top" title="Repositório">
+           data-toggle="tooltip" data-placement="top">
           <fa-icon [icon]="faGithub" class="fa-md"></fa-icon>
         </a>
 
@@ -65,34 +65,49 @@
           <fa-icon [icon]="faCommentAlt" class="fa-md"></fa-icon>
         </a>
 
-        <a class="icon-wrapper help"
+        <a class="icon-wrapper help" id="widget-help"
            href=""
-           data-toggle="tooltip" data-placement="top" title="Ajuda">
+           data-toggle="tooltip" data-placement="top">
           <fa-icon [icon]="faQuestion" class="fa-md"></fa-icon>
         </a>
       </div>
     </div>
 
-    <!-- About (only mobile) -->
-    <button *ngIf="mobileView" class="btn btn-outline-primary btn-about"
-            data-toggle="modal" data-target="#aboutModal">Sobre</button>
-
     <!-- Main Content -->
     <div class="main-content col-md-8">
 
-      <!-- About -->
-      <a *ngIf="!mobileView" class="btn btn-outline-primary btn-about"
-              data-toggle="modal" data-target="#aboutModal">Sobre</a>
-
-      <div class="content d-flex">
+      <div class="content d-flex mt-5 mt-sm-0">
 
         <div class="container">
+
+          <div class="links d-flex align-items-center">
+            <!-- About -->
+            <a class="btn btn-outline-primary btn-about mr-2"
+               data-toggle="modal" data-target="#aboutModal">{{'main-content.about' | translate}}</a>
+
+            <!-- Language -->
+            <div class="btn-lang">
+              <fa-icon [icon]="faGlobeEurope" class="fa-lg dropdown-toggle" type="button" data-toggle="dropdown"></fa-icon>
+              <div class="dropdown-menu">
+                <a class="dropdown-item d-flex align-items-center" (click)="translateService.use('pt-PT')">
+                  <img class="mr-2" src="assets/imgs/pt.svg" alt="portuguese">
+                  PT
+                </a>
+
+                <a class="dropdown-item d-flex align-items-center" (click)="translateService.use('en-GB')">
+                  <img class="mr-2" src="assets/imgs/en.svg" alt="english">
+                  EN
+                </a>
+              </div>
+            </div>
+          </div>
+
           <div class="row">
 
             <div class="col-md-10 col-lg-9 mx-auto">
 
               <!-- Pick courses -->
-              <h3 class="pick-courses-heading mb-4">Escolher cadeiras</h3>
+              <h3 class="pick-courses-heading mb-4">{{'main-content.headers.pick-courses' | translate}}</h3>
 
               <form id="generateForm" class="mb-5" [formGroup]="generateForm">
                 <div class="d-lg-flex align-items-center justify-content-between mb-3">
@@ -100,10 +115,10 @@
                   <!-- Academic Term -->
                   <div class="position-relative w-100 mr-lg-3 mb-4 mb-lg-2">
                     <div class="form-label-group">
-                      <label for="inputAcademicTerm">Ano letivo</label>
+                      <label for="inputAcademicTerm">{{'main-content.labels.term' | translate}}</label>
                       <select class="custom-select" id="inputAcademicTerm" autofocus formControlName="academicTerm"
                               (change)="loadDegrees($event.target.value)">
-                        <option disabled selected value="null">Escolher ano letivo...</option>
+                        <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{lowercase('main-content.labels.term' | translate)}}...</option>
                         <option *ngFor="let term of academicTerms" value="{{term}}">{{term}}</option>
                       </select>
                     </div>
@@ -115,10 +130,10 @@
                   <!-- Degree -->
                   <div class="position-relative w-100 ml-lg-3 mb-4 mb-lg-2">
                     <div class="form-label-group">
-                      <label for="inputDegree">Curso</label>
+                      <label for="inputDegree">{{'main-content.labels.degree' | translate}}</label>
                       <select class="custom-select" id="inputDegree" formControlName="degree"
                               (change)="loadCourses(academicTermFormControl.value, $event.target.value)">
-                        <option disabled selected value="null">Escolher curso...</option>
+                        <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{lowercase('main-content.labels.degree' | translate)}}...</option>
                         <option *ngFor="let degree of degrees" value="{{degree.id}}">{{degree.acronym}} - {{degree.name}}</option>
                       </select>
                     </div>
@@ -130,35 +145,35 @@
 
                 <!-- Course -->
                 <div class="position-relative">
-                  <label for="inputCourse">Cadeira</label>
+                  <label for="inputCourse">{{'main-content.labels.course' | translate}}</label>
                   <div class="input-group w-100">
                     <select class="custom-select" id="inputCourse" formControlName="course">
-                      <option disabled selected value="null">Escolher cadeira...</option>
+                      <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{lowercase('main-content.labels.course' | translate)}}...</option>
                       <option *ngFor="let course of courses; let i = index" id="course#{{i}}" value="{{i}}">[{{course.acronym}}] {{course.name}}</option>
                     </select>
                     <div class="input-group-append">
                       <button class="btn btn-primary" type="button"
                               [disabled]="hasAcademicTermSelected() && hasDegreeSelected() && courses.length === 0 && !coursesSpinner"
-                              (click)="addCourse()">Adicionar</button>
+                              (click)="addCourse()">{{'main-content.add-btn' | translate}}</button>
                     </div>
                   </div>
                   <div *ngIf="coursesSpinner" class="spinner-border spinner-border-sm text-primary" role="status">
                     <span class="sr-only">Loading...</span>
                   </div>
                   <p *ngIf="hasAcademicTermSelected() && hasDegreeSelected() && courses.length === 0 && !coursesSpinner"
-                     class="text-danger"><small>Não existem mais cadeiras</small></p>
+                     class="text-danger"><small>{{'main-content.no-more-courses' | translate}}</small></p>
                 </div>
               </form>
 
               <!-- Selected courses -->
-              <h3 class="pick-courses-heading mb-4">Cadeiras selecionadas</h3>
-              <p *ngIf="selectedCourses.length === 0"><em>Nenhuma cadeira selecionada</em></p>
+              <h3 class="pick-courses-heading mb-4">{{'main-content.headers.selected-courses' | translate}}</h3>
+              <p *ngIf="selectedCourses.length === 0"><em>{{'main-content.no-course-selected' | translate}}</em></p>
               <app-course-banner [courses]="selectedCourses" (removeBtn)="removeCourse($event)"></app-course-banner>
 
               <!-- Generate btn -->
               <button *ngIf="selectedCourses.length !== 0"
                       class="btn btn-lg btn-primary btn-block btn-generate mt-5"
-                      type="submit" form="generateForm" (click)="generateSchedules()">Gerar Horários</button>
+                      type="submit" form="generateForm" (click)="generateSchedules()">{{'main-content.generate-btn' | translate}}</button>
 
             </div>
           </div>
