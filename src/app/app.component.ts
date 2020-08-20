@@ -26,7 +26,9 @@ export class AppComponent implements OnInit {
   academicTerms: string[] = [];
   degrees: Degree[] = [];
   courses: Course[] = [];
+
   selectedCourses: Course[] = [];
+  selectedCoursesIds = new Map();
 
   generateForm = new FormGroup({
     academicTerm: new FormControl({value: null, disabled: true}),
@@ -98,7 +100,7 @@ export class AppComponent implements OnInit {
     this.coursesSpinner = true;
     this.fenixService.getCourses(academicTerm, courseId).then(courses => {
       // @ts-ignore
-      this.courses = courses;
+      this.courses = courses.filter((value) => !this.selectedCoursesIds.has(value.id));
       this.courseFormControl.enable();
       this.coursesSpinner = false;
       console.log('Loaded courses:');
@@ -116,6 +118,7 @@ export class AppComponent implements OnInit {
 
       // update arrays
       this.selectedCourses.push(courseToAdd);
+      this.selectedCoursesIds.set(courseToAdd.id, true);
       this.courses.splice(courseIndex, 1);
 
       // remove course from select
@@ -132,6 +135,7 @@ export class AppComponent implements OnInit {
     this.courses.push(courseToRemove);
     this.courses.sort((a, b) => a.name.localeCompare(b.name));
     this.selectedCourses.splice(index, 1);
+    this.selectedCoursesIds.delete(courseToRemove.id);
 
     console.log('Selected courses:'); // FIXME: remove
     console.log(this.selectedCourses); // FIXME: remove
