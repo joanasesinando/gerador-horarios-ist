@@ -1,5 +1,5 @@
 import {Component, HostListener, OnInit} from '@angular/core';
-import {AbstractControl, FormControl, FormGroup, Validators} from '@angular/forms';
+import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 
 import {Course} from './_domain/course';
@@ -88,7 +88,6 @@ export class AppComponent implements OnInit {
 
     // Get terms
     this.fenixService.getAcademicTerms().then(academicTerms => {
-      // @ts-ignore
       this.academicTerms = academicTerms;
       this.academicTermFormControl.enable();
       this.academicTermsSpinner = false;
@@ -110,6 +109,7 @@ export class AppComponent implements OnInit {
     return this.degreeFormControl.value != null;
   }
 
+
   hasCourseSelected(): boolean {
     // tslint:disable-next-line:triple-equals
     return this.courseFormControl.value != null;
@@ -122,10 +122,10 @@ export class AppComponent implements OnInit {
   loadDegrees(academicTerm: string): void {
     this.degreesSpinner = true;
     this.fenixService.getDegrees(academicTerm).then(degrees => {
-      // @ts-ignore
       this.degrees = degrees;
       this.degreeFormControl.enable();
       this.degreesSpinner = false;
+      console.log(this.degrees);
     });
   }
 
@@ -133,7 +133,6 @@ export class AppComponent implements OnInit {
     console.log('Loading courses...');
     this.coursesSpinner = true;
     this.fenixService.getCourses(academicTerm, courseId).then(courses => {
-      // @ts-ignore
       this.courses = courses.filter((value) => !this.selectedCoursesIds.has(value.id));
       this.courseFormControl.enable();
       this.coursesSpinner = false;
@@ -149,6 +148,7 @@ export class AppComponent implements OnInit {
     // tslint:disable-next-line:triple-equals
     if (courseIndex && courseIndex != 'null') {
       const courseToAdd = this.courses[courseIndex];
+      console.log(courseToAdd);
 
       // update arrays
       this.selectedCourses.push(courseToAdd);
@@ -167,7 +167,7 @@ export class AppComponent implements OnInit {
     const courseToRemove = this.selectedCourses[index];
 
     this.courses.push(courseToRemove);
-    this.courses.sort((a, b) => a.name.localeCompare(b.name));
+    this.courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
     this.selectedCourses.splice(index, 1);
     this.selectedCoursesIds.delete(courseToRemove.id);
 

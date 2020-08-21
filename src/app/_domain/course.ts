@@ -12,8 +12,16 @@ export enum Type {
 }
 
 export class Course {
-  // tslint:disable-next-line:variable-name
-  constructor(public _id: number, public _name: string, public _acronym: string, public _types: Type[]) {}
+  // tslint:disable:variable-name
+  constructor(
+    public _id: number,
+    public _name: string,
+    public _acronym: string,
+    public _types: Type[],
+    public _campus: string[],
+    public _shifts: Shift[]
+    // TODO: feriados na primeira semana
+  ) {}
 
   get id(): number { return this._id; }
   set id(value: number) { this._id = value; }
@@ -26,4 +34,38 @@ export class Course {
 
   get types(): Type[] { return this._types; }
   set types(value: Type[]) { this._types = value; }
+
+  get campus(): string[] { return this._campus; }
+  set campus(value: string[]) { this._campus = value; }
+}
+
+export class Shift {
+  // tslint:disable:variable-name
+  constructor(public _name: string, public _types: Type[], public _lessons: Lesson[]) {}
+
+  get name(): string { return this._name; }
+  set name(value: string) { this._name = value; }
+
+  get types(): Type[] { return this._types; }
+  set types(value: Type[]) { this._types = value; }
+
+  get lessons(): Lesson[] { return this._lessons; }
+  set lessons(value: Lesson[]) { this._lessons = value; }
+}
+
+export class Lesson {
+  // tslint:disable:variable-name
+  constructor(public _start: Date, public _end: Date, public _room: string, public _campus: string) {}
+
+  get start(): Date { return this._start; }
+  set start(value: Date) { this._start = value; }
+
+  get end(): Date { return this._end; }
+  set end(value: Date) { this._end = value; }
+
+  get room(): string { return this._room; }
+  set room(value: string) { this._room = value; }
+
+  get campus(): string { return this._campus; }
+  set campus(value: string) { this._campus = value; }
 }

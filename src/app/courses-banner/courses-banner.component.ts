@@ -1,5 +1,4 @@
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
-
 import {Course} from '../_domain/course';
 
 @Component({
