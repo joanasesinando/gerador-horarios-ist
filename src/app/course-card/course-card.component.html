@@ -8,7 +8,7 @@
     <div *ngIf="course.campus && course.campus.length >= 2" class="d-flex flex-wrap">
       <div *ngFor="let campus of course.campus; let i = index; let first = first; let last = last"
            class="custom-control custom-radio mb-2" [ngClass]="{'mr-3': !last}">
-        <input type="radio" name="campusRadio" class="custom-control-input" id="radioCampus-{{course.name}}-{{i}}">
+        <input type="radio" [checked]="first" name="campusRadio" class="custom-control-input" id="radioCampus-{{course.name}}-{{i}}">
         <label class="custom-control-label" for="radioCampus-{{course.name}}-{{i}}">{{campus}}</label>
       </div>
     </div>
