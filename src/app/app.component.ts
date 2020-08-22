@@ -102,24 +102,16 @@ export class AppComponent implements OnInit {
     $('[data-toggle="tooltip"]').tooltip();
   }
 
-  hasAcademicTermSelected(): boolean {
-    // tslint:disable-next-line:triple-equals
-    return this.academicTermFormControl.value != null;
-  }
-
-  hasDegreeSelected(): boolean {
-    // tslint:disable-next-line:triple-equals
-    return this.degreeFormControl.value != null;
-  }
-
-
-  hasCourseSelected(): boolean {
-    // tslint:disable-next-line:triple-equals
-    return this.courseFormControl.value != null;
-  }
+  hasAcademicTermSelected(): boolean { return this.academicTermFormControl.value != null; }
+  hasDegreeSelected(): boolean { return this.degreeFormControl.value != null; }
+  hasCourseSelected(): boolean { return this.courseFormControl.value != null; }
 
   lowercase(s: string): string {
     return s.toLowerCase();
+  }
+
+  showScrollDown(): boolean {
+    return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
   }
 
   loadDegrees(): void {
@@ -146,7 +138,6 @@ export class AppComponent implements OnInit {
   }
 
   addCourse(): void {
-    // @ts-ignore
     const courseIndex = $('#inputCourse').val();
 
     if (courseIndex && courseIndex !== 'null') {
@@ -155,16 +146,7 @@ export class AppComponent implements OnInit {
       let courseToAdd = this.courses[courseIndex];
 
       if (courseToAdd.hasFullInfo()) {
-        // Update arrays
-        this.selectedCourses.unshift(courseToAdd);
-        this.selectedCoursesIDs.set(courseToAdd.id, true);
-        this.courses.splice(courseIndex, 1);
-
-        // Remove course from select
-        $('#' + courseToAdd.id).remove();
-
-        addBtn.attr('disabled', false);
-        this.logger.log('selected courses', this.selectedCourses);
+        this.addCourseHelper(courseToAdd, courseIndex, addBtn);
 
       } else {
         // Load rest of info
@@ -172,20 +154,23 @@ export class AppComponent implements OnInit {
         this.fenixService.loadMissingCourseInfo(courseToAdd).then(course => {
           courseToAdd = course;
           this.spinners.course = false;
-
-          // Update arrays
-          this.selectedCourses.unshift(courseToAdd);
-          this.selectedCoursesIDs.set(courseToAdd.id, true);
-          this.courses.splice(courseIndex, 1);
-
-          // Remove course from select
-          $('#' + courseToAdd.id).remove();
-
-          addBtn.attr('disabled', false);
-          this.logger.log('selected courses', this.selectedCourses);
+          this.addCourseHelper(courseToAdd, courseIndex, addBtn);
         });
       }
     }
+  }
+
+  addCourseHelper(course, index, addBtn): void {
+    // Update arrays
+    this.selectedCourses.unshift(course);
+    this.selectedCoursesIDs.set(course.id, true);
+    this.courses.splice(index, 1);
+
+    // Remove course from select
+    $('#' + course.id).remove();
+
+    addBtn.attr('disabled', false);
+    this.logger.log('selected courses', this.selectedCourses);
   }
 
   removeCourse(index: number): void {
@@ -197,10 +182,6 @@ export class AppComponent implements OnInit {
     this.selectedCoursesIDs.delete(courseToRemove.id);
 
     this.logger.log('selected courses', this.selectedCourses);
-  }
-
-  showScrollDown(): boolean {
-    return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
   }
 
   generateSchedules(): void {
