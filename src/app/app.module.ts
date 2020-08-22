@@ -14,7 +14,7 @@ import { AboutModalComponent } from './about-modal/about-modal.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 export function HttpLoaderFactory(httpClient: HttpClient): TranslateHttpLoader {
-  return new TranslateHttpLoader(httpClient);
+  return new TranslateHttpLoader(httpClient, './assets/i18n/');
 }
 
 @NgModule({
