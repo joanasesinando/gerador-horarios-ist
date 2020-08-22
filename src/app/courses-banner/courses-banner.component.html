@@ -1,9 +1,7 @@
 <div id="selected-courses">
   <app-course-card *ngFor="let course of courses; let i = index"
                    [index]="i"
-                   [name]="course.name"
-                   [acronym]="course.acronym"
-                   [types]="course.types"
+                   [course]="course"
                    (removeBtn)="removeBtnClicked($event)">
   </app-course-card>
 </div>

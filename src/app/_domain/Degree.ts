@@ -1,5 +1,4 @@
 export class Degree {
-  // tslint:disable-next-line:variable-name
   constructor(public _id: number, public _name: string, public _acronym: string) {}
 
   get id(): number { return this._id; }
