@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
-import {Course} from '../_domain/course';
+import {Course} from '../_domain/Course';
 
 @Component({
   selector: 'app-course-banner',

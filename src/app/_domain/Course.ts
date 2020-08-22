@@ -12,14 +12,13 @@ export enum Type {
 }
 
 export class Course {
-  // tslint:disable:variable-name
   constructor(
     public _id: number,
     public _name: string,
     public _acronym: string,
-    public _types: Type[],
-    public _campus: string[],
-    public _shifts: Shift[]
+    public _types?: Type[],
+    public _campus?: string[],
+    public _shifts?: Shift[]
     // TODO: feriados na primeira semana
   ) {}
 
@@ -37,10 +36,16 @@ export class Course {
 
   get campus(): string[] { return this._campus; }
   set campus(value: string[]) { this._campus = value; }
+
+  get shifts(): Shift[] { return this._shifts; }
+  set shifts(value: Shift[]) { this._shifts = value; }
+
+  hasFullInfo(): boolean {
+    return this.types !== undefined || this.campus !== undefined || this.shifts !== undefined;
+  }
 }
 
 export class Shift {
-  // tslint:disable:variable-name
   constructor(public _name: string, public _types: Type[], public _lessons: Lesson[]) {}
 
   get name(): string { return this._name; }
@@ -54,7 +59,6 @@ export class Shift {
 }
 
 export class Lesson {
-  // tslint:disable:variable-name
   constructor(public _start: Date, public _end: Date, public _room: string, public _campus: string) {}
 
   get start(): Date { return this._start; }

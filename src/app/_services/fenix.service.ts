@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
-import {Course, Type, Shift, Lesson} from '../_domain/course';
-import {Degree} from '../_domain/degree';
+import {Course, Type, Shift, Lesson} from '../_domain/Course';
+import {Degree} from '../_domain/Degree';
 
 
 @Injectable({
@@ -15,12 +15,11 @@ export class FenixService {
 
   constructor(public translateService: TranslateService) { }
 
-  /* ------------------------------------------------------------
-   * Returns true if academicTerm is bigger or equal to 2003/2004
-   * and is not the next term. Otherwise, return false.
-   * (Reason being that there's not enough info on degrees/courses
-   * to generate schedules otherwise.
-   * ------------------------------------------------------------ */
+  /* ----------------------------------------------------------------------------
+   * Returns true if academicTerm is bigger or equal to 2003/2004 and is not the
+   * next term. Otherwise, return false.
+   * (There's not enough info on degrees/courses to generate schedules otherwise.
+   * ---------------------------------------------------------------------------- */
   private static validAcademicTerm(academicTerm: string): boolean {
     let currentTerm = new Date().getFullYear();
     return academicTerm >= '2003/2004' && academicTerm !== ++currentTerm + '/' + ++currentTerm;
@@ -43,36 +42,35 @@ export class FenixService {
     const firstLesson = new Lesson(
       new Date(lessons[0].start),
       new Date(lessons[0].end),
-      lessons[0].room.name,
-      lessons[0].room.topLevelSpace.name
+      lessons[0].room ? lessons[0].room.name : null,
+      lessons[0].room ? lessons[0].room.topLevelSpace.name : null
     );
     shiftLessons.push(firstLesson);
 
     // Find others on same week
+    // NOTE: always first week
     for (const shiftLesson of lessons.slice(1)) {
       if (FenixService.isSameWeek(firstLesson.start, new Date(shiftLesson.start))) {
-        shiftLessons.push(
-          new Lesson(
-            new Date(shiftLesson.start),
-            new Date(shiftLesson.end),
-            shiftLesson.room.name,
-            shiftLesson.room.topLevelSpace.name)
-        );
+        const lesson = new Lesson(new Date(shiftLesson.start),
+                            new Date(shiftLesson.end),
+                          shiftLesson.room ? shiftLesson.room.name : null,
+                            shiftLesson.room ? shiftLesson.room.topLevelSpace.name : null);
+
+        shiftLessons.push(lesson);
       }
     }
+
     return shiftLessons;
   }
 
-  private static getCourseCampus(shifts: Shift[]): string[] {
-    const campus = [];
+  private static getCourseCampi(shifts: Shift[]): string[] {
+    const campi: string[] = [];
     for (const shift of shifts) {
       for (const lesson of shift.lessons) {
-        if (!campus.includes(lesson.campus)) {
-          campus.push(lesson.campus);
-        }
+        if (!campi.includes(lesson.campus)) { campi.push(lesson.campus); }
       }
     }
-    return campus;
+    return campi;
   }
 
   /* ------------------------------------------------------------
@@ -129,59 +127,61 @@ export class FenixService {
   getDegrees(academicTerm: string): Promise<Degree[]> {
     return this.httpGet('degrees?academicTerm=' + academicTerm + '&lang=' + this.getLanguage())
       .then(r => r.json())
-      .then(json => {
+      .then(degreesJson => {
         const degrees: Degree[] = [];
-        for (const j of json) {
-          degrees.push(new Degree(j.id, j.name, j.acronym));
+        for (const degree of degreesJson) {
+          degrees.push(new Degree(degree.id, degree.name, degree.acronym));
         }
         return degrees.sort((a, b) => a.acronym.localeCompare(b.acronym));
       });
   }
 
-  getCourses(academicTerm: string, degreeId: string): Promise<Course[]> {
+  getCoursesBasicInfo(academicTerm: string, degreeId: string): Promise<Course[]> {
     return this.httpGet('degrees/' + degreeId + '/courses?academicTerm=' + academicTerm + '&lang=' + this.getLanguage())
       .then(r => r.json())
-      .then(async coursesJson => {
+      .then(coursesJson => {
         const courses: Course[] = [];
 
         for (const course of coursesJson) {
           // Remove optional courses (example acronym: O32)
-          if (course.acronym[0] === 'O' && course.acronym[1] >= '0'  && course.acronym[1] <= '9') { continue; }
+          if (course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9') { continue; }
 
-          let types = [];
-          const shifts = [];
-
-          console.log('Processing course...');
-          console.log(course);
-
-          await this.httpGet('courses/' + course.id + '/schedule' + '?lang=' + this.getLanguage())
-            .then(r => r.json())
-            .then(scheduleJson => {
-              console.log('Processing types...');
-
-              // Get types
-              types = this.getTypesOfCourse(scheduleJson.courseLoads);
-
-              // Get shifts
-              for (const sh of scheduleJson.shifts) {
-
-                // Get shift types
-                const shiftTypes = this.getShiftTypes(sh.types);
-
-                // Get shift lessons
-                const shiftLessons = FenixService.getShiftLessons(sh.lessons);
-
-                shifts.push(new Shift(sh.name, shiftTypes, shiftLessons));
-              }
-            });
-          courses.push(new Course(course.id, course.name, course.acronym, types, FenixService.getCourseCampus(shifts), shifts));
+          courses.push(new Course(course.id, course.name, course.acronym));
         }
 
         return courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
       });
   }
 
-  private getTypesOfCourse(courseLoads): Type[] {
+  loadMissingCourseInfo(course: Course): Promise<Course> {
+    return this.httpGet('courses/' + course.id + '/schedule' + '?lang=' + this.getLanguage())
+      .then(r => r.json())
+      .then(scheduleJson => {
+
+        // Get types
+        const types: Type[] = this.getCourseTypes(scheduleJson.courseLoads);
+
+        // Get shifts
+        const shifts: Shift[] = [];
+        for (const shift of scheduleJson.shifts) {
+
+          // Get shift types
+          const shiftTypes = this.getShiftTypes(shift.types);
+
+          // Get shift lessons
+          const shiftLessons = FenixService.getShiftLessons(shift.lessons);
+
+          shifts.push(new Shift(shift.name, shiftTypes, shiftLessons));
+        }
+
+        // Get campi
+        const campi: string[] = FenixService.getCourseCampi(shifts);
+
+        return new Course(course.id, course.name, course.acronym, types, campi, shifts);
+      });
+  }
+
+  private getCourseTypes(courseLoads): Type[] {
     const types = [];
     for (const cl of courseLoads) {
       const type = this.formatType(cl.type);

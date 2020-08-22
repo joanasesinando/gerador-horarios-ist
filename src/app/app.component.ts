@@ -2,8 +2,9 @@ import {Component, HostListener, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 
-import {Course} from './_domain/course';
-import {Degree} from './_domain/degree';
+import {LoggerService} from './_util/logger.service';
+import {Course} from './_domain/Course';
+import {Degree} from './_domain/Degree';
 import {FenixService} from './_services/fenix.service';
 
 import {faGithub} from '@fortawesome/free-brands-svg-icons';
@@ -36,7 +37,7 @@ export class AppComponent implements OnInit {
   courses: Course[] = [];
 
   selectedCourses: Course[] = [];
-  selectedCoursesIds = new Map();
+  selectedCoursesIDs = new Map();
 
   generateForm = new FormGroup({
     academicTerm: new FormControl({value: null, disabled: true}),
@@ -48,9 +49,11 @@ export class AppComponent implements OnInit {
   get degreeFormControl(): AbstractControl { return this.generateForm.get('degree'); }
   get courseFormControl(): AbstractControl { return this.generateForm.get('course'); }
 
-  academicTermsSpinner = true;
-  degreesSpinner = false;
-  coursesSpinner = false;
+  spinners = {
+    academicTerm: true,
+    degree: false,
+    course: false
+  };
 
   // FontAwesome icons
   faGithub = faGithub;
@@ -62,8 +65,7 @@ export class AppComponent implements OnInit {
   faQuestion = faQuestion;
   faGlobeEurope = faGlobeEurope;
 
-  constructor(private fenixService: FenixService,
-              public translateService: TranslateService) {
+  constructor(private logger: LoggerService, private fenixService: FenixService, public translateService: TranslateService) {
 
     // Translation
     translateService.addLangs(['pt-PT', 'en-GB']);
@@ -86,11 +88,12 @@ export class AppComponent implements OnInit {
       widget.tooltip();
     });
 
-    // Get terms
+    // Get academic terms
     this.fenixService.getAcademicTerms().then(academicTerms => {
       this.academicTerms = academicTerms;
       this.academicTermFormControl.enable();
-      this.academicTermsSpinner = false;
+      this.spinners.academicTerm = false;
+      logger.log('academic terms', this.academicTerms);
     });
   }
 
@@ -119,48 +122,70 @@ export class AppComponent implements OnInit {
     return s.toLowerCase();
   }
 
-  loadDegrees(academicTerm: string): void {
-    this.degreesSpinner = true;
+  loadDegrees(): void {
+    const academicTerm = $('#inputAcademicTerm').val();
+    this.spinners.degree = true;
     this.fenixService.getDegrees(academicTerm).then(degrees => {
       this.degrees = degrees;
       this.degreeFormControl.enable();
-      this.degreesSpinner = false;
-      console.log(this.degrees);
+      this.spinners.degree = false;
+      this.logger.log('degrees', this.degrees);
     });
   }
 
-  loadCourses(academicTerm: string, courseId: string): void {
-    console.log('Loading courses...');
-    this.coursesSpinner = true;
-    this.fenixService.getCourses(academicTerm, courseId).then(courses => {
-      this.courses = courses.filter((value) => !this.selectedCoursesIds.has(value.id));
+  loadCoursesBasicInfo(): void {
+    const academicTerm = $('#inputAcademicTerm').val();
+    const courseId = $('#inputDegree').val();
+    this.spinners.course = true;
+    this.fenixService.getCoursesBasicInfo(academicTerm, courseId).then(courses => {
+      this.courses = courses.filter((course) => !this.selectedCoursesIDs.has(course.id));
       this.courseFormControl.enable();
-      this.coursesSpinner = false;
-      console.log('Loaded courses:');
-      console.log(courses);
+      this.spinners.course = false;
+      this.logger.log('courses', this.courses);
     });
   }
 
   addCourse(): void {
     // @ts-ignore
-    const courseIndex = document.getElementById('inputCourse').value;
+    const courseIndex = $('#inputCourse').val();
 
-    // tslint:disable-next-line:triple-equals
-    if (courseIndex && courseIndex != 'null') {
-      const courseToAdd = this.courses[courseIndex];
-      console.log(courseToAdd);
+    if (courseIndex && courseIndex !== 'null') {
+      const addBtn = $('#addBtn');
+      addBtn.attr('disabled', true);
+      let courseToAdd = this.courses[courseIndex];
 
-      // update arrays
-      this.selectedCourses.push(courseToAdd);
-      this.selectedCoursesIds.set(courseToAdd.id, true);
-      this.courses.splice(courseIndex, 1);
+      if (courseToAdd.hasFullInfo()) {
+        // Update arrays
+        this.selectedCourses.unshift(courseToAdd);
+        this.selectedCoursesIDs.set(courseToAdd.id, true);
+        this.courses.splice(courseIndex, 1);
 
-      // remove course from select
-      document.getElementById('course#' + courseIndex).remove();
+        // Remove course from select
+        $('#' + courseToAdd.id).remove();
+
+        addBtn.attr('disabled', false);
+        this.logger.log('selected courses', this.selectedCourses);
+
+      } else {
+        // Load rest of info
+        this.spinners.course = true;
+        this.fenixService.loadMissingCourseInfo(courseToAdd).then(course => {
+          courseToAdd = course;
+          this.spinners.course = false;
+
+          // Update arrays
+          this.selectedCourses.unshift(courseToAdd);
+          this.selectedCoursesIDs.set(courseToAdd.id, true);
+          this.courses.splice(courseIndex, 1);
+
+          // Remove course from select
+          $('#' + courseToAdd.id).remove();
+
+          addBtn.attr('disabled', false);
+          this.logger.log('selected courses', this.selectedCourses);
+        });
+      }
     }
-
-    console.log('Selected courses:'); // FIXME: remove
-    console.log(this.selectedCourses); // FIXME: remove
   }
 
   removeCourse(index: number): void {
@@ -169,10 +194,9 @@ export class AppComponent implements OnInit {
     this.courses.push(courseToRemove);
     this.courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
     this.selectedCourses.splice(index, 1);
-    this.selectedCoursesIds.delete(courseToRemove.id);
+    this.selectedCoursesIDs.delete(courseToRemove.id);
 
-    console.log('Selected courses:'); // FIXME: remove
-    console.log(this.selectedCourses); // FIXME: remove
+    this.logger.log('selected courses', this.selectedCourses);
   }
 
   showScrollDown(): boolean {
