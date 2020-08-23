@@ -95,7 +95,12 @@ export class AppComponent implements OnInit {
     });
 
     // Get academic terms
-    this.loadAcademicterms();
+    this.fenixService.getAcademicTerms().then(academicTerms => {
+      this.academicTerms = academicTerms;
+      this.academicTermFormControl.enable();
+      this.spinners.academicTerm = false;
+      this.logger.log('academic terms', this.academicTerms);
+    });
   }
 
   ngOnInit(): void {
@@ -115,69 +120,37 @@ export class AppComponent implements OnInit {
     return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
   }
 
-  loadAcademicterms(): void {
-    this.firebaseService.hasCollection('academicTerms').then(has => {
-      if (has) {
-        this.logger.log('has academic terms saved');
-        this.firebaseService.getCollectionFromDatabase('academicTerms').then(collection => {
-          for (const item of collection) {
-            this.academicTerms.push(item.academicTerm as string);
-          }
-          this.academicTerms.reverse();
-          this.academicTermFormControl.enable();
-          this.spinners.academicTerm = false;
-          this.logger.log('academic terms', this.academicTerms);
-        });
-
-      } else {
-        this.logger.log('no academic terms found');
-        this.fenixService.getAcademicTerms().then(academicTerms => {
-          this.academicTerms = academicTerms;
-          this.academicTermFormControl.enable();
-          this.spinners.academicTerm = false;
-          this.logger.log('academic terms', this.academicTerms);
-
-          // Load to database
-          const error = {found: false, type: null};
-          for (const academicTerm of this.academicTerms) {
-            this.firebaseService.loadDocToDatabase('academicTerms', academicTerm.replace('/', '-'), {academicTerm})
-              .catch((err) => { error.found = true; error.type = err; });
-          }
-          error.found ? this.logger.log('error saving academic terms:', error.type) : this.logger.log('academic terms successfully saved');
-        });
-      }
-    });
-  }
-
   loadDegrees(): void {
     const academicTerm = $('#inputAcademicTerm').val();
     this.spinners.degree = true;
-    // this.firebaseService.hasDegrees(academicTerm).then(has => {
-    //   if (has) {
-    //     this.logger.log('has degrees saved');
-    //     this.firebaseService.getAllDegrees(academicTerm).subscribe(res => {
-    //       this.degrees = [];
-    //       res.forEach(degree => this.degrees.push(new Degree(degree._id, degree._name, degree._acronym)));
-    //       this.degreeFormControl.enable();
-    //       this.spinners.degree = false;
-    //       this.logger.log('degrees', this.degrees);
-    //     });
-    //
-    //   } else {
-    //     this.logger.log('no degrees found');
-    //     this.fenixService.getDegrees(academicTerm).then(degrees => {
-    //       this.degrees = degrees;
-    //       this.degreeFormControl.enable();
-    //       this.spinners.degree = false;
-    //       this.logger.log('degrees', this.degrees);
-    //
-    //       // Load to database
-    //       for (const degree of this.degrees) {
-    //         this.firebaseService.createDegree(academicTerm, degree);
-    //       }
-    //     });
-    //   }
-    // });
+    this.firebaseService.hasDegreesForAcademicTerm(academicTerm).then(has => {
+      if (has) {
+        this.logger.log('has degrees saved');
+        this.firebaseService.getDegreesFromDatabase(academicTerm).then(degrees => {
+          this.degrees = degrees.sort((a, b) => a.acronym.localeCompare(b.acronym));
+          this.degreeFormControl.enable();
+          this.spinners.degree = false;
+          this.logger.log('degrees', this.degrees);
+        });
+
+      } else {
+        this.logger.log('no degrees found');
+        this.fenixService.getDegrees(academicTerm).then(degrees => {
+          this.degrees = degrees;
+          this.degreeFormControl.enable();
+          this.spinners.degree = false;
+          this.logger.log('degrees', this.degrees);
+
+          // Load to database
+          const error = {found: false, type: null};
+          for (const degree of this.degrees) {
+            this.firebaseService.loadDegreeToDatabase(academicTerm, degree)
+              .catch((err) => { error.found = true; error.type = err; });
+          }
+          error.found ? this.logger.log('error saving degrees:', error.type) : this.logger.log('degrees successfully saved');
+        });
+      }
+    });
   }
 
   loadCoursesBasicInfo(): void {

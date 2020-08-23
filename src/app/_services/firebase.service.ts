@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import {AngularFirestore} from '@angular/fire/firestore';
 import {LoggerService} from '../_util/logger.service';
+import {Degree} from '../_domain/Degree';
 
 @Injectable({
   providedIn: 'root'
@@ -19,21 +20,28 @@ export class FirebaseService {
     });
   }
 
+  hasDocument(collection: string, document: string): Promise<boolean> {
+    return this.db.collection(collection).doc(document).get().then(doc => {
+      return doc.exists;
+    });
+  }
+
+  hasDegreesForAcademicTerm(academicTerm: string): Promise<boolean> {
+    return this.hasCollection(academicTerm.replace('/', '-'));
+  }
+
   loadDocToDatabase(collection: string, document: string | number, data: any): Promise<any> {
     return this.db.collection(collection).doc(document).set(data);
   }
 
-  getDocFromDatabase(collection: string, document: string | number): Promise<any> {
-    const ref = this.db.collection(collection).doc(document);
-    return ref.get()
-      .then(doc => {
-        if (doc.exists) {
-          return doc.data();
+  loadDegreeToDatabase(academicTerm: string, degree: Degree): Promise<any> {
+    return this.db.collection(academicTerm.replace('/', '-')).doc(degree.id)
+      .withConverter(degree.degreeConverter)
+      .set(new Degree(degree.id, degree.name, degree.acronym));
+  }
 
-        } else {
-          this.logger.log('No such document saved:', document);
-        }
-      }).catch(err => this.logger.log('Error getting document:', err));
+  getDegreesFromDatabase(academicTerm: string): Promise<any> {
+    return this.getCollectionFromDatabase(academicTerm.replace('/', '-'));
   }
 
   getCollectionFromDatabase(collection: string): Promise<any> {
