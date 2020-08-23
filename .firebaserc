@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "gerador-horarios-ist": {
+      "hosting": {
+        "gerador-horarios-ist": [
+          "gerador-horarios-ist"
+        ]
+      }
+    }
+  }
+}

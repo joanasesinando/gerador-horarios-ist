@@ -12,6 +12,9 @@ import { CoursesBannerComponent } from './courses-banner/courses-banner.componen
 import { AboutModalComponent } from './about-modal/about-modal.component';
 
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {AngularFireModule} from '@angular/fire';
+import {AngularFirestoreModule} from '@angular/fire/firestore';
+import {environment} from '../environments/environment';
 
 export function HttpLoaderFactory(httpClient: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(httpClient, './assets/i18n/');
@@ -36,7 +39,10 @@ export function HttpLoaderFactory(httpClient: HttpClient): TranslateHttpLoader {
         useFactory: HttpLoaderFactory,
         deps: [HttpClient]
       }
-    })
+    }),
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule,
+
   ],
   providers: [],
   bootstrap: [AppComponent]

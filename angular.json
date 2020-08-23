@@ -23,6 +23,13 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "aot": true,
+            "allowedCommonJsDependencies": [
+              "firebase/app",
+              "@firebase/app",
+              "@firebase/firestore",
+              "@firebase/component",
+              "@firebase/util"
+            ],
             "assets": [
               "src/favicon",
               "src/assets"
@@ -125,8 +132,13 @@
               "devServerTarget": "gerador-horarios-ist:serve:production"
             }
           }
+        },
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {}
         }
       }
-    }},
+    }
+  },
   "defaultProject": "gerador-horarios-ist"
 }

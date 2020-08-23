@@ -5,7 +5,9 @@ import { TranslateService } from '@ngx-translate/core';
 import {LoggerService} from './_util/logger.service';
 import {Course} from './_domain/Course';
 import {Degree} from './_domain/Degree';
+
 import {FenixService} from './_services/fenix.service';
+import {FirebaseService} from './_services/firebase.service';
 
 import {faGithub} from '@fortawesome/free-brands-svg-icons';
 import {
@@ -65,7 +67,11 @@ export class AppComponent implements OnInit {
   faQuestion = faQuestion;
   faGlobeEurope = faGlobeEurope;
 
-  constructor(private logger: LoggerService, private fenixService: FenixService, public translateService: TranslateService) {
+  constructor(
+    private logger: LoggerService,
+    private fenixService: FenixService,
+    public translateService: TranslateService,
+    public firebaseService: FirebaseService) {
 
     // Translation
     translateService.addLangs(['pt-PT', 'en-GB']);
@@ -89,12 +95,7 @@ export class AppComponent implements OnInit {
     });
 
     // Get academic terms
-    this.fenixService.getAcademicTerms().then(academicTerms => {
-      this.academicTerms = academicTerms;
-      this.academicTermFormControl.enable();
-      this.spinners.academicTerm = false;
-      logger.log('academic terms', this.academicTerms);
-    });
+    this.loadAcademicterms();
   }
 
   ngOnInit(): void {
@@ -114,15 +115,69 @@ export class AppComponent implements OnInit {
     return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
   }
 
+  loadAcademicterms(): void {
+    this.firebaseService.hasCollection('academicTerms').then(has => {
+      if (has) {
+        this.logger.log('has academic terms saved');
+        this.firebaseService.getCollectionFromDatabase('academicTerms').then(collection => {
+          for (const item of collection) {
+            this.academicTerms.push(item.academicTerm as string);
+          }
+          this.academicTerms.reverse();
+          this.academicTermFormControl.enable();
+          this.spinners.academicTerm = false;
+          this.logger.log('academic terms', this.academicTerms);
+        });
+
+      } else {
+        this.logger.log('no academic terms found');
+        this.fenixService.getAcademicTerms().then(academicTerms => {
+          this.academicTerms = academicTerms;
+          this.academicTermFormControl.enable();
+          this.spinners.academicTerm = false;
+          this.logger.log('academic terms', this.academicTerms);
+
+          // Load to database
+          const error = {found: false, type: null};
+          for (const academicTerm of this.academicTerms) {
+            this.firebaseService.loadDocToDatabase('academicTerms', academicTerm.replace('/', '-'), {academicTerm})
+              .catch((err) => { error.found = true; error.type = err; });
+          }
+          error.found ? this.logger.log('error saving academic terms:', error.type) : this.logger.log('academic terms successfully saved');
+        });
+      }
+    });
+  }
+
   loadDegrees(): void {
     const academicTerm = $('#inputAcademicTerm').val();
     this.spinners.degree = true;
-    this.fenixService.getDegrees(academicTerm).then(degrees => {
-      this.degrees = degrees;
-      this.degreeFormControl.enable();
-      this.spinners.degree = false;
-      this.logger.log('degrees', this.degrees);
-    });
+    // this.firebaseService.hasDegrees(academicTerm).then(has => {
+    //   if (has) {
+    //     this.logger.log('has degrees saved');
+    //     this.firebaseService.getAllDegrees(academicTerm).subscribe(res => {
+    //       this.degrees = [];
+    //       res.forEach(degree => this.degrees.push(new Degree(degree._id, degree._name, degree._acronym)));
+    //       this.degreeFormControl.enable();
+    //       this.spinners.degree = false;
+    //       this.logger.log('degrees', this.degrees);
+    //     });
+    //
+    //   } else {
+    //     this.logger.log('no degrees found');
+    //     this.fenixService.getDegrees(academicTerm).then(degrees => {
+    //       this.degrees = degrees;
+    //       this.degreeFormControl.enable();
+    //       this.spinners.degree = false;
+    //       this.logger.log('degrees', this.degrees);
+    //
+    //       // Load to database
+    //       for (const degree of this.degrees) {
+    //         this.firebaseService.createDegree(academicTerm, degree);
+    //       }
+    //     });
+    //   }
+    // });
   }
 
   loadCoursesBasicInfo(): void {
@@ -149,6 +204,7 @@ export class AppComponent implements OnInit {
         this.addCourseHelper(courseToAdd, courseIndex, addBtn);
 
       } else {
+
         // Load rest of info
         this.spinners.course = true;
         this.fenixService.loadMissingCourseInfo(courseToAdd).then(course => {
