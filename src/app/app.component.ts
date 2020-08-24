@@ -123,10 +123,10 @@ export class AppComponent implements OnInit {
   loadDegrees(): void {
     const academicTerm = $('#inputAcademicTerm').val();
     this.spinners.degree = true;
-    this.firebaseService.hasDegreesForAcademicTerm(academicTerm).then(has => {
+    this.firebaseService.hasDegrees(academicTerm).then(has => {
       if (has) {
         this.logger.log('has degrees saved');
-        this.firebaseService.getDegreesFromDatabase(academicTerm).then(degrees => {
+        this.firebaseService.getDegrees(academicTerm).then(degrees => {
           this.degrees = degrees.sort((a, b) => a.acronym.localeCompare(b.acronym));
           this.degreeFormControl.enable();
           this.spinners.degree = false;
@@ -144,7 +144,7 @@ export class AppComponent implements OnInit {
           // Load to database
           const error = {found: false, type: null};
           for (const degree of this.degrees) {
-            this.firebaseService.loadDegreeToDatabase(academicTerm, degree)
+            this.firebaseService.loadDegree(academicTerm, degree)
               .catch((err) => { error.found = true; error.type = err; });
           }
           error.found ? this.logger.log('error saving degrees:', error.type) : this.logger.log('degrees successfully saved');
@@ -155,13 +155,36 @@ export class AppComponent implements OnInit {
 
   loadCoursesBasicInfo(): void {
     const academicTerm = $('#inputAcademicTerm').val();
-    const courseId = $('#inputDegree').val();
+    const degreeId = $('#inputDegree').val();
     this.spinners.course = true;
-    this.fenixService.getCoursesBasicInfo(academicTerm, courseId).then(courses => {
-      this.courses = courses.filter((course) => !this.selectedCoursesIDs.has(course.id));
-      this.courseFormControl.enable();
-      this.spinners.course = false;
-      this.logger.log('courses', this.courses);
+    this.firebaseService.hasCourses(academicTerm, degreeId).then(has => {
+      if (has) {
+        this.logger.log('has courses');
+        this.firebaseService.getCoursesBasicInfo(academicTerm, degreeId).then(courses => {
+          this.courses = courses
+            .sort((a, b) => a.acronym.localeCompare(b.acronym))
+            .filter((course) => !this.selectedCoursesIDs.has(course.id));
+          this.courseFormControl.enable();
+          this.spinners.course = false;
+          this.logger.log('courses', this.courses);
+        });
+      } else {
+        this.logger.log('no courses found');
+        this.fenixService.getCoursesBasicInfo(academicTerm, degreeId).then(courses => {
+          this.courses = courses.filter((course) => !this.selectedCoursesIDs.has(course.id));
+          this.courseFormControl.enable();
+          this.spinners.course = false;
+          this.logger.log('courses', this.courses);
+
+          // Load to database
+          const error = {found: false, type: null};
+          for (const course of this.courses) {
+            this.firebaseService.loadCoursesBasicInfo(academicTerm, degreeId, course)
+              .catch((err) => { error.found = true; error.type = err; });
+          }
+          error.found ? this.logger.log('error saving courses:', error.type) : this.logger.log('courses successfully saved');
+        });
+      }
     });
   }
 

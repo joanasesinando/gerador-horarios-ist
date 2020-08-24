@@ -22,6 +22,31 @@ export class Course {
     // TODO: feriados na primeira semana
   ) {}
 
+  // Firestore data converter
+  courseConverterBasicInfo = {
+    toFirestore: (course: Course) => {
+      return {
+        id: course.id,
+        name: course.name,
+        acronym: course.acronym
+      };
+    },
+    fromFirestore: (snapshot, options) => {
+      const data = snapshot.data(options);
+      return new Course(data.id, data.name, data.acronym);
+    }
+  };
+
+  // Firestore data converter
+  typeConverter(): string[] {
+    const types: string[] = [];
+    console.log(this.types);
+    for (const type of this.types) {
+      types.push(type);
+    }
+    return types;
+  }
+
   get id(): number { return this._id; }
   set id(value: number) { this._id = value; }
 

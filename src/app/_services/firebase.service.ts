@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import {AngularFirestore} from '@angular/fire/firestore';
 import {LoggerService} from '../_util/logger.service';
 import {Degree} from '../_domain/Degree';
+import {Course} from '../_domain/Course';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +15,13 @@ export class FirebaseService {
     this.db = angularFireStore.firestore;
   }
 
-  hasCollection(collection: string): Promise<boolean> {
-    return this.db.collection(collection).get().then((querySnapshot) => {
+  hasCollection(collection: string, document?: number, subCollection?: string): Promise<boolean> {
+    if (document && subCollection) {
+      return this.db.collection(collection).doc(document).collection(subCollection).get().then(querySnapshot => {
+        return !querySnapshot.empty;
+      });
+    }
+    return this.db.collection(collection).get().then(querySnapshot => {
       return !querySnapshot.empty;
     });
   }
@@ -26,26 +32,48 @@ export class FirebaseService {
     });
   }
 
-  hasDegreesForAcademicTerm(academicTerm: string): Promise<boolean> {
+  hasDegrees(academicTerm: string): Promise<boolean> {
     return this.hasCollection(academicTerm.replace('/', '-'));
   }
 
-  loadDocToDatabase(collection: string, document: string | number, data: any): Promise<any> {
-    return this.db.collection(collection).doc(document).set(data);
+  hasCourses(academicTerm: string, degreeID: number): Promise<boolean> {
+    return this.hasCollection(academicTerm.replace('/', '-'), degreeID, 'courses');
   }
 
-  loadDegreeToDatabase(academicTerm: string, degree: Degree): Promise<any> {
-    return this.db.collection(academicTerm.replace('/', '-')).doc(degree.id)
-      .withConverter(degree.degreeConverter)
-      .set(new Degree(degree.id, degree.name, degree.acronym));
+  loadDocument(collection: string, document: number, data: any, converter: any, subCollection?: string, subDocument?: number): Promise<any> {
+    if (subCollection && subDocument) {
+       return this.db.collection(collection).doc(document).collection(subCollection).doc(subDocument)
+         .withConverter(converter)
+         .set(data);
+    }
+    return this.db.collection(collection).doc(document).withConverter(converter).set(data);
   }
 
-  getDegreesFromDatabase(academicTerm: string): Promise<any> {
-    return this.getCollectionFromDatabase(academicTerm.replace('/', '-'));
+  loadDegree(academicTerm: string, degree: Degree): Promise<any> {
+    return this.loadDocument(
+      academicTerm.replace('/', '-'),
+      degree.id,
+      new Degree(degree.id, degree.name, degree.acronym),
+      degree.degreeConverter);
   }
 
-  getCollectionFromDatabase(collection: string): Promise<any> {
-    const ref = this.db.collection(collection);
+  loadCoursesBasicInfo(academicTerm: string, degreeID: number, course: Course): Promise<any> {
+    return this.loadDocument(
+      academicTerm.replace('/', '-'),
+      degreeID,
+      new Course(course.id, course.name, course.acronym),
+      course.courseConverterBasicInfo,
+      'courses',
+      course.id);
+  }
+
+  getCollection(collection: string, document?: number, subCollection?: string): Promise<any> {
+    let ref;
+    if (document && subCollection) {
+      ref = this.db.collection(collection).doc(document).collection(subCollection);
+    } else {
+      ref = this.db.collection(collection);
+    }
     return ref.get()
       .then(querySnapshot => {
         if (!querySnapshot.empty) {
@@ -59,5 +87,13 @@ export class FirebaseService {
           this.logger.log('Collection is empty:', collection);
         }
       }).catch(err => this.logger.log('Error getting collection:', err));
+  }
+
+  getDegrees(academicTerm: string): Promise<any> {
+    return this.getCollection(academicTerm.replace('/', '-'));
+  }
+
+  getCoursesBasicInfo(academicTerm: string, degreeID: number): Promise<any> {
+    return this.getCollection(academicTerm.replace('/', '-'), degreeID, 'courses');
   }
 }
