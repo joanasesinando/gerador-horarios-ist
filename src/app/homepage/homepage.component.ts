@@ -1,5 +1,6 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 
 import {LoggerService} from '../_util/logger.service';
@@ -70,7 +71,8 @@ export class HomepageComponent implements OnInit {
     private logger: LoggerService,
     private fenixService: FenixService,
     public translateService: TranslateService,
-    public firebaseService: FirebaseService) {
+    public firebaseService: FirebaseService,
+    private router: Router) {
 
     // Translation
     translateService.addLangs(['pt-PT', 'en-GB']);
@@ -252,8 +254,7 @@ export class HomepageComponent implements OnInit {
 
   generateSchedules(): void {
     if (this.selectedCourses.length > 0) {
-      console.log('Generating...');
-      // this.generateSchedulesService().generate();
+      this.router.navigate(['/generate-schedules'], {state: {data: this.selectedCourses}});
     }
   }
 
