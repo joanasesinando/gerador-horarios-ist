@@ -234,14 +234,21 @@ export class AppComponent implements OnInit {
   }
 
   removeCourse(index: number): void {
+    const academicTerm = $('#inputAcademicTerm').val();
+    const degreeId = $('#inputDegree').val();
     const courseToRemove = this.selectedCourses[index];
 
-    this.courses.push(courseToRemove);
-    this.courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
-    this.selectedCourses.splice(index, 1);
-    this.selectedCoursesIDs.delete(courseToRemove.id);
+    this.firebaseService.hasDocument(academicTerm.replace('/', '-'), degreeId, 'courses', courseToRemove.id).then(has => {
+      // Add back to select if same degree
+      if (has) {
+        this.courses.push(courseToRemove);
+        this.courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
+      }
 
-    this.logger.log('selected courses', this.selectedCourses);
+      this.selectedCourses.splice(index, 1);
+      this.selectedCoursesIDs.delete(courseToRemove.id);
+      this.logger.log('selected courses', this.selectedCourses);
+    });
   }
 
   generateSchedules(): void {

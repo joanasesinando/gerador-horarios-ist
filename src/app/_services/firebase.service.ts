@@ -26,8 +26,14 @@ export class FirebaseService {
     });
   }
 
-  hasDocument(collection: string, document: string): Promise<boolean> {
-    return this.db.collection(collection).doc(document).get().then(doc => {
+  hasDocument(collection: string, document: string, subCollection?: string, subDocument?: number): Promise<boolean> {
+    let ref;
+    if (subCollection && subDocument) {
+      ref = this.db.collection(collection).doc(document).collection(subCollection).doc(subDocument);
+    } else {
+      ref = this.db.collection(collection).doc(document);
+    }
+    return ref.get().then(doc => {
       return doc.exists;
     });
   }
