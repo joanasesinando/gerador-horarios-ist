@@ -25,6 +25,22 @@ export class FenixService {
     return academicTerm >= '2003/2004' && academicTerm !== ++currentTerm + '/' + ++currentTerm;
   }
 
+  private static hasTotalHoursPerWeek(hoursPerWeek: {}, lessons: Lesson[], shiftType: string): boolean {
+    const MILLISECONDS_IN_AN_HOUR = 60 * 60 * 1000;
+    let totalHoursPerWeek = 0;
+    for (const lesson of lessons) {
+      console.log('ADD: ' + Math.abs(lesson.end.getTime() - lesson.start.getTime()) / MILLISECONDS_IN_AN_HOUR);
+      totalHoursPerWeek += Math.abs(lesson.end.getTime() - lesson.start.getTime()) / MILLISECONDS_IN_AN_HOUR;
+    }
+    console.log('TOTAL: ' + totalHoursPerWeek);
+    console.log('BASE: ' + hoursPerWeek[shiftType]);
+    return totalHoursPerWeek === hoursPerWeek[shiftType];
+  }
+
+  private static isSameLesson(lesson1: Lesson, lesson2: Lesson): boolean {
+    return new Date(lesson1.start).getTime() === new Date(lesson2.start).getTime();
+  }
+
   private static isSameWeek(date1: Date, date2: Date): boolean {
     const MILLISECONDS_IN_A_WEEK = 604800000;
     const minDate = date1 < date2 ? date1 : date2;
@@ -35,29 +51,54 @@ export class FenixService {
     return !(maxDate.getTime() - minDate.getTime() >= MILLISECONDS_IN_A_WEEK || minDayOfWeek > maxDayOfWeek);
   }
 
-  private static getShiftLessons(lessons): Lesson[] {
-    const shiftLessons: Lesson[] = [];
+  /* --------------------------------------------------------------------------------
+   * Returns lessons for a given shift.
+   * --------------------------------------------------------------------------------
+   * [Algorithm]
+   *  - get hours/week of all types of lessons
+   *  - build lessons for 1st week
+   *  - if lessons are NOT according to total nr. hours/week, then repeat with
+   *    next week until it is
+   * (this strategy covers cases where there are days off in the 1st week of classes
+   * -------------------------------------------------------------------------------- */
+  private static getShiftLessons(courseLoads, lessons, shiftType): Lesson[] {
+    const hoursPerWeek = {};
+    let shiftLessons: Lesson[] = [];
+    let weekIndex = 0;
 
-    // Add first lesson
-    const firstLesson = new Lesson(
-      new Date(lessons[0].start),
-      new Date(lessons[0].end),
-      lessons[0].room ? lessons[0].room.name : null,
-      lessons[0].room ? lessons[0].room.topLevelSpace.name : null
-    );
-    shiftLessons.push(firstLesson);
+    // Get hours/week of lessons
+    for (const cl of courseLoads) {
+      hoursPerWeek[cl.type] = parseFloat(cl.unitQuantity);
+    }
 
-    // Find others on same week
-    // NOTE: always first week
-    for (const shiftLesson of lessons.slice(1)) {
-      if (FenixService.isSameWeek(firstLesson.start, new Date(shiftLesson.start))) {
-        const lesson = new Lesson(new Date(shiftLesson.start),
-                            new Date(shiftLesson.end),
-                          shiftLesson.room ? shiftLesson.room.name : null,
-                            shiftLesson.room ? shiftLesson.room.topLevelSpace.name : null);
+    while (shiftLessons.length === 0 || !this.hasTotalHoursPerWeek(hoursPerWeek, shiftLessons, shiftType[0])) {
+      console.log('Building...');
+      console.log('weekIndex: ' + weekIndex);
 
-        shiftLessons.push(lesson);
+      shiftLessons = [];
+
+      // Add lesson to compare to
+      const baseLesson = new Lesson(
+        new Date(lessons[weekIndex].start),
+        new Date(lessons[weekIndex].end),
+        lessons[weekIndex].room ? lessons[weekIndex].room.name : null,
+        lessons[weekIndex].room ? lessons[weekIndex].room.topLevelSpace.name : null
+      );
+      shiftLessons.push(baseLesson);
+
+      // Find others on same week
+      for (const shiftLesson of lessons) {
+        if (!this.isSameLesson(baseLesson, shiftLesson) && FenixService.isSameWeek(baseLesson.start, new Date(shiftLesson.start))) {
+          const lesson = new Lesson(new Date(shiftLesson.start),
+            new Date(shiftLesson.end),
+            shiftLesson.room ? shiftLesson.room.name : null,
+            shiftLesson.room ? shiftLesson.room.topLevelSpace.name : null);
+
+          shiftLessons.push(lesson);
+        }
       }
+
+      weekIndex++;
     }
 
     return shiftLessons;
@@ -67,7 +108,7 @@ export class FenixService {
     const campi: string[] = [];
     for (const shift of shifts) {
       for (const lesson of shift.lessons) {
-        if (!campi.includes(lesson.campus)) { campi.push(lesson.campus); }
+        if (!campi.includes(lesson.campus) && lesson.campus) { campi.push(lesson.campus); }
       }
     }
     return campi;
@@ -169,7 +210,7 @@ export class FenixService {
           const shiftTypes = this.getShiftTypes(shift.types);
 
           // Get shift lessons
-          const shiftLessons = FenixService.getShiftLessons(shift.lessons);
+          const shiftLessons = FenixService.getShiftLessons(scheduleJson.courseLoads, shift.lessons, shift.types);
 
           shifts.push(new Shift(shift.name, shiftTypes, shiftLessons));
         }
