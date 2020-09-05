@@ -159,8 +159,8 @@ export class AppComponent implements OnInit {
     this.spinners.course = true;
     this.firebaseService.hasCourses(academicTerm, degreeId).then(has => {
       if (has) {
-        this.logger.log('has courses');
-        this.firebaseService.getCoursesBasicInfo(academicTerm, degreeId).then(courses => {
+        this.logger.log('has courses saved');
+        this.firebaseService.getCourses(academicTerm, degreeId).then(courses => {
           this.courses = courses
             .sort((a, b) => a.acronym.localeCompare(b.acronym))
             .filter((course) => !this.selectedCoursesIDs.has(course.id));
@@ -179,7 +179,7 @@ export class AppComponent implements OnInit {
           // Load to database
           const error = {found: false, type: null};
           for (const course of this.courses) {
-            this.firebaseService.loadCoursesBasicInfo(academicTerm, degreeId, course)
+            this.firebaseService.loadCourse(academicTerm, degreeId, course)
               .catch((err) => { error.found = true; error.type = err; });
           }
           error.found ? this.logger.log('error saving courses:', error.type) : this.logger.log('courses successfully saved');
@@ -207,6 +207,14 @@ export class AppComponent implements OnInit {
           courseToAdd = course;
           this.spinners.course = false;
           this.addCourseHelper(courseToAdd, courseIndex, addBtn);
+
+          // Load to database
+          const error = {found: false, type: null};
+          const academicTerm = $('#inputAcademicTerm').val();
+          const degreeId = $('#inputDegree').val();
+          this.firebaseService.updateCourse(academicTerm, degreeId, courseToAdd)
+            .catch((err) => { error.found = true; error.type = err; });
+          error.found ? this.logger.log('error saving courses:', error.type) : this.logger.log('course successfully updated');
         });
       }
     }

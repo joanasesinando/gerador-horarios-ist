@@ -80,9 +80,9 @@ a { color: $gh-blue; }
  *
  * ------------------------------------------------------------------- */
 
-.dropdown-item.active,
-.dropdown-item:active {
-  background-color: $gh-blue;
+.dropdown-item:focus,
+.dropdown-item:hover {
+  background-color: #e6e8e9;
 }
 
 
