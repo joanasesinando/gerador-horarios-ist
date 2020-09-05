@@ -15,7 +15,7 @@
     </div>
 
     <!-- Types of classes -->
-    <div *ngIf="course.types"class="d-flex flex-wrap">
+    <div *ngIf="course.types" class="d-flex flex-wrap">
       <div *ngFor="let type of course.types; let i = index; let last = last"
            class="custom-control custom-checkbox mb-2" [ngClass]="{'mr-3': !last}">
         <input type="checkbox" [checked]="true" class="custom-control-input" id="checkTypeClass-{{course.name}}-{{i}}">

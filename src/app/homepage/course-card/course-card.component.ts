@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import {Course} from '../_domain/Course';
+import {Course} from '../../_domain/Course';
 
 @Component({
   selector: 'app-course-card',
