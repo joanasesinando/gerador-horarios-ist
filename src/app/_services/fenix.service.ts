@@ -29,11 +29,8 @@ export class FenixService {
     const MILLISECONDS_IN_AN_HOUR = 60 * 60 * 1000;
     let totalHoursPerWeek = 0;
     for (const lesson of lessons) {
-      console.log('ADD: ' + Math.abs(lesson.end.getTime() - lesson.start.getTime()) / MILLISECONDS_IN_AN_HOUR);
       totalHoursPerWeek += Math.abs(lesson.end.getTime() - lesson.start.getTime()) / MILLISECONDS_IN_AN_HOUR;
     }
-    console.log('TOTAL: ' + totalHoursPerWeek);
-    console.log('BASE: ' + hoursPerWeek[shiftType]);
     return totalHoursPerWeek === hoursPerWeek[shiftType];
   }
 
@@ -72,8 +69,7 @@ export class FenixService {
     }
 
     while (shiftLessons.length === 0 || !this.hasTotalHoursPerWeek(hoursPerWeek, shiftLessons, shiftType[0])) {
-      console.log('Building...');
-      console.log('weekIndex: ' + weekIndex);
+      if (weekIndex === lessons.length) { break; }
 
       shiftLessons = [];
 
