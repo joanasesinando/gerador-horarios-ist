@@ -80,7 +80,8 @@ export class FirebaseService {
       .update({
         types: course.types,
         campus: course.campus,
-        shifts: course.convertShifts()
+        shifts: course.convertShifts(),
+        courseLoads: course.courseLoads
       });
   }
 

@@ -21,8 +21,8 @@ export class Course {
     public _acronym: string,
     public _types?: Type[],
     public _campus?: string[],
-    public _shifts?: Shift[]
-    // TODO: feriados na primeira semana
+    public _shifts?: Shift[],
+    public _courseLoads?: {}
   ) {}
 
   get id(): number { return this._id; }
@@ -42,6 +42,9 @@ export class Course {
 
   get shifts(): Shift[] { return this._shifts; }
   set shifts(value: Shift[]) { this._shifts = value; }
+
+  get courseLoads(): {}  { return this._courseLoads; }
+  set courseLoads(value: {}) { this._courseLoads = value; }
 
   hasFullInfo(): boolean {
     return this.types !== undefined || this.campus !== undefined || this.shifts !== undefined;
@@ -67,7 +70,7 @@ export const courseConverter = {
   },
   fromFirestore: (snapshot, options) => {
     const data = snapshot.data(options);
-    if (data.types && data.campus && data.shifts) {
+    if (data.types && data.campus && data.shifts && data.courseLoads) {
       const shifts: Shift[] = [];
       for (const shift of data.shifts) {
         const lessons: Lesson[] = [];
@@ -78,7 +81,7 @@ export const courseConverter = {
         }
         shifts.push(new Shift(shift.name, shift.types, lessons));
       }
-      return new Course(data.id, data.name, data.acronym, data.types, data.campus, shifts);
+      return new Course(data.id, data.name, data.acronym, data.types, data.campus, shifts, data.courseLoads);
     }
     return new Course(data.id, data.name, data.acronym);
   }

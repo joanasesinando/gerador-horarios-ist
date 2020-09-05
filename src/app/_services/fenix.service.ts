@@ -12,6 +12,7 @@ export class FenixService {
 
   // FIXME: take server out
   url = 'https://cors-anywhere.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/';
+  errorInAPI = false;
 
   constructor(public translateService: TranslateService) { }
 
@@ -23,6 +24,24 @@ export class FenixService {
   private static validAcademicTerm(academicTerm: string): boolean {
     let currentTerm = new Date().getFullYear();
     return academicTerm >= '2003/2004' && academicTerm !== ++currentTerm + '/' + ++currentTerm;
+  }
+
+  private static getCourseLoads(courseLoads): {} {
+    const loads = {};
+    for (const cl of courseLoads) {
+      loads[cl.type] = parseFloat(cl.unitQuantity);
+    }
+    return loads;
+  }
+
+  private static getCourseCampi(shifts: Shift[]): string[] {
+    const campi: string[] = [];
+    for (const shift of shifts) {
+      for (const lesson of shift.lessons) {
+        if (!campi.includes(lesson.campus) && lesson.campus) { campi.push(lesson.campus); }
+      }
+    }
+    return campi;
   }
 
   private static hasTotalHoursPerWeek(hoursPerWeek: {}, lessons: Lesson[], shiftType: string): boolean {
@@ -48,28 +67,40 @@ export class FenixService {
     return !(maxDate.getTime() - minDate.getTime() >= MILLISECONDS_IN_A_WEEK || minDayOfWeek > maxDayOfWeek);
   }
 
+  private static calculateCourseLoads(shifts: Shift[]): {} {
+    const courseLoads = {};
+    for (const shift of shifts) {
+      const type = shift.types[0];
+      if (!courseLoads[type]) {
+        const MILLISECONDS_IN_AN_HOUR = 60 * 60 * 1000;
+        let totalHours = 0;
+        for (const lesson of shift.lessons) {
+          totalHours += Math.abs(lesson.end.getTime() - lesson.start.getTime()) / MILLISECONDS_IN_AN_HOUR;
+        }
+        courseLoads[type] = totalHours;
+      }
+    }
+    return courseLoads;
+  }
+
   /* --------------------------------------------------------------------------------
    * Returns lessons for a given shift.
    * --------------------------------------------------------------------------------
    * [Algorithm]
-   *  - get hours/week of all types of lessons
    *  - build lessons for 1st week
    *  - if lessons are NOT according to total nr. hours/week, then repeat with
    *    next week until it is
    * (this strategy covers cases where there are days off in the 1st week of classes
    * -------------------------------------------------------------------------------- */
-  private static getShiftLessons(courseLoads, lessons, shiftType): Lesson[] {
-    const hoursPerWeek = {};
+  private getShiftLessons(hoursPerWeek, lessons, shiftType): Lesson[] {
     let shiftLessons: Lesson[] = [];
     let weekIndex = 0;
 
-    // Get hours/week of lessons
-    for (const cl of courseLoads) {
-      hoursPerWeek[cl.type] = parseFloat(cl.unitQuantity);
-    }
-
-    while (shiftLessons.length === 0 || !this.hasTotalHoursPerWeek(hoursPerWeek, shiftLessons, shiftType[0])) {
-      if (weekIndex === lessons.length) { break; }
+    while (shiftLessons.length === 0 || !FenixService.hasTotalHoursPerWeek(hoursPerWeek, shiftLessons, shiftType[0])) {
+      if (weekIndex === lessons.length) {
+        this.errorInAPI = true;
+        break;
+      }
 
       shiftLessons = [];
 
@@ -84,7 +115,7 @@ export class FenixService {
 
       // Find others on same week
       for (const shiftLesson of lessons) {
-        if (!this.isSameLesson(baseLesson, shiftLesson) && FenixService.isSameWeek(baseLesson.start, new Date(shiftLesson.start))) {
+        if (!FenixService.isSameLesson(baseLesson, shiftLesson) && FenixService.isSameWeek(baseLesson.start, new Date(shiftLesson.start))) {
           const lesson = new Lesson(new Date(shiftLesson.start),
             new Date(shiftLesson.end),
             shiftLesson.room ? shiftLesson.room.name : null,
@@ -98,16 +129,6 @@ export class FenixService {
     }
 
     return shiftLessons;
-  }
-
-  private static getCourseCampi(shifts: Shift[]): string[] {
-    const campi: string[] = [];
-    for (const shift of shifts) {
-      for (const lesson of shift.lessons) {
-        if (!campi.includes(lesson.campus) && lesson.campus) { campi.push(lesson.campus); }
-      }
-    }
-    return campi;
   }
 
   /* ------------------------------------------------------------
@@ -198,6 +219,9 @@ export class FenixService {
         // Get types
         const types: Type[] = this.getCourseTypes(scheduleJson.courseLoads);
 
+        // Get course loads
+        let courseLoads = FenixService.getCourseLoads(scheduleJson.courseLoads);
+
         // Get shifts
         const shifts: Shift[] = [];
         for (const shift of scheduleJson.shifts) {
@@ -206,7 +230,7 @@ export class FenixService {
           const shiftTypes = this.getShiftTypes(shift.types);
 
           // Get shift lessons
-          const shiftLessons = FenixService.getShiftLessons(scheduleJson.courseLoads, shift.lessons, shift.types);
+          const shiftLessons = this.getShiftLessons(courseLoads, shift.lessons, shift.types);
 
           shifts.push(new Shift(shift.name, shiftTypes, shiftLessons));
         }
@@ -214,7 +238,13 @@ export class FenixService {
         // Get campi
         const campi: string[] = FenixService.getCourseCampi(shifts);
 
-        return new Course(course.id, course.name, course.acronym, types, campi, shifts);
+        // Update courseLoads if inconsistencies found
+        if (this.errorInAPI) {
+          courseLoads = FenixService.calculateCourseLoads(shifts);
+          this.errorInAPI = false;
+        }
+
+        return new Course(course.id, course.name, course.acronym, types, campi, shifts, courseLoads);
       });
   }
 

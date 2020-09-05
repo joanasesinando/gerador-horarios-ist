@@ -19,7 +19,7 @@ export class SchedulesComponent implements OnInit {
     this.logger.log('courses to generate', this.selectedCourses);
   }
 
-  parseCourses(data: {_id, _name, _acronym, _types, _campus, _shifts}[]): Course[] {
+  parseCourses(data: {_id, _name, _acronym, _types, _campus, _shifts, _courseLoads}[]): Course[] {
     const courses: Course[] = [];
     for (const obj of data) {
       const course = new Course(obj._id, obj._name, obj._acronym, obj._types, obj._campus);
@@ -37,6 +37,7 @@ export class SchedulesComponent implements OnInit {
       }
       course.shifts = shifts;
 
+      course.courseLoads = obj._courseLoads;
       courses.push(course);
     }
     return courses;
