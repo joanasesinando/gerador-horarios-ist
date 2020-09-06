@@ -2,6 +2,8 @@
   <app-course-card *ngFor="let course of courses; let i = index"
                    [index]="i"
                    [course]="course"
+                   (campusSelected)="campusPicked($event)"
+                   (typesOfClassesSelected)="typesOfClassesPicked($event)"
                    (removeBtn)="removeBtnClicked($event)">
   </app-course-card>
 </div>

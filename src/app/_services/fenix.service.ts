@@ -236,7 +236,7 @@ export class FenixService {
         }
 
         // Get campi
-        const campi: string[] = FenixService.getCourseCampi(shifts);
+        const campi: string[] = FenixService.getCourseCampi(shifts).reverse();
 
         // Update courseLoads if inconsistencies found
         if (this.errorInAPI) {

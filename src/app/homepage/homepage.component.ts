@@ -40,6 +40,8 @@ export class HomepageComponent implements OnInit {
 
   selectedCourses: Course[] = [];
   selectedCoursesIDs = new Map();
+  campusPicked = new Map();
+  typesOfClassesPicked = new Map();
 
   generateForm = new FormGroup({
     academicTerm: new FormControl({value: null, disabled: true}),
@@ -252,8 +254,24 @@ export class HomepageComponent implements OnInit {
     });
   }
 
+  pickCourseCampus(selected: {index: number, data: string}): void {
+    this.campusPicked.set(selected.index, [selected.data]);
+  }
+
+  pickTypesOfClasses(selected: {index: number, data: string[]}): void {
+    this.typesOfClassesPicked.set(selected.index, selected.data);
+  }
+
   generateSchedules(): void {
     if (this.selectedCourses.length > 0) {
+      // Update selected courses based on user choice
+      for (const key of this.campusPicked.keys()) {
+        this.selectedCourses[key].campus = this.campusPicked.get(key);
+      }
+      for (const key of this.typesOfClassesPicked.keys()) {
+        this.selectedCourses[key].types = this.typesOfClassesPicked.get(key);
+      }
+
       this.router.navigate(['/generate-schedules'], {state: {data: this.selectedCourses}});
     }
   }

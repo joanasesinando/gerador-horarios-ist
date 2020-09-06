@@ -168,7 +168,11 @@
               <!-- Selected courses -->
               <h3 class="pick-courses-heading mb-4">{{'main-content.headers.selected-courses' | translate}}</h3>
               <p *ngIf="selectedCourses.length === 0"><em>{{'main-content.no-course-selected' | translate}}</em></p>
-              <app-course-banner [courses]="selectedCourses" (removeBtn)="removeCourse($event)"></app-course-banner>
+              <app-course-banner
+                [courses]="selectedCourses"
+                (campusSelected)="pickCourseCampus($event)"
+                (typesOfClassesSelected)="pickTypesOfClasses($event)"
+                (removeBtn)="removeCourse($event)"></app-course-banner>
 
               <!-- Generate btn -->
               <button *ngIf="selectedCourses.length !== 0"
