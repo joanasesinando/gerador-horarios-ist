@@ -173,6 +173,7 @@
                 (campusSelected)="pickCourseCampus($event)"
                 (typesOfClassesSelected)="pickTypesOfClasses($event)"
                 (removeBtn)="removeCourse($event)"></app-course-banner>
+              <!-- TODO: show warning if not enough info from API to generate schedules on given course -->
 
               <!-- Generate btn -->
               <button *ngIf="selectedCourses.length !== 0"

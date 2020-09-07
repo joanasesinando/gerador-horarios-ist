@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, Output, EventEmitter, AfterViewInit} from '@angular/core';
+import {Component, Input, Output, EventEmitter, AfterViewInit} from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import {Course} from '../../_domain/Course';
 
@@ -25,12 +25,15 @@ export class CourseCardComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.campusPicked(this.course);
-    this.typesOfClassesPicked(this.course);
-    // FIXME: get what's checked properly (error: multiple courses selected
+  }
+
+  formatName(name: string): string {
+    // @ts-ignore
+    return name.replaceAll(/[ ,]/g, '');
   }
 
   campusPicked(course): void {
-    const radioBtns = $('input[name^=radioCampus-' + course.name.replaceAll(' ', '') + ']');
+    const radioBtns = $('input[name^=radioCampus-' + this.formatName(course.name) + ']');
     for (const btn of radioBtns) {
       if (btn.checked) {
         this.campusSelected.emit({index: this.index, data: btn.labels[0].innerText});
@@ -39,7 +42,7 @@ export class CourseCardComponent implements AfterViewInit {
   }
 
   typesOfClassesPicked(course): void {
-    const checkboxes = $('input[name^=checkTypeClass-' + course.name.replaceAll(' ', '') + ']');
+    const checkboxes = $('input[name^=checkTypeClass-' + this.formatName(course.name) + ']');
     const checked: string[] = [];
     for (const box of checkboxes) {
       if (box.checked) {

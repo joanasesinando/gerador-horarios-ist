@@ -90,7 +90,7 @@ export class FenixService {
    *  - build lessons for 1st week
    *  - if lessons are NOT according to total nr. hours/week, then repeat with
    *    next week until it is
-   * (this strategy covers cases where there are days off in the 1st week of classes
+   * (this strategy covers cases where there are days off in the 1st week of classes)
    * -------------------------------------------------------------------------------- */
   private getShiftLessons(hoursPerWeek, lessons, shiftType): Lesson[] {
     let shiftLessons: Lesson[] = [];

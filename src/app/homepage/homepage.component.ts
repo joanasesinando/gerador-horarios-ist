@@ -264,12 +264,38 @@ export class HomepageComponent implements OnInit {
 
   generateSchedules(): void {
     if (this.selectedCourses.length > 0) {
-      // Update selected courses based on user choice
+
+      // Update campus based on user choice
       for (const key of this.campusPicked.keys()) {
         this.selectedCourses[key].campus = this.campusPicked.get(key);
       }
+
+      // Update types of classes based on user choice
       for (const key of this.typesOfClassesPicked.keys()) {
         this.selectedCourses[key].types = this.typesOfClassesPicked.get(key);
+      }
+
+      for (let i = 0; i < this.selectedCourses.length; i++) {
+        const course = this.selectedCourses[i];
+
+        // Remove shifts not held on selected campus
+        for (let j = course.shifts.length - 1; j >= 0; j--) {
+          if (!course.campus.includes(course.shifts[j].lessons[0].campus)) {
+            course.shifts.splice(j, 1);
+          }
+        }
+
+        // Remove shifts with types of classes not selected
+        if (this.typesOfClassesPicked.has(i)) {
+          for (let j = course.shifts.length - 1; j >= 0; j--) {
+            const shift = course.shifts[j];
+            for (const type of shift.types) {
+              if (!course.types.includes(type)) {
+                course.shifts.splice(j, 1);
+              }
+            }
+          }
+        }
       }
 
       this.router.navigate(['/generate-schedules'], {state: {data: this.selectedCourses}});
