@@ -1,7 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
 
 import {LoggerService} from '../_util/logger.service';
-import {Course, Lesson, Shift} from '../_domain/Course';
+import {Course} from '../_domain/Course';
+import {Schedule} from '../_domain/Schedule';
+import {Lesson} from '../_domain/Lesson';
+import {Shift} from '../_domain/Shift';
+import {Class} from '../_domain/Class';
 
 @Component({
   selector: 'app-schedules',
@@ -11,12 +16,24 @@ import {Course, Lesson, Shift} from '../_domain/Course';
 export class SchedulesComponent implements OnInit {
 
   selectedCourses: Course[] = [];
+  generatedSchedules: Schedule[] = [];
 
-  constructor(private logger: LoggerService) { }
+  spinner = true;
+
+  constructor(private logger: LoggerService, private router: Router) { }
 
   ngOnInit(): void {
+    // Receive selected courses
+    const data = history.state.data;
+    if (!data) { this.router.navigate(['/']); return; }
     this.selectedCourses = this.parseCourses(history.state.data);
     this.logger.log('courses to generate', this.selectedCourses);
+
+    // Generate schedules
+    this.generatedSchedules = this.generateSchedules();
+    this.logger.log('generated schedules', this.generatedSchedules);
+
+    this.spinner = false;
   }
 
   parseCourses(data: {_id, _name, _acronym, _types, _campus, _shifts, _courseLoads}[]): Course[] {
@@ -41,6 +58,98 @@ export class SchedulesComponent implements OnInit {
       courses.push(course);
     }
     return courses;
+  }
+
+  /* --------------------------------------------------------------------------------
+   * Returns generated schedules based on user selected courses.
+   * --------------------------------------------------------------------------------
+   * [Algorithm]
+   *  - get all combinations of shifts for a given course (taking into account hours
+   *    per week of each type of class selected); check for overlaps and discard
+   *  - combine each to create different schedules; check for overlaps and discard
+   * -------------------------------------------------------------------------------- */
+  generateSchedules(): Schedule[] {
+    // Combine shifts
+    const classesPerCourse: Class[][] = [];
+    for (const course of this.selectedCourses) {
+      classesPerCourse.push(this.combineShifts(course));
+    }
+
+    // Combine classes
+    return this.combineClasses(classesPerCourse);
+  }
+
+  combineShifts(course: Course): Class[] {
+    const shiftsMap = new Map<string, Shift[]>();
+    const shiftsArray: Shift[][] = [];
+
+    // Group shifts based on type of class
+    // NOTE: potential bug - types.length > 1 && type[0] equal e.g. another type on shift w/ types.length == 1
+    for (const shift of course.shifts) {
+      const type = shift.types[0];
+      shiftsMap.has(type) ? shiftsMap.get(type).push(shift) : shiftsMap.set(type, [shift]);
+    }
+    for (const key of shiftsMap.keys()) {
+      shiftsArray.push(shiftsMap.get(key));
+    }
+
+    // Get combinations of shifts & arrange into classes
+    const classes: Class[] = [];
+    for (const combination of this.allPossibleCases(shiftsArray)) {
+      classes.push(new Class(course, combination));
+    }
+
+    return classes;
+  }
+
+  combineClasses(classes: Class[][]): Schedule[] {
+    // Get combinations of classes & arrange into schedules
+    const schedules: Schedule[] = [];
+    for (const combination of this.allPossibleCases(classes)) {
+      schedules.push(new Schedule(combination));
+    }
+    return schedules;
+  }
+
+  /* --------------------------------------------------------------------------------
+   * Returns all possible combinations between different arrays.
+   * --------------------------------------------------------------------------------
+   * For example:
+   * array = [ ['a', 'b'], ['c'], ['d', 'e', 'f'] ]
+   *
+   * result = [ ['a', 'c', 'd'], ['b', 'c', 'd'], ['a', 'c', 'e'], ['b', 'c', 'e'],
+   *          ['a', 'c', 'f'], ['b', 'c', 'f'] ]
+   * --------------------------------------------------------------------------------
+   * [Reference]
+   * https://stackoverflow.com/questions/4331092/finding-all-combinations-cartesian-
+   * product-of-javascript-array-values
+   * -------------------------------------------------------------------------------- */
+  allPossibleCases(array: any[][]): any[][] {
+    return allPossibleCasesHelper(array, true);
+
+    function allPossibleCasesHelper(arr: any[][], isFirst: boolean): any[][] {
+      if (arr.length === 1) {
+        if (isFirst) {
+          // Make an array of every item, if nothing to combine
+          for (let i = 0; i < arr[0].length; i++) {
+            arr[0][i] = [arr[0][i]];
+          }
+        }
+        return arr[0];
+
+      } else {
+        const result = [];
+        const allCasesOfRest = allPossibleCasesHelper(arr.slice(1), false);
+        for (let rest of allCasesOfRest) {
+          for (let item of arr[0]) {
+            if (!Array.isArray(item)) { item = [item]; }
+            if (!Array.isArray(rest)) { rest = [rest]; }
+            result.push(item.concat(rest));
+          }
+        }
+        return result;
+      }
+    }
   }
 
 }

@@ -1,1 +1,17 @@
-<p>schedules works!</p>
+<div class="container-fluid">
+
+  <div *ngIf="spinner" class="spinner-wrapper text-center">
+    <div class="spinner-border text-primary mb-4" role="status"></div>
+    <h5>Generating . . .</h5>
+  </div>
+
+  <div *ngIf="!spinner">
+    <h3>Generated {{generatedSchedules.length}} Schedules</h3>
+    <hr>
+    <div *ngFor="let schedule of generatedSchedules; let i = index" class="mb-4">
+      <h4>Schedule #{{i+1}}</h4>
+      <p *ngFor="let cl of schedule.classes">{{cl.course.name}} -> {{cl}}</p>
+    </div>
+  </div>
+
+</div>

@@ -14,8 +14,8 @@ export class CourseCardComponent implements AfterViewInit {
   @Input() index: number;
   @Input() course: Course;
 
-  @Output() campusSelected = new EventEmitter<{index: number, data: string}>();
-  @Output() typesOfClassesSelected = new EventEmitter<{index: number, data: string[]}>();
+  @Output() campusSelected = new EventEmitter<{courseID: number, campus: string}>();
+  @Output() typesOfClassesSelected = new EventEmitter<{courseID: number, types: string[]}>();
   @Output() removeBtn = new EventEmitter<number>();
 
   faTimes = faTimes;
@@ -36,20 +36,20 @@ export class CourseCardComponent implements AfterViewInit {
     const radioBtns = $('input[name^=radioCampus-' + this.formatName(course.name) + ']');
     for (const btn of radioBtns) {
       if (btn.checked) {
-        this.campusSelected.emit({index: this.index, data: btn.labels[0].innerText});
+        this.campusSelected.emit({courseID: course.id, campus: btn.labels[0].innerText});
       }
     }
   }
 
   typesOfClassesPicked(course): void {
     const checkboxes = $('input[name^=checkTypeClass-' + this.formatName(course.name) + ']');
-    const checked: string[] = [];
+    const typesChecked: string[] = [];
     for (const box of checkboxes) {
       if (box.checked) {
-        checked.push(box.labels[0].innerText);
+        typesChecked.push(box.labels[0].innerText);
       }
     }
-    this.typesOfClassesSelected.emit({index: this.index, data: checked});
+    this.typesOfClassesSelected.emit({courseID: course.id, types: typesChecked});
   }
 
   removeBtnClicked(): void {

@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
-import {Course, Type, Shift, Lesson} from '../_domain/Course';
+import {Course} from '../_domain/Course';
 import {Degree} from '../_domain/Degree';
+import {Lesson} from '../_domain/Lesson';
+import {Shift} from '../_domain/Shift';
+import {ClassType} from '../_domain/ClassType';
 
 
 @Injectable({
@@ -134,29 +137,29 @@ export class FenixService {
   /* ------------------------------------------------------------
    * Formats the type of class to one that's more readable
    * ------------------------------------------------------------ */
-  private formatType(type: string): Type | string {
+  private formatType(type: string): ClassType | string {
     switch (type) {
       case 'TEORICA':
-        if (this.translateService.currentLang === 'pt-PT') { return Type.THEORY_PT; }
-        return Type.THEORY_EN;
+        if (this.translateService.currentLang === 'pt-PT') { return ClassType.THEORY_PT; }
+        return ClassType.THEORY_EN;
 
       case 'LABORATORIAL':
-        if (this.translateService.currentLang === 'pt-PT') { return Type.LAB_PT; }
-        return Type.LAB_EN;
+        if (this.translateService.currentLang === 'pt-PT') { return ClassType.LAB_PT; }
+        return ClassType.LAB_EN;
 
       case 'PROBLEMS':
-        if (this.translateService.currentLang === 'pt-PT') { return Type.PROBLEMS_PT; }
-        return Type.PROBLEMS_EN;
+        if (this.translateService.currentLang === 'pt-PT') { return ClassType.PROBLEMS_PT; }
+        return ClassType.PROBLEMS_EN;
 
       case 'SEMINARY':
-        if (this.translateService.currentLang === 'pt-PT') { return Type.SEMINARY_PT; }
-        return Type.SEMINARY_EN;
+        if (this.translateService.currentLang === 'pt-PT') { return ClassType.SEMINARY_PT; }
+        return ClassType.SEMINARY_EN;
 
       case 'TUTORIAL_ORIENTATION':
-        return Type.TUTORIAL_ORIENTATION;
+        return ClassType.TUTORIAL_ORIENTATION;
 
       case 'TRAINING_PERIOD':
-        return Type.TRAINING_PERIOD;
+        return ClassType.TRAINING_PERIOD;
 
       default:
         const t = type.toLowerCase();
@@ -217,7 +220,7 @@ export class FenixService {
       .then(scheduleJson => {
 
         // Get types
-        const types: Type[] = this.getCourseTypes(scheduleJson.courseLoads);
+        const types: ClassType[] = this.getCourseTypes(scheduleJson.courseLoads);
 
         // Get course loads
         let courseLoads = FenixService.getCourseLoads(scheduleJson.courseLoads);
@@ -248,7 +251,7 @@ export class FenixService {
       });
   }
 
-  private getCourseTypes(courseLoads): Type[] {
+  private getCourseTypes(courseLoads): ClassType[] {
     const types = [];
     for (const cl of courseLoads) {
       const type = this.formatType(cl.type);
@@ -257,7 +260,7 @@ export class FenixService {
     return types.reverse();
   }
 
-  private getShiftTypes(types): Type[] {
+  private getShiftTypes(types): ClassType[] {
     const shiftTypes = [];
     for (const shiftType of types) {
       const type = this.formatType(shiftType);

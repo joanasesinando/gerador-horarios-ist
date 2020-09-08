@@ -10,8 +10,8 @@ export class CoursesBannerComponent implements OnInit {
 
   @Input() courses: Course[];
 
-  @Output() campusSelected = new EventEmitter<{index: number, data: string}>();
-  @Output() typesOfClassesSelected = new EventEmitter<{index: number, data: string[]}>();
+  @Output() campusSelected = new EventEmitter<{courseID: number, campus: string}>();
+  @Output() typesOfClassesSelected = new EventEmitter<{courseID: number, types: string[]}>();
   @Output() removeBtn = new EventEmitter<number>();
 
   constructor() { }
@@ -19,11 +19,11 @@ export class CoursesBannerComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  campusPicked(campusSelected: {index: number, data: string}): void {
+  campusPicked(campusSelected: {courseID: number, campus: string}): void {
     this.campusSelected.emit(campusSelected);
   }
 
-  typesOfClassesPicked(typesSelected: {index: number, data: string[]}): void {
+  typesOfClassesPicked(typesSelected: {courseID: number, types: string[]}): void {
     this.typesOfClassesSelected.emit(typesSelected);
   }
 

@@ -1,28 +1,17 @@
-import * as firebase from 'firebase/app';
-import 'firebase/firestore';
+import {ClassType} from './ClassType';
+import {Shift} from './Shift';
+import {Lesson} from './Lesson';
 
-export enum Type {
-  THEORY_PT = 'Teórica',
-  LAB_PT = 'Laboratorial',
-  PROBLEMS_PT = 'Problemas',
-  SEMINARY_PT = 'Seminário',
-  THEORY_EN = 'Theoretical',
-  LAB_EN = 'Laboratory',
-  PROBLEMS_EN = 'Problems',
-  SEMINARY_EN = 'Seminary',
-  TUTORIAL_ORIENTATION = 'Tutorial Orientation',
-  TRAINING_PERIOD = 'Training Period'
-}
 
 export class Course {
   constructor(
-    public _id: number,
-    public _name: string,
-    public _acronym: string,
-    public _types?: Type[],
-    public _campus?: string[],
-    public _shifts?: Shift[],
-    public _courseLoads?: {}
+    private _id: number,
+    private _name: string,
+    private _acronym: string,
+    private _types?: ClassType[],
+    private _campus?: string[],
+    private _shifts?: Shift[],
+    private _courseLoads?: {}
   ) {}
 
   get id(): number { return this._id; }
@@ -34,8 +23,8 @@ export class Course {
   get acronym(): string { return this._acronym; }
   set acronym(value: string) { this._acronym = value; }
 
-  get types(): Type[] { return this._types; }
-  set types(value: Type[]) { this._types = value; }
+  get types(): ClassType[] { return this._types; }
+  set types(value: ClassType[]) { this._types = value; }
 
   get campus(): string[] { return this._campus; }
   set campus(value: string[]) { this._campus = value; }
@@ -59,7 +48,7 @@ export class Course {
   }
 }
 
-// Firestore data converters
+// Firestore data converter
 export const courseConverter = {
   toFirestore: (course: Course) => {
     return {
@@ -86,53 +75,3 @@ export const courseConverter = {
     return new Course(data.id, data.name, data.acronym);
   }
 };
-
-export class Shift {
-  constructor(public _name: string, public _types: Type[], public _lessons: Lesson[]) {}
-
-  get name(): string { return this._name; }
-  set name(value: string) { this._name = value; }
-
-  get types(): Type[] { return this._types; }
-  set types(value: Type[]) { this._types = value; }
-
-  get lessons(): Lesson[] { return this._lessons; }
-  set lessons(value: Lesson[]) { this._lessons = value; }
-
-  shiftConverter(): {} {
-    const lessons: {}[] = [];
-    for (const lesson of this.lessons) {
-      lessons.push(lesson.lessonConverter());
-    }
-    return {
-      name: this.name,
-      types: this.types,
-      lessons
-    };
-  }
-}
-
-export class Lesson {
-  constructor(public _start: Date, public _end: Date, public _room: string, public _campus: string) {}
-
-  get start(): Date { return this._start; }
-  set start(value: Date) { this._start = value; }
-
-  get end(): Date { return this._end; }
-  set end(value: Date) { this._end = value; }
-
-  get room(): string { return this._room; }
-  set room(value: string) { this._room = value; }
-
-  get campus(): string { return this._campus; }
-  set campus(value: string) { this._campus = value; }
-
-  lessonConverter(): {} {
-    return {
-      start: firebase.firestore.Timestamp.fromDate(this.start),
-      end: firebase.firestore.Timestamp.fromDate(this.end),
-      room: this.room,
-      campus: this.campus
-    };
-  }
-}

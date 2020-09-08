@@ -254,12 +254,21 @@ export class HomepageComponent implements OnInit {
     });
   }
 
-  pickCourseCampus(selected: {index: number, data: string}): void {
-    this.campusPicked.set(selected.index, [selected.data]);
+  findCourseIndex(courseID: number, courses: Course[]): number {
+    let index = 0;
+    for (const course of courses) {
+      if (course.id === courseID) { return index; }
+      index++;
+    }
+    return null;
   }
 
-  pickTypesOfClasses(selected: {index: number, data: string[]}): void {
-    this.typesOfClassesPicked.set(selected.index, selected.data);
+  pickCourseCampus(selected: {courseID: number, campus: string}): void {
+    this.campusPicked.set(selected.courseID, [selected.campus]);
+  }
+
+  pickTypesOfClasses(selected: {courseID: number, types: string[]}): void {
+    this.typesOfClassesPicked.set(selected.courseID, selected.types);
   }
 
   generateSchedules(): void {
@@ -267,12 +276,14 @@ export class HomepageComponent implements OnInit {
 
       // Update campus based on user choice
       for (const key of this.campusPicked.keys()) {
-        this.selectedCourses[key].campus = this.campusPicked.get(key);
+        const index = this.findCourseIndex(key, this.selectedCourses);
+        this.selectedCourses[index].campus = this.campusPicked.get(key);
       }
 
       // Update types of classes based on user choice
       for (const key of this.typesOfClassesPicked.keys()) {
-        this.selectedCourses[key].types = this.typesOfClassesPicked.get(key);
+        const index = this.findCourseIndex(key, this.selectedCourses);
+        this.selectedCourses[index].types = this.typesOfClassesPicked.get(key);
       }
 
       for (let i = 0; i < this.selectedCourses.length; i++) {
