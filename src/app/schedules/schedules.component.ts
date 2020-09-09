@@ -69,12 +69,14 @@ export class SchedulesComponent implements OnInit {
    *  - combine each to create different schedules; check for overlaps and discard
    * -------------------------------------------------------------------------------- */
   generateSchedules(): Schedule[] {
+    // TODO: remove overlaps
     // Combine shifts
     const classesPerCourse: Class[][] = [];
     for (const course of this.selectedCourses) {
       classesPerCourse.push(this.combineShifts(course));
     }
 
+    // TODO: remove overlaps
     // Combine classes
     return this.combineClasses(classesPerCourse);
   }

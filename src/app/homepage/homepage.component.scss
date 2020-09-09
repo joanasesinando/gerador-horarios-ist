@@ -118,6 +118,17 @@
   }
 }
 
+.pick-courses-heading {
+  display: flex;
+  align-items: center;
+
+  span {
+    font-family: poppins-regular, sans-serif;
+    font-size: 1rem;
+    color: $gh-blue;
+  }
+}
+
 .spinner-border {
   position: absolute;
   top: 61%;

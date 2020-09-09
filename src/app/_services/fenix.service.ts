@@ -13,20 +13,21 @@ import {ClassType} from '../_domain/ClassType';
 })
 export class FenixService {
 
-  // FIXME: take server out
   url = 'https://cors-anywhere.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/';
   errorInAPI = false;
 
   constructor(public translateService: TranslateService) { }
 
   /* ----------------------------------------------------------------------------
-   * Returns true if academicTerm is bigger or equal to 2003/2004 and is not the
-   * next term. Otherwise, return false.
-   * (There's not enough info on degrees/courses to generate schedules otherwise.
+   * Returns true if academicTerm is bigger or equal to 2003/2004.
+   * Otherwise, return false.
+   * ----------------------------------------------------------------------------
+   * [Reason]
+   * There's not enough info on degrees and courses on academic terms smaller than
+   * 2003/2004 to generate schedules.
    * ---------------------------------------------------------------------------- */
   private static validAcademicTerm(academicTerm: string): boolean {
-    let currentTerm = new Date().getFullYear();
-    return academicTerm >= '2003/2004' && academicTerm !== ++currentTerm + '/' + ++currentTerm;
+    return academicTerm >= '2003/2004';
   }
 
   private static getCourseLoads(courseLoads): {} {
