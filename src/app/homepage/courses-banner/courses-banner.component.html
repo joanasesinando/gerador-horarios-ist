@@ -1,6 +1,5 @@
 <div id="selected-courses">
-  <app-course-card *ngFor="let course of courses; let i = index"
-                   [index]="i"
+  <app-course-card *ngFor="let course of courses"
                    [course]="course"
                    (campusSelected)="campusPicked($event)"
                    (typesOfClassesSelected)="typesOfClassesPicked($event)"

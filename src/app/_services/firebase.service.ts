@@ -26,7 +26,7 @@ export class FirebaseService {
     });
   }
 
-  hasDocument(collection: string, document: string, subCollection?: string, subDocument?: number): Promise<boolean> {
+  hasDocument(collection: string, document: number, subCollection?: string, subDocument?: number): Promise<boolean> {
     let ref;
     if (subCollection && subDocument) {
       ref = this.db.collection(collection).doc(document).collection(subCollection).doc(subDocument);
@@ -44,6 +44,10 @@ export class FirebaseService {
 
   hasCourses(academicTerm: string, degreeID: number): Promise<boolean> {
     return this.hasCollection(academicTerm.replace('/', '-'), degreeID, 'courses');
+  }
+
+  hasCourseInDegree(academicTerm: string, degreeID: number, courseID: number): Promise<any> {
+    return this.hasDocument(academicTerm.replace('/', '-'), degreeID, 'courses', courseID);
   }
 
   // tslint:disable-next-line:max-line-length

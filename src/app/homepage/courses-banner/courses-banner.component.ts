@@ -27,8 +27,8 @@ export class CoursesBannerComponent implements OnInit {
     this.typesOfClassesSelected.emit(typesSelected);
   }
 
-  removeBtnClicked(index: number): void {
-    this.removeBtn.emit(index);
+  removeBtnClicked(courseID: number): void {
+    this.removeBtn.emit(courseID);
   }
 
 }

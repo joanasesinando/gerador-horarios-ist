@@ -11,7 +11,6 @@ declare let $;
 })
 export class CourseCardComponent implements AfterViewInit {
 
-  @Input() index: number;
   @Input() course: Course;
 
   @Output() campusSelected = new EventEmitter<{courseID: number, campus: string}>();
@@ -53,7 +52,7 @@ export class CourseCardComponent implements AfterViewInit {
   }
 
   removeBtnClicked(): void {
-    this.removeBtn.emit(this.index);
+    this.removeBtn.emit(this.course.id);
   }
 
 }

@@ -198,7 +198,7 @@ export class FenixService {
       });
   }
 
-  getCoursesBasicInfo(academicTerm: string, degreeId: string): Promise<Course[]> {
+  getCoursesBasicInfo(academicTerm: string, degreeId: number): Promise<Course[]> {
     return this.httpGet('degrees/' + degreeId + '/courses?academicTerm=' + academicTerm + '&lang=' + this.getLanguage())
       .then(r => r.json())
       .then(coursesJson => {
