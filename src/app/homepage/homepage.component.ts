@@ -271,7 +271,7 @@ export class HomepageComponent implements OnInit {
     this.typesOfClassesPicked.set(selected.courseID, selected.types);
   }
 
-  generateSchedules(): void {
+  generateSchedules(): void { // TODO: testing
     if (this.selectedCourses.length > 0) {
 
       // Update campus based on user choice
@@ -286,9 +286,7 @@ export class HomepageComponent implements OnInit {
         this.selectedCourses[index].types = this.typesOfClassesPicked.get(key);
       }
 
-      for (let i = 0; i < this.selectedCourses.length; i++) {
-        const course = this.selectedCourses[i];
-
+      for (const course of this.selectedCourses) {
         // Remove shifts not held on selected campus
         for (let j = course.shifts.length - 1; j >= 0; j--) {
           if (!course.campus.includes(course.shifts[j].lessons[0].campus)) {
@@ -297,7 +295,7 @@ export class HomepageComponent implements OnInit {
         }
 
         // Remove shifts with types of classes not selected
-        if (this.typesOfClassesPicked.has(i)) {
+        if (this.typesOfClassesPicked.has(course.id)) {
           for (let j = course.shifts.length - 1; j >= 0; j--) {
             const shift = course.shifts[j];
             for (const type of shift.types) {

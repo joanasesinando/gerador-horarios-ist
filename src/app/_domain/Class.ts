@@ -17,4 +17,13 @@ export class Class {
     }
     return s;
   }
+
+  overlap(other: Class): boolean {
+    for (const shift of this.shifts) {
+      for (const otherShift of other.shifts) {
+        if (shift.overlap(otherShift)) { return true; }
+      }
+    }
+    return false;
+  }
 }

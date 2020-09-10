@@ -25,4 +25,27 @@ export class Lesson {
             campus: this.campus
         };
     }
+
+    overlap(other: Lesson): boolean {
+      function convertDateToTime(date: Date): number {
+        const min = date.getMinutes() === 0 ? 0 : (date.getMinutes() * 0.5) / 30;
+        return date.getHours() + min;
+      }
+
+      const weekDay = this.start.getDay();
+      const startTime = convertDateToTime(this.start);
+      const endTime = convertDateToTime(this.end);
+
+      const otherWeekDay = other.start.getDay();
+      const otherStartTime = convertDateToTime(other.start);
+      const otherEndTime = convertDateToTime(other.end);
+
+      return weekDay === otherWeekDay && (
+             (startTime >= otherStartTime && startTime < otherEndTime) ||
+             (otherStartTime >= startTime && otherStartTime < endTime) ||
+             (endTime > otherStartTime && endTime <= otherEndTime) ||
+             (otherEndTime > startTime && otherEndTime <= endTime)
+      );
+    }
+
 }

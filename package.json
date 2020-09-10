@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --prod",
+    "build": "ng test --watch=false && ng build --prod",
     "postbuild": "python scripts/preload_fonts.py",
     "test": "ng test",
     "lint": "ng lint",

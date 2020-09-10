@@ -19,6 +19,7 @@ export class SchedulesComponent implements OnInit {
   generatedSchedules: Schedule[] = [];
 
   spinner = true;
+  generationTime: number;
 
   constructor(private logger: LoggerService, private router: Router) { }
 
@@ -26,14 +27,17 @@ export class SchedulesComponent implements OnInit {
     // Receive selected courses
     const data = history.state.data;
     if (!data) { this.router.navigate(['/']); return; }
-    this.selectedCourses = this.parseCourses(history.state.data);
+    this.selectedCourses = this.parseCourses(data);
     this.logger.log('courses to generate', this.selectedCourses);
 
     // Generate schedules
     this.generatedSchedules = this.generateSchedules();
     this.logger.log('generated schedules', this.generatedSchedules);
 
-    this.spinner = false;
+    // Fake staling for UX
+    if (this.generationTime < 1000) {
+      setTimeout(() => this.spinner = false, 1000);
+    }
   }
 
   parseCourses(data: {_id, _name, _acronym, _types, _campus, _shifts, _courseLoads}[]): Course[] {
@@ -69,19 +73,27 @@ export class SchedulesComponent implements OnInit {
    *  - combine each to create different schedules; check for overlaps and discard
    * -------------------------------------------------------------------------------- */
   generateSchedules(): Schedule[] {
-    // TODO: remove overlaps
+    this.logger.log('generating...');
+    const t0 = performance.now();
+
     // Combine shifts
     const classesPerCourse: Class[][] = [];
     for (const course of this.selectedCourses) {
       classesPerCourse.push(this.combineShifts(course));
     }
 
-    // TODO: remove overlaps
     // Combine classes
-    return this.combineClasses(classesPerCourse);
+    const schedules: Schedule[] = this.combineClasses(classesPerCourse);
+
+    this.logger.log('done');
+    const t1 = performance.now();
+    this.generationTime = t1 - t0;
+    this.logger.log('generated in (milliseconds)', this.generationTime);
+
+    return schedules;
   }
 
-  combineShifts(course: Course): Class[] {
+  combineShifts(course: Course): Class[] { // TODO: testing
     const shiftsMap = new Map<string, Shift[]>();
     const shiftsArray: Shift[][] = [];
 
@@ -91,6 +103,8 @@ export class SchedulesComponent implements OnInit {
       const type = shift.types[0];
       shiftsMap.has(type) ? shiftsMap.get(type).push(shift) : shiftsMap.set(type, [shift]);
     }
+
+    // Get input ready for combination
     for (const key of shiftsMap.keys()) {
       shiftsArray.push(shiftsMap.get(key));
     }
@@ -98,16 +112,20 @@ export class SchedulesComponent implements OnInit {
     // Get combinations of shifts & arrange into classes
     const classes: Class[] = [];
     for (const combination of this.allPossibleCases(shiftsArray)) {
+      // Check for overlaps and discard
+      if (this.checkForOverlapsOnShifts(combination)) { continue; }
       classes.push(new Class(course, combination));
     }
 
     return classes;
   }
 
-  combineClasses(classes: Class[][]): Schedule[] {
+  combineClasses(classes: Class[][]): Schedule[] { // TODO: testing
     // Get combinations of classes & arrange into schedules
     const schedules: Schedule[] = [];
     for (const combination of this.allPossibleCases(classes)) {
+      // Check for overlaps and discard
+      if (this.checkForOverlapsOnClasses(combination)) { continue; }
       schedules.push(new Schedule(combination));
     }
     return schedules;
@@ -152,6 +170,24 @@ export class SchedulesComponent implements OnInit {
         return result;
       }
     }
+  }
+
+  checkForOverlapsOnShifts(shifts: Shift[]): boolean {
+    for (let i = 0; i < shifts.length - 1; i++) {
+      for (let j = i + 1; j < shifts.length; j++) {
+        if (shifts[i].overlap(shifts[j])) { return true; }
+      }
+    }
+    return false;
+  }
+
+  checkForOverlapsOnClasses(classes: Class[]): boolean {
+    for (let i = 0; i < classes.length - 1; i++) {
+      for (let j = i + 1; j < classes.length; j++) {
+        if (classes[i].overlap(classes[j])) { return true; }
+      }
+    }
+    return false;
   }
 
 }

@@ -25,4 +25,14 @@ export class Shift {
             lessons
         };
     }
+
+  overlap(other: Shift): boolean {
+    for (const lesson of this.lessons) {
+      for (const otherLesson of other.lessons) {
+        if (lesson.overlap(otherLesson)) { return true; }
+      }
+    }
+    return false;
+  }
+
 }
