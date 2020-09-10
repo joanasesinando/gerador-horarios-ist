@@ -35,9 +35,7 @@ export class SchedulesComponent implements OnInit {
     this.logger.log('generated schedules', this.generatedSchedules);
 
     // Fake staling for UX
-    if (this.generationTime < 1000) {
-      setTimeout(() => this.spinner = false, 1000);
-    }
+    this.generationTime < 1000 ? setTimeout(() => this.spinner = false, 1000) : this.spinner = false;
   }
 
   parseCourses(data: {_id, _name, _acronym, _types, _campus, _shifts, _courseLoads}[]): Course[] {
@@ -144,7 +142,7 @@ export class SchedulesComponent implements OnInit {
    * https://stackoverflow.com/questions/4331092/finding-all-combinations-cartesian-
    * product-of-javascript-array-values
    * -------------------------------------------------------------------------------- */
-  allPossibleCases(array: any[][]): any[][] {
+  allPossibleCases(array: any[][]): any[][] { // TODO: testing
     return allPossibleCasesHelper(array, true);
 
     function allPossibleCasesHelper(arr: any[][], isFirst: boolean): any[][] {
