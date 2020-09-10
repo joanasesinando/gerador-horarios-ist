@@ -9,7 +9,7 @@ import { HomepageComponent } from './homepage.component';
 import { CourseCardComponent } from './course-card/course-card.component';
 import { CoursesBannerComponent } from './courses-banner/courses-banner.component';
 import { AboutModalComponent } from './about-modal/about-modal.component';
-import {TranslateModule} from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @NgModule({

@@ -5,12 +5,13 @@
     <h5 class="card-title course-name mt-2">[{{course.acronym}}] {{course.name}}</h5>
 
     <!-- Campus -->
-    <div *ngIf="course.campus && course.campus.length >= 2" class="d-flex flex-wrap">
+    <div *ngIf="course.campus" class="d-flex flex-wrap">
       <div *ngFor="let campus of course.campus; let i = index; let first = first; let last = last"
            class="custom-control custom-radio mb-2" [ngClass]="{'mr-3': !last}">
-        <input type="radio" [checked]="first" name="radioCampus-{{course.name}}"
-               class="custom-control-input" id="radioCampus-{{course.name}}-{{i}}">
-        <label class="custom-control-label" for="radioCampus-{{course.name}}-{{i}}">{{campus}}</label>
+        <input type="radio" [checked]="first" class="custom-control-input"
+               name="radioCampus-{{formatName(course.name)}}"
+               id="radioCampus-{{formatName(course.name)}}-{{i}}" (change)="campusPicked(course)">
+        <label class="custom-control-label" for="radioCampus-{{formatName(course.name)}}-{{i}}">{{campus}}</label>
       </div>
     </div>
 
@@ -18,8 +19,9 @@
     <div *ngIf="course.types" class="d-flex flex-wrap">
       <div *ngFor="let type of course.types; let i = index; let last = last"
            class="custom-control custom-checkbox mb-2" [ngClass]="{'mr-3': !last}">
-        <input type="checkbox" [checked]="true" class="custom-control-input" id="checkTypeClass-{{course.name}}-{{i}}">
-        <label class="custom-control-label" for="checkTypeClass-{{course.name}}-{{i}}">{{type}}</label>
+        <input type="checkbox" [checked]="true" name="checkTypeClass-{{formatName(course.name)}}" class="custom-control-input"
+               id="checkTypeClass-{{formatName(course.name)}}-{{i}}" (change)="typesOfClassesPicked(course)">
+        <label class="custom-control-label" for="checkTypeClass-{{formatName(course.name)}}-{{i}}">{{type}}</label>
       </div>
     </div>
 

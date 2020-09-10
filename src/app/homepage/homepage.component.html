@@ -117,7 +117,7 @@
                     <div class="form-label-group">
                       <label for="inputAcademicTerm">{{'main-content.labels.term' | translate}}</label>
                       <select class="custom-select" id="inputAcademicTerm" autofocus formControlName="academicTerm"
-                              (change)="loadDegrees()">
+                              (change)="loadDegrees(academicTermFormControl.value)">
                         <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{lowercase('main-content.labels.term' | translate)}}...</option>
                         <option *ngFor="let term of academicTerms" value="{{term}}">{{term}}</option>
                       </select>
@@ -132,7 +132,7 @@
                     <div class="form-label-group">
                       <label for="inputDegree">{{'main-content.labels.degree' | translate}}</label>
                       <select class="custom-select" id="inputDegree" formControlName="degree"
-                              (change)="loadCoursesBasicInfo()">
+                              (change)="loadCoursesBasicInfo(academicTermFormControl.value, degreeFormControl.value)">
                         <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{lowercase('main-content.labels.degree' | translate)}}...</option>
                         <option *ngFor="let degree of degrees" value="{{degree.id}}">{{degree.acronym}} - {{degree.name}}</option>
                       </select>
@@ -148,13 +148,13 @@
                   <label for="inputCourse">{{'main-content.labels.course' | translate}}</label>
                   <div class="input-group w-100">
                     <select class="custom-select" id="inputCourse" formControlName="course">
-                      <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{lowercase('main-content.labels.course' | translate)}}...</option>
-                      <option *ngFor="let course of courses; let i = index" id="{{course.id}}" value="{{i}}">[{{course.acronym}}] {{course.name}}</option>
+                      <option disabled selected value="{{-1}}">{{'main-content.labels.placeholder' | translate}} {{lowercase('main-content.labels.course' | translate)}}...</option>
+                      <option *ngFor="let course of courses" id="{{course.id}}" value="{{course.id}}">[{{course.acronym}}] {{course.name}}</option>
                     </select>
                     <div class="input-group-append">
                       <button id="addBtn" class="btn btn-primary" type="button"
                               [disabled]="hasAcademicTermSelected() && hasDegreeSelected() && courses.length === 0 && !spinners.course"
-                              (click)="addCourse()">{{'main-content.add-btn' | translate}}</button>
+                              (click)="addCourse(courseFormControl.value)">{{'main-content.add-btn' | translate}}</button>
                     </div>
                   </div>
                   <div *ngIf="spinners.course" class="spinner-border spinner-border-sm text-primary" role="status">
@@ -166,9 +166,15 @@
               </form>
 
               <!-- Selected courses -->
-              <h3 class="pick-courses-heading mb-4">{{'main-content.headers.selected-courses' | translate}}</h3>
+              <h3 class="pick-courses-heading mb-4">{{'main-content.headers.selected-courses' | translate}}
+                <span *ngIf="this.selectedCourses.length > 0" class="ml-2 mt-1">{{this.selectedCourses.length}}</span></h3>
               <p *ngIf="selectedCourses.length === 0"><em>{{'main-content.no-course-selected' | translate}}</em></p>
-              <app-course-banner [courses]="selectedCourses" (removeBtn)="removeCourse($event)"></app-course-banner>
+              <app-course-banner
+                [courses]="selectedCourses"
+                (campusSelected)="pickCourseCampus($event)"
+                (typesOfClassesSelected)="pickTypesOfClasses($event)"
+                (removeBtn)="removeCourse($event)"></app-course-banner>
+              <!-- TODO: show warning if not enough info from API to generate schedules on given course -->
 
               <!-- Generate btn -->
               <button *ngIf="selectedCourses.length !== 0"

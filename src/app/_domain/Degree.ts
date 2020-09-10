@@ -1,5 +1,5 @@
 export class Degree {
-  constructor(public _id: number, public _name: string, public _acronym: string) {}
+  constructor(private _id: number, private _name: string, private _acronym: string) {}
 
   get id(): number { return this._id; }
   set id(value: number) { this._id = value; }

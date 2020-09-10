@@ -1,5 +1,6 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 
 import {LoggerService} from '../_util/logger.service';
@@ -39,11 +40,13 @@ export class HomepageComponent implements OnInit {
 
   selectedCourses: Course[] = [];
   selectedCoursesIDs = new Map();
+  campusPicked = new Map();
+  typesOfClassesPicked = new Map();
 
   generateForm = new FormGroup({
     academicTerm: new FormControl({value: null, disabled: true}),
     degree: new FormControl({value: null, disabled: true}),
-    course: new FormControl({value: null, disabled: true}),
+    course: new FormControl({value: -1, disabled: true}),
   });
 
   get academicTermFormControl(): AbstractControl { return this.generateForm.get('academicTerm'); }
@@ -70,7 +73,8 @@ export class HomepageComponent implements OnInit {
     private logger: LoggerService,
     private fenixService: FenixService,
     public translateService: TranslateService,
-    public firebaseService: FirebaseService) {
+    public firebaseService: FirebaseService,
+    private router: Router) {
 
     // Translation
     translateService.addLangs(['pt-PT', 'en-GB']);
@@ -119,8 +123,8 @@ export class HomepageComponent implements OnInit {
     return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
   }
 
-  loadDegrees(): void {
-    const academicTerm = $('#inputAcademicTerm').val();
+  // TODO: same academic term; reset when picking different
+  loadDegrees(academicTerm: string): void { // TODO: testing
     this.spinners.degree = true;
     this.firebaseService.hasDegrees(academicTerm).then(has => {
       if (has) {
@@ -152,14 +156,12 @@ export class HomepageComponent implements OnInit {
     });
   }
 
-  loadCoursesBasicInfo(): void {
-    const academicTerm = $('#inputAcademicTerm').val();
-    const degreeId = $('#inputDegree').val();
+  loadCoursesBasicInfo(academicTerm: string, degreeID: number): void { // TODO: testing
     this.spinners.course = true;
-    this.firebaseService.hasCourses(academicTerm, degreeId).then(has => {
+    this.firebaseService.hasCourses(academicTerm, degreeID).then(has => {
       if (has) {
         this.logger.log('has courses saved');
-        this.firebaseService.getCourses(academicTerm, degreeId).then(courses => {
+        this.firebaseService.getCourses(academicTerm, degreeID).then(courses => {
           this.courses = courses
             .sort((a, b) => a.acronym.localeCompare(b.acronym))
             .filter((course) => !this.selectedCoursesIDs.has(course.id));
@@ -169,7 +171,7 @@ export class HomepageComponent implements OnInit {
         });
       } else {
         this.logger.log('no courses found');
-        this.fenixService.getCoursesBasicInfo(academicTerm, degreeId).then(courses => {
+        this.fenixService.getCoursesBasicInfo(academicTerm, degreeID).then(courses => {
           this.courses = courses.filter((course) => !this.selectedCoursesIDs.has(course.id));
           this.courseFormControl.enable();
           this.spinners.course = false;
@@ -178,7 +180,7 @@ export class HomepageComponent implements OnInit {
           // Load to database
           const error = {found: false, type: null};
           for (const course of this.courses) {
-            this.firebaseService.loadCourse(academicTerm, degreeId, course)
+            this.firebaseService.loadCourse(academicTerm, degreeID, course)
               .catch((err) => { error.found = true; error.type = err; });
           }
           error.found ? this.logger.log('error saving courses:', error.type) : this.logger.log('courses successfully saved');
@@ -187,10 +189,10 @@ export class HomepageComponent implements OnInit {
     });
   }
 
-  addCourse(): void {
-    const courseIndex = $('#inputCourse').val();
+  addCourse(courseID: number): void { // TODO: testing
+    const courseIndex = this.findCourseIndex(courseID, this.courses);
 
-    if (courseIndex && courseIndex !== 'null') {
+    if (courseID && courseID !== -1) {
       const addBtn = $('#addBtn');
       addBtn.attr('disabled', true);
       let courseToAdd = this.courses[courseIndex];
@@ -228,32 +230,86 @@ export class HomepageComponent implements OnInit {
     // Remove course from select
     $('#' + course.id).remove();
 
+    // Reset select
+    this.courseFormControl.patchValue(-1);
+
     addBtn.attr('disabled', false);
     this.logger.log('selected courses', this.selectedCourses);
   }
 
-  removeCourse(index: number): void {
-    const academicTerm = $('#inputAcademicTerm').val();
-    const degreeId = $('#inputDegree').val();
-    const courseToRemove = this.selectedCourses[index];
+  removeCourse(courseID: number): void { // TODO: testing
+    const academicTerm = this.academicTermFormControl.value;
+    const degreeId = this.degreeFormControl.value;
+    const courseIndex = this.findCourseIndex(courseID, this.selectedCourses);
 
-    this.firebaseService.hasDocument(academicTerm.replace('/', '-'), degreeId, 'courses', courseToRemove.id).then(has => {
+    this.firebaseService.hasCourseInDegree(academicTerm, degreeId, courseID).then(has => {
       // Add back to select if same degree
       if (has) {
+        const courseToRemove = this.selectedCourses[courseIndex];
         this.courses.push(courseToRemove);
         this.courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
       }
 
-      this.selectedCourses.splice(index, 1);
-      this.selectedCoursesIDs.delete(courseToRemove.id);
+      this.selectedCourses.splice(courseIndex, 1);
+      this.selectedCoursesIDs.delete(courseID);
       this.logger.log('selected courses', this.selectedCourses);
     });
   }
 
-  generateSchedules(): void {
+  findCourseIndex(courseID: number, courses: Course[]): number {
+    let index = 0;
+    for (const course of courses) {
+      if (course.id === courseID) { return index; }
+      index++;
+    }
+    return null;
+  }
+
+  pickCourseCampus(selected: {courseID: number, campus: string}): void {
+    this.campusPicked.set(selected.courseID, [selected.campus]);
+  }
+
+  pickTypesOfClasses(selected: {courseID: number, types: string[]}): void {
+    this.typesOfClassesPicked.set(selected.courseID, selected.types);
+  }
+
+  generateSchedules(): void { // TODO: testing
     if (this.selectedCourses.length > 0) {
-      console.log('Generating...');
-      // this.generateSchedulesService().generate();
+
+      // Update campus based on user choice
+      for (const key of this.campusPicked.keys()) {
+        const index = this.findCourseIndex(key, this.selectedCourses);
+        this.selectedCourses[index].campus = this.campusPicked.get(key);
+      }
+
+      // Update types of classes based on user choice
+      for (const key of this.typesOfClassesPicked.keys()) {
+        const index = this.findCourseIndex(key, this.selectedCourses);
+        this.selectedCourses[index].types = this.typesOfClassesPicked.get(key);
+      }
+
+      for (const course of this.selectedCourses) {
+        // Remove shifts not held on selected campus
+        for (let j = course.shifts.length - 1; j >= 0; j--) {
+          if (!course.campus.includes(course.shifts[j].lessons[0].campus)) {
+            course.shifts.splice(j, 1);
+          }
+        }
+
+        // Remove shifts with types of classes not selected
+        if (this.typesOfClassesPicked.has(course.id)) {
+          for (let j = course.shifts.length - 1; j >= 0; j--) {
+            const shift = course.shifts[j];
+            for (const type of shift.types) {
+              if (!course.types.includes(type)) {
+                course.shifts.splice(j, 1);
+              }
+            }
+          }
+        }
+      }
+
+      this.router.navigate(['/generate-schedules'], {state: {data: this.selectedCourses}});
     }
   }
 
