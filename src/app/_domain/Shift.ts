@@ -3,7 +3,11 @@ import {Lesson} from './Lesson';
 
 
 export class Shift {
-    constructor(private _name: string, private _types: ClassType[], private _lessons: Lesson[]) {}
+    constructor(
+      private _name: string,
+      private _types: ClassType[],
+      private _lessons: Lesson[],
+      private _campus: string) {}
 
     get name(): string { return this._name; }
     set name(value: string) { this._name = value; }
@@ -14,6 +18,9 @@ export class Shift {
     get lessons(): Lesson[] { return this._lessons; }
     set lessons(value: Lesson[]) { this._lessons = value; }
 
+    get campus(): string { return this._campus; }
+    set campus(value: string) { this._campus = value; }
+
     shiftConverter(): {} {
         const lessons: {}[] = [];
         for (const lesson of this.lessons) {
@@ -22,7 +29,8 @@ export class Shift {
         return {
             name: this.name,
             types: this.types,
-            lessons
+            lessons,
+            campus: this.campus
         };
     }
 

@@ -118,7 +118,7 @@
                       <label for="inputAcademicTerm">{{'main-content.labels.term' | translate}}</label>
                       <select class="custom-select" id="inputAcademicTerm" autofocus formControlName="academicTerm"
                               (change)="loadDegrees(academicTermFormControl.value)">
-                        <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{lowercase('main-content.labels.term' | translate)}}...</option>
+                        <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.term' | translate).toLowerCase()}}...</option>
                         <option *ngFor="let term of academicTerms" value="{{term}}">{{term}}</option>
                       </select>
                     </div>
@@ -133,7 +133,7 @@
                       <label for="inputDegree">{{'main-content.labels.degree' | translate}}</label>
                       <select class="custom-select" id="inputDegree" formControlName="degree"
                               (change)="loadCoursesBasicInfo(academicTermFormControl.value, degreeFormControl.value)">
-                        <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{lowercase('main-content.labels.degree' | translate)}}...</option>
+                        <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.degree' | translate).toLowerCase()}}...</option>
                         <option *ngFor="let degree of degrees" value="{{degree.id}}">{{degree.acronym}} - {{degree.name}}</option>
                       </select>
                     </div>
@@ -148,7 +148,7 @@
                   <label for="inputCourse">{{'main-content.labels.course' | translate}}</label>
                   <div class="input-group w-100">
                     <select class="custom-select" id="inputCourse" formControlName="course">
-                      <option disabled selected value="{{-1}}">{{'main-content.labels.placeholder' | translate}} {{lowercase('main-content.labels.course' | translate)}}...</option>
+                      <option disabled selected value="{{-1}}">{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.course' | translate).toLowerCase()}}...</option>
                       <option *ngFor="let course of courses" id="{{course.id}}" value="{{course.id}}">[{{course.acronym}}] {{course.name}}</option>
                     </select>
                     <div class="input-group-append">

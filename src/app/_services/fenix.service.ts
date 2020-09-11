@@ -236,7 +236,10 @@ export class FenixService {
           // Get shift lessons
           const shiftLessons = this.getShiftLessons(courseLoads, shift.lessons, shift.types);
 
-          shifts.push(new Shift(shift.name, shiftTypes, shiftLessons));
+          // Get shift campus
+          const shiftCampus = shiftLessons[0].campus;
+
+          shifts.push(new Shift(shift.name, shiftTypes, shiftLessons, shiftCampus));
         }
 
         // Get campi

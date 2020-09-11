@@ -68,7 +68,7 @@ export const courseConverter = {
           const end = lesson.end.toDate();
           lessons.push(new Lesson(start, end, lesson.room, lesson.campus));
         }
-        shifts.push(new Shift(shift.name, shift.types, lessons));
+        shifts.push(new Shift(shift.name, shift.types, lessons, shift.campus));
       }
       return new Course(data.id, data.name, data.acronym, data.types, data.campus, shifts, data.courseLoads);
     }

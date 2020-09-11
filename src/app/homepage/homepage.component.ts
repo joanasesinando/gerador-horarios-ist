@@ -1,7 +1,7 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
-import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import {Router} from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
 
 import {LoggerService} from '../_util/logger.service';
 import {Course} from '../_domain/Course';
@@ -20,6 +20,7 @@ import {
   faQuestion,
   faGlobeEurope
 } from '@fortawesome/free-solid-svg-icons';
+import {of} from 'rxjs';
 
 declare let $;
 
@@ -98,6 +99,7 @@ export class HomepageComponent implements OnInit {
     });
 
     // Get academic terms
+    // TODO: only show current and next (API about)
     this.fenixService.getAcademicTerms().then(academicTerms => {
       this.academicTerms = academicTerms;
       this.academicTermFormControl.enable();
@@ -113,20 +115,16 @@ export class HomepageComponent implements OnInit {
 
   hasAcademicTermSelected(): boolean { return this.academicTermFormControl.value != null; }
   hasDegreeSelected(): boolean { return this.degreeFormControl.value != null; }
-  hasCourseSelected(): boolean { return this.courseFormControl.value != null; }
-
-  lowercase(s: string): string {
-    return s.toLowerCase();
-  }
+  hasCourseSelected(): boolean { return this.courseFormControl.value !== -1; }
 
   showScrollDown(): boolean {
     return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
   }
 
   // TODO: same academic term; reset when picking different
-  loadDegrees(academicTerm: string): void { // TODO: testing
+  loadDegrees(academicTerm: string): Promise<void | Degree[]> {
     this.spinners.degree = true;
-    this.firebaseService.hasDegrees(academicTerm).then(has => {
+    return this.firebaseService.hasDegrees(academicTerm).then(has => {
       if (has) {
         this.logger.log('has degrees saved');
         this.firebaseService.getDegrees(academicTerm).then(degrees => {
@@ -156,9 +154,9 @@ export class HomepageComponent implements OnInit {
     });
   }
 
-  loadCoursesBasicInfo(academicTerm: string, degreeID: number): void { // TODO: testing
+  loadCoursesBasicInfo(academicTerm: string, degreeID: number): Promise<void | Course[]> {
     this.spinners.course = true;
-    this.firebaseService.hasCourses(academicTerm, degreeID).then(has => {
+    return this.firebaseService.hasCourses(academicTerm, degreeID).then(has => {
       if (has) {
         this.logger.log('has courses saved');
         this.firebaseService.getCourses(academicTerm, degreeID).then(courses => {
@@ -189,10 +187,10 @@ export class HomepageComponent implements OnInit {
     });
   }
 
-  addCourse(courseID: number): void { // TODO: testing
+  addCourse(courseID: number): void {
     const courseIndex = this.findCourseIndex(courseID, this.courses);
 
-    if (courseID && courseID !== -1) {
+    if (courseID && courseID !== -1 && courseIndex != null) {
       const addBtn = $('#addBtn');
       addBtn.attr('disabled', true);
       let courseToAdd = this.courses[courseIndex];
@@ -237,12 +235,15 @@ export class HomepageComponent implements OnInit {
     this.logger.log('selected courses', this.selectedCourses);
   }
 
-  removeCourse(courseID: number): void { // TODO: testing
+  removeCourse(courseID: number): Promise<void> | Promise<null> {
     const academicTerm = this.academicTermFormControl.value;
-    const degreeId = this.degreeFormControl.value;
+    const degreeID = this.degreeFormControl.value;
     const courseIndex = this.findCourseIndex(courseID, this.selectedCourses);
 
-    this.firebaseService.hasCourseInDegree(academicTerm, degreeId, courseID).then(has => {
+    // Course to remove is not selected
+    if (courseIndex == null) { return of(null).toPromise(); }
+
+    return this.firebaseService.hasCourseInDegree(academicTerm, degreeID, courseID).then(has => {
       // Add back to select if same degree
       if (has) {
         const courseToRemove = this.selectedCourses[courseIndex];
@@ -273,43 +274,67 @@ export class HomepageComponent implements OnInit {
     this.typesOfClassesPicked.set(selected.courseID, selected.types);
   }
 
-  generateSchedules(): void { // TODO: testing
+  generateSchedules(): void {
     if (this.selectedCourses.length > 0) {
-
-      // Update campus based on user choice
-      for (const key of this.campusPicked.keys()) {
-        const index = this.findCourseIndex(key, this.selectedCourses);
-        this.selectedCourses[index].campus = this.campusPicked.get(key);
-      }
-
-      // Update types of classes based on user choice
-      for (const key of this.typesOfClassesPicked.keys()) {
-        const index = this.findCourseIndex(key, this.selectedCourses);
-        this.selectedCourses[index].types = this.typesOfClassesPicked.get(key);
-      }
-
-      for (const course of this.selectedCourses) {
-        // Remove shifts not held on selected campus
-        for (let j = course.shifts.length - 1; j >= 0; j--) {
-          if (!course.campus.includes(course.shifts[j].lessons[0].campus)) {
-            course.shifts.splice(j, 1);
-          }
-        }
-
-        // Remove shifts with types of classes not selected
-        if (this.typesOfClassesPicked.has(course.id)) {
-          for (let j = course.shifts.length - 1; j >= 0; j--) {
-            const shift = course.shifts[j];
-            for (const type of shift.types) {
-              if (!course.types.includes(type)) {
-                course.shifts.splice(j, 1);
-              }
-            }
-          }
-        }
-      }
-
+      this.prepareCoursesToGenerate();
       this.router.navigate(['/generate-schedules'], {state: {data: this.selectedCourses}});
+    }
+  }
+
+  prepareCoursesToGenerate(): void {
+    this.updateCampus();
+    this.updateTypesOfClasses();
+
+    for (const course of this.selectedCourses) {
+      this.removeShiftsBasedOnCampus(course);
+      this.removeShiftsBasedOnTypesOfClasses(course);
+    }
+  }
+
+  /* -----------------------------------------------------------
+   * Update campus based on user choice
+   * ----------------------------------------------------------- */
+  updateCampus(): void {
+    for (const key of this.campusPicked.keys()) {
+      const index = this.findCourseIndex(key, this.selectedCourses);
+      this.selectedCourses[index].campus = this.campusPicked.get(key);
+    }
+  }
+
+  /* -----------------------------------------------------------
+   * Update types of classes based on user choice
+   * ----------------------------------------------------------- */
+  updateTypesOfClasses(): void {
+    for (const key of this.typesOfClassesPicked.keys()) {
+      const index = this.findCourseIndex(key, this.selectedCourses);
+      this.selectedCourses[index].types = this.typesOfClassesPicked.get(key);
+    }
+  }
+
+  /* -----------------------------------------------------------
+   * Remove shifts not held on selected campus
+   * ----------------------------------------------------------- */
+  removeShiftsBasedOnCampus(course: Course): void {
+    for (let i = course.shifts.length - 1; i >= 0; i--) {
+      if (!course.campus.includes(course.shifts[i].campus)) {
+        course.shifts.splice(i, 1);
+      }
+    }
+  }
+
+  /* -----------------------------------------------------------
+   * Remove shifts with types of classes not selected
+   * ----------------------------------------------------------- */
+  removeShiftsBasedOnTypesOfClasses(course: Course): void {
+    if (this.typesOfClassesPicked.has(course.id)) {
+      for (let i = course.shifts.length - 1; i >= 0; i--) {
+        const shift = course.shifts[i];
+        for (const type of shift.types) {
+          if (!course.types.includes(type)) {
+            course.shifts.splice(i, 1);
+          }
+        }
+      }
     }
   }
 
