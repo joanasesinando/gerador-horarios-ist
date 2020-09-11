@@ -1,6 +1,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {DebugElement} from '@angular/core';
 import {of} from 'rxjs';
+import _ from 'lodash';
 
 import {HomepageComponent} from './homepage.component';
 import {CourseCardComponent} from './course-card/course-card.component';
@@ -54,10 +55,20 @@ describe('HomepageComponent', () => {
       new Course(2, 'Course #2', 'C2', [ClassType.THEORY_PT], ['Taguspark'],
         [
           new Shift('T01', [ClassType.THEORY_PT], [
+            new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Taguspark'),
+            new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Taguspark')
+          ])
+        ], { Teórica: 3 }),
+      new Course(3, 'Course #3', 'C3', [ClassType.THEORY_PT, ClassType.PROBLEMS_PT], ['Alameda'],
+        [
+          new Shift('T01', [ClassType.THEORY_PT], [
             new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda'),
             new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Alameda')
+          ]),
+          new Shift('PB01', [ClassType.PROBLEMS_PT], [
+            new Lesson(new Date('2020-09-08 09:30'), new Date('2020-09-07 11:00'), 'R2', 'Alameda')
           ])
-        ], { Teórica: 3 })
+        ], { Teórica: 3, Problemas: 1.5 })
     ];
 
     fenixServiceStub = {
@@ -68,7 +79,8 @@ describe('HomepageComponent', () => {
       hasDegrees: () => of(true).toPromise(),
       getDegrees: () => of(degrees).toPromise(),
       hasCourses: () => of(true).toPromise(),
-      getCourses: () => of(courses).toPromise()
+      getCourses: () => of(courses).toPromise(),
+      // hasCourseInDegree: () => of(true).toPromise()
     };
 
     TestBed.configureTestingModule({
@@ -136,6 +148,7 @@ describe('HomepageComponent', () => {
 
 
   describe('Testing functionality', () => {
+
     beforeEach(async () => {
       const selectedAcademicTerm = academicTerms[0];
       await component.loadDegrees(selectedAcademicTerm);
@@ -144,18 +157,189 @@ describe('HomepageComponent', () => {
       await component.loadCoursesBasicInfo(selectedAcademicTerm, selectedDegree.id);
     });
 
-    describe('Adding a course', () => {
+    describe('Adding courses', () => {
 
       it('should add a course successfully', () => {
         const courseToAdd = courses[0];
         const index = 0;
 
+        // Add course
         component.addCourse(courseToAdd.id);
         courses.splice(index, 1);
 
         expect(component.selectedCourses).toEqual([courseToAdd]);
         expect(component.selectedCoursesIDs.has(courseToAdd.id)).toBeTrue();
         expect(component.courses).toEqual(courses);
+      });
+
+      it('should add two courses in a row successfully', () => {
+        const courseToAdd1 = courses[0];
+        const courseToAdd2 = courses[1];
+        const index = 0;
+
+        // Add course1
+        component.addCourse(courseToAdd1.id);
+        courses.splice(index, 1);
+
+        // Add course2
+        component.addCourse(courseToAdd2.id);
+        courses.splice(index, 1);
+
+        expect(component.selectedCourses).toEqual([courseToAdd2, courseToAdd1]);
+        expect(component.selectedCoursesIDs.has(courseToAdd1.id)).toBeTrue();
+        expect(component.selectedCoursesIDs.has(courseToAdd2.id)).toBeTrue();
+        expect(component.courses).toEqual(courses);
+      });
+
+      it('should add all courses of a degree', () => {
+        const coursesToAdd = _.cloneDeep(courses);
+
+        for (let i = courses.length - 1; i >= 0; i--) {
+          const courseToAdd = courses[i];
+          component.addCourse(courseToAdd.id);
+          courses.pop();
+          expect(component.selectedCoursesIDs.has(courseToAdd.id)).toBeTrue();
+        }
+
+        expect(component.selectedCourses).toEqual(coursesToAdd);
+        expect(component.courses).toEqual([]);
+      });
+
+
+      it('should add two courses from different degrees', async () => {
+        const selectedAcademicTerm = academicTerms[0];
+        const courseToAdd1 = courses[0];
+        const index = 0;
+
+        // Add course1
+        component.addCourse(courseToAdd1.id);
+        courses.splice(index, 1);
+
+        // Pick another degree
+        const selectedDegree = degrees[1];
+        await component.loadCoursesBasicInfo(selectedAcademicTerm, selectedDegree.id);
+
+        // Add course2
+        const courseToAdd2 = courses[0];
+        component.addCourse(courseToAdd2.id);
+        courses.splice(index, 1);
+
+        expect(component.selectedCourses).toEqual([courseToAdd2, courseToAdd1]);
+        expect(component.selectedCoursesIDs.has(courseToAdd1.id)).toBeTrue();
+        expect(component.selectedCoursesIDs.has(courseToAdd2.id)).toBeTrue();
+        expect(component.courses).toEqual(courses);
+      });
+
+      describe('Testing invalid inputs', () => {
+        const parameters = [
+          {description: 'should NOT add a course that doesnt exist on courses', input: 0},
+          {description: 'should NOT add a course when courses are empty', input: -1},
+          {description: 'should NOT add a course when no course selected to add', input: null}
+        ];
+
+        parameters.forEach((parameter) => {
+          it(parameter.description, () => {
+            // Add invalid course
+            component.addCourse(parameter.input);
+
+            expect(component.selectedCourses).toEqual([]);
+            expect(component.selectedCoursesIDs.size).toBe(0);
+            expect(component.courses).toEqual(courses);
+          });
+        });
+      });
+
+    });
+
+    describe('Removing courses', () => {
+      let course1: Course;
+      let course2: Course;
+
+      function sameDegree(value: boolean): void {
+        firebaseServiceStub.hasCourseInDegree = () => of(value).toPromise();
+      }
+
+      beforeEach(() => {
+        course1 = courses[0];
+        course2 = courses[1];
+
+        // Add courses
+        component.addCourse(course1.id);
+        component.addCourse(course2.id);
+        courses.splice(0, 2);
+
+        // Set form values
+        component.academicTermFormControl.setValue(academicTerms[0]);
+        component.degreeFormControl.setValue(degrees[0]);
+      });
+
+      it('should remove a course successfully', async () => {
+        sameDegree(true);
+        const courseToRemove = component.selectedCourses[0];
+
+        // Remove course
+        await expectAsync(component.removeCourse(courseToRemove.id)).toBeResolved();
+        courses.push(courseToRemove);
+        courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
+
+        expect(component.courses).toEqual(courses);
+        expect(component.selectedCourses).toEqual([course1]);
+        expect(component.selectedCoursesIDs.has(courseToRemove.id)).toBeFalse();
+      });
+
+      it('should remove two courses in a row', async () => {
+        sameDegree(true);
+        const courseToRemove1 = component.selectedCourses[0];
+        const courseToRemove2 = component.selectedCourses[1];
+
+        // Remove course1
+        await expectAsync(component.removeCourse(courseToRemove1.id)).toBeResolved();
+        courses.push(courseToRemove1);
+
+        // Remove course2
+        await expectAsync(component.removeCourse(courseToRemove2.id)).toBeResolved();
+        courses.push(courseToRemove2);
+        courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
+
+        expect(component.courses).toEqual(courses);
+        expect(component.selectedCourses).toEqual([]);
+        expect(component.selectedCoursesIDs.has(courseToRemove1.id)).toBeFalse();
+        expect(component.selectedCoursesIDs.has(courseToRemove2.id)).toBeFalse();
+      });
+
+      it('should remove all courses selected', async () => {
+        sameDegree(true);
+
+        for (let i = component.selectedCourses.length - 1; i >= 0; i--) {
+          const courseToRemove = component.selectedCourses[i];
+          await expectAsync(component.removeCourse(courseToRemove.id)).toBeResolved();
+          courses.push(courseToRemove);
+          expect(component.selectedCoursesIDs.has(courseToRemove.id)).toBeFalse();
+        }
+        courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
+
+        expect(component.courses).toEqual(courses);
+        expect(component.selectedCourses).toEqual([]);
+      });
+
+      it('should remove a course from a degree not currently selected', async () => {
+        sameDegree(false);
+
+        const courseToRemove = component.selectedCourses[0];
+        await expectAsync(component.removeCourse(courseToRemove.id)).toBeResolved();
+
+        expect(component.courses).toEqual(courses);
+        expect(component.selectedCourses).toEqual([course1]);
+        expect(component.selectedCoursesIDs.has(courseToRemove.id)).toBeFalse();
+      });
+
+      it('should NOT remove a course not selected', async () => {
+        const courseToRemove = courses[0];
+        await expectAsync(component.removeCourse(courseToRemove.id)).toBeResolved();
+
+        expect(component.courses).toEqual(courses);
+        expect(component.selectedCourses).toEqual([course2, course1]);
+        expect(component.selectedCoursesIDs.has(courseToRemove.id)).toBeFalse();
       });
 
     });

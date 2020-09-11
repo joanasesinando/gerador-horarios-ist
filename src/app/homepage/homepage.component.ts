@@ -20,6 +20,7 @@ import {
   faQuestion,
   faGlobeEurope
 } from '@fortawesome/free-solid-svg-icons';
+import {of} from 'rxjs';
 
 declare let $;
 
@@ -186,16 +187,15 @@ export class HomepageComponent implements OnInit {
     });
   }
 
-  addCourse(courseID: number): void { // TODO: testing
+  addCourse(courseID: number): void {
     const courseIndex = this.findCourseIndex(courseID, this.courses);
 
-    if (courseID && courseID !== -1) {
+    if (courseID && courseID !== -1 && courseIndex != null) {
       const addBtn = $('#addBtn');
       addBtn.attr('disabled', true);
       let courseToAdd = this.courses[courseIndex];
 
       if (courseToAdd.hasFullInfo()) {
-        console.log('has');
         this.addCourseHelper(courseToAdd, courseIndex, addBtn);
 
       } else {
@@ -235,12 +235,15 @@ export class HomepageComponent implements OnInit {
     this.logger.log('selected courses', this.selectedCourses);
   }
 
-  removeCourse(courseID: number): void { // TODO: testing
+  removeCourse(courseID: number): Promise<void> | Promise<null> {
     const academicTerm = this.academicTermFormControl.value;
-    const degreeId = this.degreeFormControl.value;
+    const degreeID = this.degreeFormControl.value;
     const courseIndex = this.findCourseIndex(courseID, this.selectedCourses);
 
-    this.firebaseService.hasCourseInDegree(academicTerm, degreeId, courseID).then(has => {
+    // Course to remove is not selected
+    if (courseIndex == null) { return of(null).toPromise(); }
+
+    return this.firebaseService.hasCourseInDegree(academicTerm, degreeID, courseID).then(has => {
       // Add back to select if same degree
       if (has) {
         const courseToRemove = this.selectedCourses[courseIndex];
