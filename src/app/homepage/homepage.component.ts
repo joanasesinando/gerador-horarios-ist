@@ -274,43 +274,67 @@ export class HomepageComponent implements OnInit {
     this.typesOfClassesPicked.set(selected.courseID, selected.types);
   }
 
-  generateSchedules(): void { // TODO: testing
+  generateSchedules(): void {
     if (this.selectedCourses.length > 0) {
-
-      // Update campus based on user choice
-      for (const key of this.campusPicked.keys()) {
-        const index = this.findCourseIndex(key, this.selectedCourses);
-        this.selectedCourses[index].campus = this.campusPicked.get(key);
-      }
-
-      // Update types of classes based on user choice
-      for (const key of this.typesOfClassesPicked.keys()) {
-        const index = this.findCourseIndex(key, this.selectedCourses);
-        this.selectedCourses[index].types = this.typesOfClassesPicked.get(key);
-      }
-
-      for (const course of this.selectedCourses) {
-        // Remove shifts not held on selected campus
-        for (let j = course.shifts.length - 1; j >= 0; j--) {
-          if (!course.campus.includes(course.shifts[j].lessons[0].campus)) {
-            course.shifts.splice(j, 1);
-          }
-        }
-
-        // Remove shifts with types of classes not selected
-        if (this.typesOfClassesPicked.has(course.id)) {
-          for (let j = course.shifts.length - 1; j >= 0; j--) {
-            const shift = course.shifts[j];
-            for (const type of shift.types) {
-              if (!course.types.includes(type)) {
-                course.shifts.splice(j, 1);
-              }
-            }
-          }
-        }
-      }
-
+      this.prepareCoursesToGenerate();
       this.router.navigate(['/generate-schedules'], {state: {data: this.selectedCourses}});
+    }
+  }
+
+  prepareCoursesToGenerate(): void {
+    this.updateCampus();
+    this.updateTypesOfClasses();
+
+    for (const course of this.selectedCourses) {
+      this.removeShiftsBasedOnCampus(course);
+      this.removeShiftsBasedOnTypesOfClasses(course);
+    }
+  }
+
+  /* -----------------------------------------------------------
+   * Update campus based on user choice
+   * ----------------------------------------------------------- */
+  updateCampus(): void {
+    for (const key of this.campusPicked.keys()) {
+      const index = this.findCourseIndex(key, this.selectedCourses);
+      this.selectedCourses[index].campus = this.campusPicked.get(key);
+    }
+  }
+
+  /* -----------------------------------------------------------
+   * Update types of classes based on user choice
+   * ----------------------------------------------------------- */
+  updateTypesOfClasses(): void {
+    for (const key of this.typesOfClassesPicked.keys()) {
+      const index = this.findCourseIndex(key, this.selectedCourses);
+      this.selectedCourses[index].types = this.typesOfClassesPicked.get(key);
+    }
+  }
+
+  /* -----------------------------------------------------------
+   * Remove shifts not held on selected campus
+   * ----------------------------------------------------------- */
+  removeShiftsBasedOnCampus(course: Course): void {
+    for (let i = course.shifts.length - 1; i >= 0; i--) {
+      if (!course.campus.includes(course.shifts[i].campus)) {
+        course.shifts.splice(i, 1);
+      }
+    }
+  }
+
+  /* -----------------------------------------------------------
+   * Remove shifts with types of classes not selected
+   * ----------------------------------------------------------- */
+  removeShiftsBasedOnTypesOfClasses(course: Course): void {
+    if (this.typesOfClassesPicked.has(course.id)) {
+      for (let i = course.shifts.length - 1; i >= 0; i--) {
+        const shift = course.shifts[i];
+        for (const type of shift.types) {
+          if (!course.types.includes(type)) {
+            course.shifts.splice(i, 1);
+          }
+        }
+      }
     }
   }
 

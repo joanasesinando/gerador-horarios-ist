@@ -47,27 +47,27 @@ describe('HomepageComponent', () => {
           new Shift('T01', [ClassType.THEORY_PT], [
             new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda'),
             new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Alameda')
-          ]),
+          ], 'Alameda'),
           new Shift('L01', [ClassType.LAB_PT], [
             new Lesson(new Date('2020-09-08 09:30'), new Date('2020-09-07 11:00'), 'R2', 'Alameda')
-          ])
+          ], 'Alameda')
         ], { Teórica: 3, Laboratorial: 1.5 }),
       new Course(2, 'Course #2', 'C2', [ClassType.THEORY_PT], ['Taguspark'],
         [
           new Shift('T01', [ClassType.THEORY_PT], [
             new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Taguspark'),
             new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Taguspark')
-          ])
+          ], 'Taguspark')
         ], { Teórica: 3 }),
       new Course(3, 'Course #3', 'C3', [ClassType.THEORY_PT, ClassType.PROBLEMS_PT], ['Alameda'],
         [
           new Shift('T01', [ClassType.THEORY_PT], [
             new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda'),
             new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Alameda')
-          ]),
+          ], 'Alameda'),
           new Shift('PB01', [ClassType.PROBLEMS_PT], [
             new Lesson(new Date('2020-09-08 09:30'), new Date('2020-09-07 11:00'), 'R2', 'Alameda')
-          ])
+          ], 'Alameda')
         ], { Teórica: 3, Problemas: 1.5 })
     ];
 
@@ -340,6 +340,180 @@ describe('HomepageComponent', () => {
         expect(component.courses).toEqual(courses);
         expect(component.selectedCourses).toEqual([course2, course1]);
         expect(component.selectedCoursesIDs.has(courseToRemove.id)).toBeFalse();
+      });
+
+    });
+
+    describe('Preparing courses to generate schedules for', () => {
+      let course: Course;
+
+      beforeEach(() => {
+        course = new Course(
+          1,
+          'Course #1',
+          'C1',
+          [ClassType.THEORY_PT, ClassType.LAB_PT],
+          ['Alameda', 'Taguspark'],
+          [
+            new Shift('T01', [ClassType.THEORY_PT], [
+              new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda'),
+              new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Alameda')
+            ], 'Alameda'),
+            new Shift('T02', [ClassType.THEORY_PT], [
+              new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Taguspark'),
+              new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Taguspark')
+            ], 'Taguspark'),
+            new Shift('L01', [ClassType.LAB_PT], [
+              new Lesson(new Date('2020-09-08 09:30'), new Date('2020-09-07 11:00'), 'R2', 'Alameda')
+            ], 'Alameda'),
+            new Shift('L02', [ClassType.LAB_PT], [
+              new Lesson(new Date('2020-09-08 09:30'), new Date('2020-09-07 11:00'), 'R2', 'Taguspark')
+            ], 'Taguspark')
+          ],
+          { Teórica: 3, Laboratorial: 1.5 });
+
+        // Add course
+        component.addCourse(course.id);
+      });
+
+      it('should update campus based on user choice', () => {
+        const campusSelected = course.campus[0];
+
+        component.pickCourseCampus({courseID: course.id, campus: campusSelected});
+        expect(component.campusPicked.has(course.id)).toBeTrue();
+        expect(component.campusPicked.get(course.id)).toEqual([campusSelected]);
+
+        component.updateCampus();
+        const courseSelected = component.selectedCourses[0];
+        expect(courseSelected.campus).toEqual([campusSelected]);
+      });
+
+      it('should update types of classes based on user choice', () => {
+        const typesSelected = [ClassType.THEORY_PT];
+
+        component.pickTypesOfClasses({courseID: course.id, types: typesSelected});
+        expect(component.typesOfClassesPicked.has(course.id)).toBeTrue();
+        expect(component.typesOfClassesPicked.get(course.id)).toEqual(typesSelected);
+
+        component.updateTypesOfClasses();
+        const courseSelected = component.selectedCourses[0];
+        expect(courseSelected.types).toEqual(typesSelected);
+      });
+
+      it('should update campus & types of classes based on user choice', () => {
+        const campusSelected = course.campus[0];
+        const typesSelected = [ClassType.THEORY_PT];
+
+        component.pickCourseCampus({courseID: course.id, campus: campusSelected});
+        expect(component.campusPicked.has(course.id)).toBeTrue();
+        expect(component.campusPicked.get(course.id)).toEqual([campusSelected]);
+
+        component.pickTypesOfClasses({courseID: course.id, types: typesSelected});
+        expect(component.typesOfClassesPicked.has(course.id)).toBeTrue();
+        expect(component.typesOfClassesPicked.get(course.id)).toEqual(typesSelected);
+
+        component.updateCampus();
+        component.updateTypesOfClasses();
+
+        const courseSelected = component.selectedCourses[0];
+        expect(courseSelected.campus).toEqual([campusSelected]);
+        expect(courseSelected.types).toEqual(typesSelected);
+      });
+
+      it('should remove shifts not held on selected campus', () => {
+        const campusSelected = course.campus[0];
+        component.pickCourseCampus({courseID: course.id, campus: campusSelected});
+
+        component.removeShiftsBasedOnCampus(course);
+        const courseSelected = component.selectedCourses[0];
+        courseSelected.shifts.forEach(shift => {
+          expect(shift.campus).toEqual(campusSelected);
+        });
+      });
+
+      it('should remove shifts with types of classes not selected', () => {
+        const typesSelected = [ClassType.THEORY_PT];
+        component.pickTypesOfClasses({courseID: course.id, types: typesSelected});
+
+        component.removeShiftsBasedOnTypesOfClasses(course);
+        const courseSelected = component.selectedCourses[0];
+        courseSelected.shifts.forEach(shift => {
+          shift.types.forEach(type => {
+            expect(typesSelected.includes(type));
+          });
+        });
+      });
+
+      it('should prepare one course successfully', () => {
+        const campusSelected = course.campus[0];
+        const typesSelected = [ClassType.THEORY_PT];
+
+        component.pickCourseCampus({courseID: course.id, campus: campusSelected});
+        expect(component.campusPicked.has(course.id)).toBeTrue();
+        expect(component.campusPicked.get(course.id)).toEqual([campusSelected]);
+
+        component.pickTypesOfClasses({courseID: course.id, types: typesSelected});
+        expect(component.typesOfClassesPicked.has(course.id)).toBeTrue();
+        expect(component.typesOfClassesPicked.get(course.id)).toEqual(typesSelected);
+
+        component.prepareCoursesToGenerate();
+        const courseSelected = component.selectedCourses[0];
+
+        expect(courseSelected.campus).toEqual([campusSelected]);
+        expect(courseSelected.types).toEqual(typesSelected);
+
+        courseSelected.shifts.forEach(shift => {
+          expect(shift.campus).toEqual(campusSelected);
+        });
+
+        courseSelected.shifts.forEach(shift => {
+          shift.types.forEach(type => {
+            expect(typesSelected.includes(type));
+          });
+        });
+      });
+
+      it('should prepare two courses successfully', () => {
+        const course2 = new Course(
+          2,
+          'Course #2',
+          'C2',
+          [ClassType.THEORY_PT],
+          ['Alameda'],
+          [
+            new Shift('T01', [ClassType.THEORY_PT], [
+              new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda'),
+              new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Alameda')
+            ], 'Alameda')
+          ],
+          { Teórica: 3 });
+
+        // Add course
+        component.addCourse(course2.id);
+
+        const campusSelected = course.campus[0];
+        const typesSelected = [ClassType.THEORY_PT];
+
+        component.pickCourseCampus({courseID: course.id, campus: campusSelected});
+        component.pickTypesOfClasses({courseID: course.id, types: typesSelected});
+        component.pickCourseCampus({courseID: course2.id, campus: campusSelected});
+        component.pickTypesOfClasses({courseID: course2.id, types: typesSelected});
+
+        component.prepareCoursesToGenerate();
+        component.selectedCourses.forEach(courseSelected => {
+          expect(courseSelected.campus).toEqual([campusSelected]);
+          expect(courseSelected.types).toEqual(typesSelected);
+
+          courseSelected.shifts.forEach(shift => {
+            expect(shift.campus).toEqual(campusSelected);
+          });
+
+          courseSelected.shifts.forEach(shift => {
+            shift.types.forEach(type => {
+              expect(typesSelected.includes(type));
+            });
+          });
+        });
       });
 
     });

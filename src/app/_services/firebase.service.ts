@@ -85,7 +85,7 @@ export class FirebaseService {
         types: course.types,
         campus: course.campus,
         shifts: course.convertShifts(),
-        courseLoads: course.courseLoads
+        courseLoads: course.courseLoads,
       });
   }
 

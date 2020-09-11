@@ -51,7 +51,7 @@ export class SchedulesComponent implements OnInit {
           for (const lesson of shift._lessons) {
             lessons.push(new Lesson(new Date(lesson._start), new Date(lesson._end), lesson._room, lesson._campus));
           }
-          shifts.push(new Shift(shift._name, shift._types, lessons));
+          shifts.push(new Shift(shift._name, shift._types, lessons, shift._campus));
         }
       }
       course.shifts = shifts;
