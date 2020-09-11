@@ -1,7 +1,7 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
-import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import {Router} from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
 
 import {LoggerService} from '../_util/logger.service';
 import {Course} from '../_domain/Course';
@@ -98,6 +98,7 @@ export class HomepageComponent implements OnInit {
     });
 
     // Get academic terms
+    // TODO: only show current and next (API about)
     this.fenixService.getAcademicTerms().then(academicTerms => {
       this.academicTerms = academicTerms;
       this.academicTermFormControl.enable();
@@ -113,20 +114,16 @@ export class HomepageComponent implements OnInit {
 
   hasAcademicTermSelected(): boolean { return this.academicTermFormControl.value != null; }
   hasDegreeSelected(): boolean { return this.degreeFormControl.value != null; }
-  hasCourseSelected(): boolean { return this.courseFormControl.value != null; }
-
-  lowercase(s: string): string {
-    return s.toLowerCase();
-  }
+  hasCourseSelected(): boolean { return this.courseFormControl.value !== -1; }
 
   showScrollDown(): boolean {
     return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
   }
 
   // TODO: same academic term; reset when picking different
-  loadDegrees(academicTerm: string): void { // TODO: testing
+  loadDegrees(academicTerm: string): Promise<void | Degree[]> {
     this.spinners.degree = true;
-    this.firebaseService.hasDegrees(academicTerm).then(has => {
+    return this.firebaseService.hasDegrees(academicTerm).then(has => {
       if (has) {
         this.logger.log('has degrees saved');
         this.firebaseService.getDegrees(academicTerm).then(degrees => {
@@ -156,9 +153,9 @@ export class HomepageComponent implements OnInit {
     });
   }
 
-  loadCoursesBasicInfo(academicTerm: string, degreeID: number): void { // TODO: testing
+  loadCoursesBasicInfo(academicTerm: string, degreeID: number): Promise<void | Course[]> {
     this.spinners.course = true;
-    this.firebaseService.hasCourses(academicTerm, degreeID).then(has => {
+    return this.firebaseService.hasCourses(academicTerm, degreeID).then(has => {
       if (has) {
         this.logger.log('has courses saved');
         this.firebaseService.getCourses(academicTerm, degreeID).then(courses => {
@@ -198,6 +195,7 @@ export class HomepageComponent implements OnInit {
       let courseToAdd = this.courses[courseIndex];
 
       if (courseToAdd.hasFullInfo()) {
+        console.log('has');
         this.addCourseHelper(courseToAdd, courseIndex, addBtn);
 
       } else {
