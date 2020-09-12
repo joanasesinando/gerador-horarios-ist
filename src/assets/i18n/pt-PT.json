@@ -30,6 +30,15 @@
     "no-more-courses": "Não existem mais cadeiras"
   },
 
+  "week-days": {
+    "monday": "Seg",
+    "tuesday": "Ter",
+    "wednesday": "Qua",
+    "thursday": "Qui",
+    "friday": "Sex",
+    "saturday": "Sáb"
+  },
+
   "errors": {
     "no-shifts-found": "Cadeira sem informação suficiente"
   }

@@ -1,42 +1,20 @@
 <div class="cd-schedule loading">
   <div class="timeline">
     <ul>
-      <li><span>08:00</span></li>
-      <li><span>08:30</span></li>
-      <li><span>09:00</span></li>
-      <li><span>09:30</span></li>
-      <li><span>10:00</span></li>
-      <li><span>10:30</span></li>
-      <li><span>11:00</span></li>
-      <li><span>11:30</span></li>
-      <li><span>12:00</span></li>
-      <li><span>12:30</span></li>
-      <li><span>13:00</span></li>
-      <li><span>13:30</span></li>
-      <li><span>14:00</span></li>
-      <li><span>14:30</span></li>
-      <li><span>15:00</span></li>
-      <li><span>15:30</span></li>
-      <li><span>16:00</span></li>
-      <li><span>16:30</span></li>
-      <li><span>17:00</span></li>
-      <li><span>17:30</span></li>
-      <li><span>18:00</span></li>
-      <li><span>18:30</span></li>
-      <li><span>19:00</span></li>
-      <li><span>19:30</span></li>
-      <li><span>20:00</span></li>
+      <li *ngFor="let time of timeline.hours">
+        <span>{{time}}</span>
+      </li>
     </ul>
   </div> <!-- .timeline -->
 
   <div class="events">
     <ul class="wrap">
       <li class="events-group">
-        <div class="top-info"><span>Monday</span></div>
+        <div class="top-info"><span>{{'week-days.monday' | translate}}</span></div>
         <ul>
           <li class="single-event" data-start="08:00" data-end="09:00" data-content="event-abs-circuit" data-event="event-1">
             <div class="single-event-div" (click)="pin()">
-              <em class="event-name">{{test}}</em>
+              <em class="event-name">gf</em>
             </div>
           </li>
 
@@ -55,7 +33,7 @@
       </li>
 
       <li class="events-group">
-        <div class="top-info"><span>Tuesday</span></div>
+        <div class="top-info"><span>{{'week-days.tuesday' | translate}}</span></div>
 
         <ul>
           <li class="single-event" data-start="10:00" data-end="11:00"  data-content="event-rowing-workout" data-event="event-2">
@@ -85,7 +63,7 @@
       </li>
 
       <li class="events-group">
-        <div class="top-info"><span>Wednesday</span></div>
+        <div class="top-info"><span>{{'week-days.wednesday' | translate}}</span></div>
 
         <ul>
           <li class="single-event" data-start="09:00" data-end="10:00" data-content="event-restorative-yoga" data-event="event-4">
@@ -115,7 +93,7 @@
       </li>
 
       <li class="events-group">
-        <div class="top-info"><span>Thursday</span></div>
+        <div class="top-info"><span>{{'week-days.thursday' | translate}}</span></div>
 
         <ul>
           <li class="single-event" data-start="09:30" data-end="10:30" data-content="event-abs-circuit" data-event="event-1">
@@ -145,7 +123,7 @@
       </li>
 
       <li class="events-group">
-        <div class="top-info"><span>Friday</span></div>
+        <div class="top-info"><span>{{'week-days.friday' | translate}}</span></div>
 
         <ul>
           <li class="single-event" data-start="10:00" data-end="11:00"  data-content="event-rowing-workout" data-event="event-2">
@@ -169,7 +147,7 @@
       </li>
       <!--        -->
       <li class="events-group">
-        <div class="top-info"><span>Saturday</span></div>
+        <div class="top-info"><span>{{'week-days.saturday' | translate}}</span></div>
         <ul>
           <li class="single-event" data-start="09:30" data-end="10:30" data-content="event-abs-circuit" data-event="event-1">
             <div class="single-event-div" (click)="pin()">

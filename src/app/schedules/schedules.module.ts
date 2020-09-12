@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { SchedulesRoutingModule } from './schedules-routing.module';
 import { SchedulesComponent } from './schedules.component';
 import { TimetableComponent } from './timetable/timetable.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @NgModule({
@@ -13,7 +14,8 @@ import { TimetableComponent } from './timetable/timetable.component';
   ],
   imports: [
     CommonModule,
-    SchedulesRoutingModule
+    SchedulesRoutingModule,
+    TranslateModule
   ]
 })
 export class SchedulesModule { }

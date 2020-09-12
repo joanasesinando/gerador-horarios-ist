@@ -30,6 +30,15 @@
     "no-more-courses": "No more courses available"
   },
 
+  "week-days": {
+    "monday": "Mon",
+    "tuesday": "Tue",
+    "wednesday": "Wed",
+    "thursday": "Thu",
+    "friday": "Fri",
+    "saturday": "Sat"
+  },
+
   "errors": {
     "no-shifts-found": "Course with not enough info"
   }
