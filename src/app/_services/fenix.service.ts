@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import {Course} from '../_domain/Course';
@@ -28,6 +28,56 @@ export class FenixService {
    * ---------------------------------------------------------------------------- */
   private static validAcademicTerm(academicTerm: string): boolean {
     return academicTerm >= '2003/2004';
+  }
+
+  private static parseDegree(degree): Degree {
+    if (!degree.id) { throw new Error('No ID found for degree'); }
+    if (!degree.name) { throw new Error('No name found for degree ' + degree.id); }
+    if (!degree.acronym) { throw new Error('No acronym found for degree ' + degree.id); }
+
+    return new Degree(degree.id, degree.name, degree.acronym);
+  }
+
+  private static parseCourseBasicInfo(course): Course {
+    if (!course.id) { throw new Error('No ID found for course'); }
+    if (!course.name) { throw new Error('No name found for course ' + course.id); }
+    if (!course.acronym) { throw new Error('No acronym found for course ' + course.id); }
+
+    return new Course(course.id, course.name, course.acronym);
+  }
+
+  private static parseCourseMissingInfo(scheduleJson): void {
+    if (!scheduleJson.courseLoads) { throw new Error('No courseLoads found'); }
+    scheduleJson.courseLoads.forEach(cl => {
+      if (!cl.type) { throw new Error('No type found in courseLoads'); }
+      if (!cl.unitQuantity) { throw new Error('No unitQuantity found in courseLoads'); }
+    });
+
+    if (!scheduleJson.shifts) { throw new Error('No shifts found'); }
+    scheduleJson.shifts.forEach(shift => {
+      if (!shift.name) { throw new Error('No name found for shift'); }
+      if (!shift.types) { throw new Error('No types found for shift ' + shift.name); }
+      if (!shift.lessons) { throw new Error('No lessons found for shift ' + shift.name); }
+
+      shift.lessons.forEach(lesson => {
+        if (!lesson.start) { throw new Error('No start found for lesson'); }
+        if (!lesson.end) { throw new Error('No end found for lesson'); }
+        if (!lesson.room) { throw new Error('No room found for lesson'); }
+      });
+      if (!shift.rooms) { throw new Error('No rooms found for shift ' + shift.name); }
+    });
+  }
+
+  /* ----------------------------------------------------------------------------
+   * Fill-in missing info that's not crucial for generating schedules.
+   * ---------------------------------------------------------------------------- */
+  private static fillMissingInfo(course: Course): Course {
+    if (course.campus.length === 0) { course.campus = ['NONE FOUND']; }
+    if (course.types.length === 0) { course.types = [ClassType.NONE]; }
+    if (course.shifts.length === 0) {
+      throw new Error('No shifts found. Impossible to generate schedules for course: ' + course.name);
+    }
+    return course;
   }
 
   private static getCourseLoads(courseLoads): {} {
@@ -186,72 +236,82 @@ export class FenixService {
       });
   }
 
-  getDegrees(academicTerm: string): Promise<Degree[]> {
+  getDegrees(academicTerm: string): Promise<Degree[]> { // TODO: testing
     return this.httpGet('degrees?academicTerm=' + academicTerm + '&lang=' + this.getLanguage())
       .then(r => r.json())
       .then(degreesJson => {
         const degrees: Degree[] = [];
-        for (const degree of degreesJson) {
-          degrees.push(new Degree(degree.id, degree.name, degree.acronym));
+        for (let degree of degreesJson) {
+          try {
+            degree = FenixService.parseDegree(degree);
+            degrees.push(degree);
+          } catch (error) { console.error(error); }
         }
         return degrees.sort((a, b) => a.acronym.localeCompare(b.acronym));
       });
   }
 
-  getCoursesBasicInfo(academicTerm: string, degreeId: number): Promise<Course[]> {
+  getCoursesBasicInfo(academicTerm: string, degreeId: number): Promise<Course[]> { // TODO: testing
     return this.httpGet('degrees/' + degreeId + '/courses?academicTerm=' + academicTerm + '&lang=' + this.getLanguage())
       .then(r => r.json())
       .then(coursesJson => {
         const courses: Course[] = [];
 
-        for (const course of coursesJson) {
-          // Remove optional courses (example acronym: O32)
-          if (course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9') { continue; }
+        for (let course of coursesJson) {
+          try {
+            course = FenixService.parseCourseBasicInfo(course);
 
-          courses.push(new Course(course.id, course.name, course.acronym));
+            // Remove optional courses (example acronym: O32)
+            if (course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9') { continue; }
+
+            courses.push(course);
+          } catch (error) { console.error(error); }
         }
 
         return courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
       });
   }
 
-  loadMissingCourseInfo(course: Course): Promise<Course> {
+  loadMissingCourseInfo(course: Course): Promise<Course> { // TODO: testing
     return this.httpGet('courses/' + course.id + '/schedule' + '?lang=' + this.getLanguage())
       .then(r => r.json())
       .then(scheduleJson => {
+        try {
+          FenixService.parseCourseMissingInfo(scheduleJson);
 
-        // Get types
-        const types: ClassType[] = this.getCourseTypes(scheduleJson.courseLoads);
+          // Get types
+          const types: ClassType[] = this.getCourseTypes(scheduleJson.courseLoads);
 
-        // Get course loads
-        let courseLoads = FenixService.getCourseLoads(scheduleJson.courseLoads);
+          // Get course loads
+          let courseLoads = FenixService.getCourseLoads(scheduleJson.courseLoads);
 
-        // Get shifts
-        const shifts: Shift[] = [];
-        for (const shift of scheduleJson.shifts) {
+          // Get shifts
+          const shifts: Shift[] = [];
+          for (const shift of scheduleJson.shifts) {
 
-          // Get shift types
-          const shiftTypes = this.getShiftTypes(shift.types);
+            // Get shift types
+            const shiftTypes = this.getShiftTypes(shift.types);
 
-          // Get shift lessons
-          const shiftLessons = this.getShiftLessons(courseLoads, shift.lessons, shift.types);
+            // Get shift lessons
+            const shiftLessons = this.getShiftLessons(courseLoads, shift.lessons, shift.types);
 
-          // Get shift campus
-          const shiftCampus = shiftLessons[0].campus;
+            // Get shift campus
+            const shiftCampus = shiftLessons[0].campus;
 
-          shifts.push(new Shift(shift.name, shiftTypes, shiftLessons, shiftCampus));
-        }
+            shifts.push(new Shift(shift.name, shiftTypes, shiftLessons, shiftCampus));
+          }
 
-        // Get campi
-        const campi: string[] = FenixService.getCourseCampi(shifts).reverse();
+          // Get campi
+          const campi: string[] = FenixService.getCourseCampi(shifts).reverse();
 
-        // Update courseLoads if inconsistencies found
-        if (this.errorInAPI) {
-          courseLoads = FenixService.calculateCourseLoads(shifts);
-          this.errorInAPI = false;
-        }
+          // Update courseLoads if inconsistencies found
+          if (this.errorInAPI) {
+            courseLoads = FenixService.calculateCourseLoads(shifts);
+            this.errorInAPI = false;
+          }
 
-        return new Course(course.id, course.name, course.acronym, types, campi, shifts, courseLoads);
+          return FenixService.fillMissingInfo(new Course(course.id, course.name, course.acronym, types, campi, shifts, courseLoads));
+        } catch (error) { console.error(error); }
       });
   }
 

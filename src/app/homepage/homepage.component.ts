@@ -208,28 +208,32 @@ export class HomepageComponent implements OnInit {
           this.addCourseHelper(courseToAdd, courseIndex, addBtn);
 
           // Load to database
-          const error = {found: false, type: null};
-          const academicTerm = $('#inputAcademicTerm').val();
-          const degreeId = $('#inputDegree').val();
-          this.firebaseService.updateCourse(academicTerm, degreeId, courseToAdd)
-            .catch((err) => { error.found = true; error.type = err; });
-          error.found ? this.logger.log('error saving courses:', error.type) : this.logger.log('course successfully updated');
+          if (course) {
+            const error = {found: false, type: null};
+            const academicTerm = $('#inputAcademicTerm').val();
+            const degreeId = $('#inputDegree').val();
+            this.firebaseService.updateCourse(academicTerm, degreeId, courseToAdd)
+              .catch((err) => { error.found = true; error.type = err; });
+            error.found ? this.logger.log('error saving courses:', error.type) : this.logger.log('course successfully updated');
+          }
         });
       }
     }
   }
 
   addCourseHelper(course, index, addBtn): void {
-    // Update arrays
-    this.selectedCourses.unshift(course);
-    this.selectedCoursesIDs.set(course.id, true);
-    this.courses.splice(index, 1);
+    if (course) {
+      // Update arrays
+      this.selectedCourses.unshift(course);
+      this.selectedCoursesIDs.set(course.id, true);
+      this.courses.splice(index, 1);
 
-    // Remove course from select
-    $('#' + course.id).remove();
+      // Remove course from select
+      $('#' + course.id).remove();
 
-    // Reset select
-    this.courseFormControl.patchValue(-1);
+      // Reset select
+      this.courseFormControl.patchValue(-1);
+    }
 
     addBtn.attr('disabled', false);
     this.logger.log('selected courses', this.selectedCourses);

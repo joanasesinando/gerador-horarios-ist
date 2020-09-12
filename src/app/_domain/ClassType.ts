@@ -8,5 +8,6 @@ export enum ClassType {
     PROBLEMS_EN = 'Problems',
     SEMINARY_EN = 'Seminary',
     TUTORIAL_ORIENTATION = 'Tutorial Orientation',
-    TRAINING_PERIOD = 'Training Period'
+    TRAINING_PERIOD = 'Training Period',
+    NONE = 'NONE FOUND'
 }

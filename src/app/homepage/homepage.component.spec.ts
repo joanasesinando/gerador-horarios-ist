@@ -121,7 +121,6 @@ describe('HomepageComponent', () => {
     expect(component).toBeTruthy();
   });
 
-
   describe('Loading academic terms, degrees, and courses', () => {
 
     it('should load academic terms', async () => {
