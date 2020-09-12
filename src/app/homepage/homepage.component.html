@@ -162,6 +162,8 @@
                   </div>
                   <p *ngIf="hasAcademicTermSelected() && hasDegreeSelected() && courses.length === 0 && !spinners.course"
                      class="text-danger"><small>{{'main-content.no-more-courses' | translate}}</small></p>
+                  <p *ngIf="noShiftsFound"
+                     class="text-danger"><small>{{'errors.no-shifts-found' | translate}}</small></p>
                 </div>
               </form>
 
@@ -194,3 +196,19 @@
 </div> <!-- /.container-fluid -->
 
 <app-about-modal></app-about-modal>
+
+
+<!-- Alerts
+================================================== -->
+<div id="errorAlert" class="alert alert-danger collapse" role="alert" onclick="$('#errorAlert').hide();">
+  <div class="d-flex align-items-center">
+    <div class="alert-icon-container">
+      <fa-icon [icon]="faBolt" class="fa-md"></fa-icon>
+    </div>
+    <div class="alert-content">
+      <p class="alert-title">Error</p>
+      <p class="alert-text"></p>
+    </div>
+  </div>
+</div>
+<!-- ================================================== -->

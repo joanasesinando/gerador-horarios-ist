@@ -28,5 +28,9 @@
     "generate-btn": "Generate Schedules",
     "no-course-selected": "No course selected",
     "no-more-courses": "No more courses available"
+  },
+
+  "errors": {
+    "no-shifts-found": "Course with not enough info"
   }
 }

@@ -19,7 +19,7 @@ export class SchedulesComponent implements OnInit {
   generatedSchedules: Schedule[] = [];
 
   spinner = true;
-  generationTime: number;
+  generationTime: number = null;
 
   constructor(private logger: LoggerService, private router: Router) { }
 
@@ -35,7 +35,8 @@ export class SchedulesComponent implements OnInit {
     this.logger.log('generated schedules', this.generatedSchedules);
 
     // Fake staling for UX
-    this.generationTime < 1000 ? setTimeout(() => this.spinner = false, 1000) : this.spinner = false;
+    this.generationTime != null && this.generationTime < 1000 ?
+      setTimeout(() => this.spinner = false, 1000) : this.spinner = false;
   }
 
   parseCourses(data: {_id, _name, _acronym, _types, _campus, _shifts, _courseLoads}[]): Course[] {
@@ -77,7 +78,10 @@ export class SchedulesComponent implements OnInit {
     // Combine shifts
     const classesPerCourse: Class[][] = [];
     for (const course of this.selectedCourses) {
-      classesPerCourse.push(this.combineShifts(course));
+      const classes = this.combineShifts(course);
+      if (classes.length !== 0) {
+        classesPerCourse.push(classes);
+      }
     }
 
     // Combine classes
@@ -92,6 +96,8 @@ export class SchedulesComponent implements OnInit {
   }
 
   combineShifts(course: Course): Class[] { // TODO: testing
+    if (course.shifts.length === 0) { return []; }
+
     const shiftsMap = new Map<string, Shift[]>();
     const shiftsArray: Shift[][] = [];
 
@@ -119,6 +125,9 @@ export class SchedulesComponent implements OnInit {
   }
 
   combineClasses(classes: Class[][]): Schedule[] { // TODO: testing
+    if (classes.length === 0) { return []; }
+    if (classes.length === 1) { return [new Schedule(classes[0])]; }
+
     // Get combinations of classes & arrange into schedules
     const schedules: Schedule[] = [];
     for (const combination of this.allPossibleCases(classes)) {

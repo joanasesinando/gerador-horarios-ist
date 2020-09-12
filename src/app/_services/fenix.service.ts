@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
+import {ErrorService} from '../_util/error.service';
 
 import {Course} from '../_domain/Course';
 import {Degree} from '../_domain/Degree';
@@ -16,7 +17,7 @@ export class FenixService {
   url = 'https://cors-anywhere.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/';
   errorInAPI = false;
 
-  constructor(public translateService: TranslateService) { }
+  constructor(public translateService: TranslateService, public errorService: ErrorService) { }
 
   /* ----------------------------------------------------------------------------
    * Returns true if academicTerm is bigger or equal to 2003/2004.
@@ -311,7 +312,8 @@ export class FenixService {
           }
 
           return FenixService.fillMissingInfo(new Course(course.id, course.name, course.acronym, types, campi, shifts, courseLoads));
-        } catch (error) { console.error(error); }
+
+        } catch (error) { this.errorService.showError(error); }
       });
   }
 

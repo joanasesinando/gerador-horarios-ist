@@ -18,7 +18,8 @@ import {
   faTh,
   faThumbtack,
   faQuestion,
-  faGlobeEurope
+  faGlobeEurope,
+  faBolt
 } from '@fortawesome/free-solid-svg-icons';
 import {of} from 'rxjs';
 
@@ -34,6 +35,7 @@ export class HomepageComponent implements OnInit {
 
   mobileView = false;
   featuresHorizontal = false;
+  noShiftsFound = false;
 
   academicTerms: string[] = [];
   degrees: Degree[] = [];
@@ -69,6 +71,7 @@ export class HomepageComponent implements OnInit {
   faTh = faTh;
   faQuestion = faQuestion;
   faGlobeEurope = faGlobeEurope;
+  faBolt = faBolt;
 
   constructor(
     private logger: LoggerService,
@@ -188,6 +191,7 @@ export class HomepageComponent implements OnInit {
   }
 
   addCourse(courseID: number): void {
+    this.noShiftsFound = false;
     const courseIndex = this.findCourseIndex(courseID, this.courses);
 
     if (courseID && courseID !== -1 && courseIndex != null) {
@@ -233,7 +237,8 @@ export class HomepageComponent implements OnInit {
 
       // Reset select
       this.courseFormControl.patchValue(-1);
-    }
+
+    } else { this.noShiftsFound = true; }
 
     addBtn.attr('disabled', false);
     this.logger.log('selected courses', this.selectedCourses);

@@ -5,7 +5,8 @@
  *    2. Buttons
  *    3. Checkboxes
  *    4. Dropdowns
- *    5. Scrollbar
+ *    5. Alerts
+ *    6. Scrollbar
  *
  * =================================================================== */
 
@@ -88,7 +89,119 @@ a { color: $gh-blue; }
 
 
 /* ===================================================================
- *  5. Scrollbar
+ *  5. Alerts
+ *
+ * ------------------------------------------------------------------- */
+
+.alert {
+  position: fixed;
+  top: .5rem;
+  right: .5rem;
+  border-width: 1px;
+  border-radius: .25rem;
+  padding: 1rem;
+  width: 25rem;
+  box-shadow: 0 .5rem 1rem 0 rgba(44, 51, 73, 0.1);
+  margin-bottom: 0;
+  z-index: 1060;
+}
+@media (max-width: 575.98px) {
+  .alert { width: 95%; }
+}
+
+.alert-icon-container {
+  background-color: white;
+  border-radius: 0.25rem;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 1.25rem;
+}
+
+.alert-title {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.5rem;
+  color: white;
+  margin-bottom: 0;
+}
+
+.alert-text {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.125rem;
+  color: white;
+  margin-bottom: 0;
+}
+
+.alert-success {
+  background-color: #00d68f;
+  border-color: #00d68f;
+}
+
+.alert-success:hover {
+  background-color: #00e498;
+  border-color: #00e498;
+  cursor: pointer;
+}
+
+.alert-success .alert-icon-container {
+  color: #00d68f;
+}
+
+.alert-danger {
+  background-color: #ff3d71;
+  border-color: #ff3d71;
+}
+
+.alert-danger:hover {
+  background-color: #ff4678;
+  border-color: #ff4678;
+  cursor: pointer;
+}
+
+.alert-danger .alert-icon-container {
+  color: #ff3d71;
+}
+
+.alert-warning {
+  background-color: #ffaa00;
+  border-color: #ffaa00;
+}
+
+.alert-warning:hover {
+  background-color: #feae0c;
+  border-color: #feae0c;
+  cursor: pointer;
+}
+
+.alert-warning .alert-icon-container {
+  color: #ffaa00;
+}
+
+.alert-info {
+  background-color: #0095ff;
+  border-color: #0095ff;
+}
+
+.alert-info:hover {
+  background-color: #0c9afe;
+  border-color: #0c9afe;
+  cursor: pointer;
+}
+
+.alert-info .alert-icon-container {
+  color: #0095ff;
+}
+
+
+
+/* ===================================================================
+ *  6. Scrollbar
  *
  * ------------------------------------------------------------------- */
 

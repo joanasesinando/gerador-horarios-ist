@@ -28,5 +28,9 @@
     "generate-btn": "Gerar Horários",
     "no-course-selected": "Nenhuma cadeira selecionada",
     "no-more-courses": "Não existem mais cadeiras"
+  },
+
+  "errors": {
+    "no-shifts-found": "Cadeira sem informação suficiente"
   }
 }

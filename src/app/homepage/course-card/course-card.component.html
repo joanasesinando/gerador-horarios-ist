@@ -5,7 +5,7 @@
     <h5 class="card-title course-name mt-2">[{{course.acronym}}] {{course.name}}</h5>
 
     <!-- Campus -->
-    <div *ngIf="course.campus" class="d-flex flex-wrap">
+    <div *ngIf="course.campus && course.campus.length > 1" class="d-flex flex-wrap">
       <div *ngFor="let campus of course.campus; let i = index; let first = first; let last = last"
            class="custom-control custom-radio mb-2" [ngClass]="{'mr-3': !last}">
         <input type="radio" [checked]="first" class="custom-control-input"
