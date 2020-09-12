@@ -1,0 +1,331 @@
+/* reset css */
+/* https://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, main {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol, ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* style css */
+/* --------------------------------
+
+Primary style
+
+-------------------------------- */
+.single-event-div {
+  font-size: .8rem;
+  color: white;
+  text-decoration: none;
+}
+
+
+/* --------------------------------
+
+Main Components
+
+-------------------------------- */
+$top-info-height: 50px; // NOTE: change on js as well
+$cell-height: 50px;
+$timeline-width: 60px; // NOTE: change more
+$columns: 6; // NOTE: change more
+
+/* ----------------------
+   cd-schedule
+   ---------------------- */
+.cd-schedule {
+  position: relative;
+  width: 95%;
+  margin: 2em auto;
+
+  &::before {
+    /* never visible - this is used in js to check the current MQ */
+    content: 'mobile';
+    display: none;
+  }
+
+  @media only screen and (min-width: 800px) {
+    width: 90%;
+    max-width: 1200px;
+    margin: 2em auto;
+
+    &::after { // FIXME: maybe remove
+      clear: both;
+      content: "";
+      display: block;
+    }
+
+    &::before {
+      content: 'desktop';
+    }
+  }
+}
+
+/* ----------------------
+   timeline
+   ---------------------- */
+.cd-schedule .timeline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  padding-top: $top-info-height;
+  @media only screen and (max-width: 799px) { padding-top: 40px; }
+
+  li {
+    position: relative;
+    height: $cell-height;
+    @media only screen and (max-width: 799px) { height: 40px; }
+
+    &::after {
+      // this is used to create the table horizontal lines
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: #EAEAEA;
+    }
+
+    &:last-of-type::after {
+      display: none;
+    }
+
+    span {
+      display: none;
+    }
+
+    @media only screen and (min-width: 1000px) {
+      &::after {
+        // NOTE: $timeline-width -> 60px
+        width: calc(100% - 60px);
+        left: $timeline-width;
+      }
+
+      span {
+        display: inline-block;
+        -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+      }
+
+      &:nth-of-type(2n) span {
+        // count from hour to hour
+        display: none;
+      }
+    }
+  }
+
+  @media only screen and (min-width: 800px) {
+    display: block;
+  }
+}
+
+/* ----------------------
+   events
+   ---------------------- */
+.cd-schedule .events {
+  position: relative;
+  float: left;
+  width: 100%;
+  z-index: 1;
+
+  @media only screen and (min-width: 1000px) {
+    // NOTE: $timeline-width -> 60px
+    width: calc(100% - 60px);
+    margin-left: $timeline-width;
+  }
+
+  .events-group {
+    width: calc(100% / 6); // NOTE: $columns -> 6
+    float: left;
+    border: 1px solid #EAEAEA;
+    margin-bottom: 0;
+
+    > ul {
+      position: relative;
+      display: block;
+      height: 959px;
+      @media only screen and (min-width: 1000px) { height: 1199px; }
+      overflow: visible;
+      padding: 0;
+
+      &::after {
+        /* never visible - used to add a right padding to .events-group > ul */
+        content: "";
+        display: block;
+        width: 1px;
+        height: 100%;
+        opacity: 0;
+        color: transparent;
+        clear: both;
+
+      }
+
+      &::after {
+        display: none;
+      }
+    }
+
+    &:not(:first-of-type) {
+      border-left-width: 0;
+    }
+  }
+
+  .top-info {
+    width: 100%;
+    /* vertically center its content */
+    display: table;
+    height: $top-info-height;
+    @media only screen and (max-width: 799px) { height: 40px; }
+    border-bottom: 1px solid #EAEAEA;
+    padding: 0;
+
+    > span {
+      /* vertically center inside its parent */
+      display: table-cell;
+      vertical-align: middle;
+      text-align: center;
+
+      @media only screen and (max-width: 799px) {
+        font-size: .6rem;
+      }
+    }
+  }
+
+  .single-event {
+    position: absolute;
+    float: left;
+    -webkit-transition: opacity .2s, background .2s;
+    transition: opacity .2s, background .2s;
+    z-index: 3;
+    /* top position and height will be set using js */
+    width: calc(100% + 2px);
+    left: -1px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+    /* reset style */
+    max-width: none;
+    margin-right: 0;
+
+    &:last-of-type {
+      margin-right: 0;
+    }
+
+    .single-event-div {
+      display: block;
+      height: 100%;
+      padding: 1.2em;
+      cursor: pointer;
+    }
+
+    .selected-event {
+      /* the .selected-event class is added when a user selects the event */
+      visibility: hidden;
+    }
+  }
+}
+
+/* ----------------------
+   loading
+   ---------------------- */
+.cd-schedule.loading .events .single-event {
+  /* the class .loading is added by default to the .cd-schedule element
+	   it is removed as soon as the single events are placed in the schedule plan (using javascript) */
+  opacity: 0;
+}
+
+/* --------------------------
+   event-name & event-date
+   -------------------------- */
+.cd-schedule .event-name,
+.cd-schedule .event-date {
+  display: block;
+  color: white;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.cd-schedule .event-name {
+  font-size: .7rem;
+
+  @media only screen and (min-width: 800px) {
+    font-size: 1rem;
+  }
+}
+
+.cd-schedule .event-date {
+  /* they are not included in the HTML but added using JavScript */
+  font-size: 1.4rem;
+  opacity: .7;
+  line-height: 1.2;
+  margin-bottom: .2em;
+}
+
+
+/* --------------------------
+   event colors
+   -------------------------- */
+.cd-schedule .single-event[data-event="event-1"] {
+  /* this is used to set a background color for the event */
+  background: #577F92;
+  &:hover { background: #618da1; }
+}
+
+.cd-schedule .single-event[data-event="event-2"] {
+  background: #443453;
+  &:hover { background: #513e63; }
+}
+
+.cd-schedule .single-event[data-event="event-3"],
+.cd-schedule [data-event="event-3"] .header-bg {
+  background: #A2B9B2;
+  &:hover { background: #b1c4be; }
+}
+
+.cd-schedule .single-event[data-event="event-4"],
+.cd-schedule [data-event="event-4"] .header-bg {
+  background: #f6b067;
+  &:hover { background: #f7bd7f; }
+}
