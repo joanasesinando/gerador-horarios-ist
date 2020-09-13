@@ -1,10 +1,10 @@
 import {AfterViewInit, Component, HostListener, Input, OnInit} from '@angular/core';
 
-import {TranslateService} from '@ngx-translate/core';
-
-import {Timetable} from '../../_domain/Timetable';
-import {Schedule} from '../../_domain/Schedule';
 import {LoggerService} from '../../_util/logger.service';
+import {TranslateService} from '@ngx-translate/core';
+import {TimetableService} from '../../_services/timetable.service';
+
+import {Schedule} from '../../_domain/Schedule';
 
 @Component({
   selector: 'app-timetable',
@@ -17,14 +17,18 @@ export class TimetableComponent implements OnInit, AfterViewInit {
 
   mobileView = false;
 
-  constructor(private logger: LoggerService, public translateService: TranslateService) { }
+  constructor(
+    private logger: LoggerService,
+    public translateService: TranslateService,
+    public timetableService: TimetableService
+  ) { }
 
   ngOnInit(): void {
     this.onWindowResize();
   }
 
   ngAfterViewInit(): void {
-    Timetable.create();
+    this.timetableService.createTimetable();
   }
 
   getTimelineHours(start, end): string[] {
@@ -55,6 +59,14 @@ export class TimetableComponent implements OnInit, AfterViewInit {
   @HostListener('window:resize', [])
   onWindowResize(): void {
     this.mobileView = window.innerWidth < 800; // phones & tablets
+    this.updateTimetable();
   }
 
+  updateTimetable(): void {
+    if (this.timetableService.timetableSchedulesObjs.length > 0) {
+      this.timetableService.timetableSchedulesObjs.forEach((timetable) => {
+        timetable.initSchedule();
+      });
+    }
+  }
 }

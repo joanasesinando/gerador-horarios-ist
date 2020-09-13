@@ -1,4 +1,4 @@
-<div class="cd-schedule loading">
+<div class="schedule">
   <div class="timeline">
     <ul>
       <li *ngFor="let time of getTimelineHours(8, 20)">
@@ -14,18 +14,21 @@
         <ul>
           <li class="single-event" data-start="08:00" data-end="09:00" data-content="event-abs-circuit" data-event="event-1">
             <div class="single-event-div" (click)="pin()">
+              <span class="event-date">08:00 - 09:00</span>
               <em class="event-name">gf</em>
             </div>
           </li>
 
           <li class="single-event" data-start="11:00" data-end="12:30" data-content="event-rowing-workout" data-event="event-2">
             <div class="single-event-div" (click)="pin()">
+              <span class="event-date">11:00 - 12:30</span>
               <em class="event-name">Rowing Workout</em>
             </div>
           </li>
 
           <li class="single-event" data-start="13:00" data-end="15:00"  data-content="event-yoga-1" data-event="event-3">
             <div class="single-event-div" (click)="pin()">
+              <span class="event-date">13:00 - 15:00</span>
               <em class="event-name">Yoga Level 1</em>
             </div>
           </li>
@@ -173,4 +176,4 @@
   </div>
 
   <div class="cover-layer"></div>
-</div> <!-- .cd-schedule -->
+</div> <!-- .schedule -->
