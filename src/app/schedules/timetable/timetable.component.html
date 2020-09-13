@@ -1,7 +1,7 @@
 <div class="cd-schedule loading">
   <div class="timeline">
     <ul>
-      <li *ngFor="let time of timeline.hours">
+      <li *ngFor="let time of getTimelineHours(8, 20)">
         <span>{{time}}</span>
       </li>
     </ul>

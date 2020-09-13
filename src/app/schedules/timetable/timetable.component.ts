@@ -4,6 +4,7 @@ import {TranslateService} from '@ngx-translate/core';
 
 import {Timetable} from '../../_domain/Timetable';
 import {Schedule} from '../../_domain/Schedule';
+import {LoggerService} from '../../_util/logger.service';
 
 @Component({
   selector: 'app-timetable',
@@ -12,13 +13,11 @@ import {Schedule} from '../../_domain/Schedule';
 })
 export class TimetableComponent implements OnInit, AfterViewInit {
 
-  @Input() shedules: Schedule[];
-  mobileView = false;
-  timeline = { start: 8, end: 20, hours: [] };
+  @Input() schedules: Schedule[];
 
-  constructor(public translateService: TranslateService) {
-    this.getTimelineHours(this.timeline.start, this.timeline.end);
-  }
+  mobileView = false;
+
+  constructor(private logger: LoggerService, public translateService: TranslateService) { }
 
   ngOnInit(): void {
     this.onWindowResize();
@@ -28,24 +27,25 @@ export class TimetableComponent implements OnInit, AfterViewInit {
     Timetable.create();
   }
 
-  getTimelineHours(start, end): void {
+  getTimelineHours(start, end): string[] {
+    const timeline: string[] = [];
     let current = start;
 
     while (current !== end + 1) {
       let s = '';
       if (current.toString().length === 1) { s += '0'; }
       s += current + ':00';
-      this.timeline.hours.push(s);
+      timeline.push(s);
 
       if (current !== end) {
         s = '';
         if (current.toString().length === 1) { s += '0'; }
         s += current + ':30';
-        this.timeline.hours.push(s);
+        timeline.push(s);
       }
       current++;
     }
-    console.log('finished timeline');
+    return timeline;
   }
 
   pin(): void {
