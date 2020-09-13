@@ -291,12 +291,33 @@ export class HomepageComponent implements OnInit {
   }
 
   prepareCoursesToGenerate(): void {
+    this.removeABDifferencesInShifts();
     this.updateCampus();
     this.updateTypesOfClasses();
 
     for (const course of this.selectedCourses) {
       this.removeShiftsBasedOnCampus(course);
       this.removeShiftsBasedOnTypesOfClasses(course);
+    }
+  }
+
+  /* -----------------------------------------------------------
+   * [Patching - Covid-19 Social Distancing]
+   * Updates courses so that A and B merges into one shift.
+   * ----------------------------------------------------------- */
+  removeABDifferencesInShifts(): void {
+    for (const course of this.selectedCourses) {
+      for (let i = course.shifts.length - 1; i >= 0; i--) {
+        const shift = course.shifts[i];
+
+        // Keep As & remove Bs
+        if (shift.name.startsWith('a_')) {
+          shift.name = shift.name.substring(2);
+
+        } else if (shift.name.startsWith('b_')) {
+          course.shifts.splice(i, 1);
+        }
+      }
     }
   }
 
