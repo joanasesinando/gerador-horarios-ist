@@ -79,9 +79,7 @@ export class SchedulesComponent implements OnInit {
     const classesPerCourse: Class[][] = [];
     for (const course of this.selectedCourses) {
       const classes = this.combineShifts(course);
-      if (classes.length !== 0) {
-        classesPerCourse.push(classes);
-      }
+      classesPerCourse.push(classes);
     }
 
     // Combine classes
@@ -95,14 +93,13 @@ export class SchedulesComponent implements OnInit {
     return schedules;
   }
 
-  combineShifts(course: Course): Class[] { // TODO: testing
-    if (course.shifts.length === 0) { return []; }
-
+  combineShifts(course: Course): Class[] {
     const shiftsMap = new Map<string, Shift[]>();
     const shiftsArray: Shift[][] = [];
 
     // Group shifts based on type of class
-    // NOTE: potential bug - types.length > 1 && type[0] equal e.g. another type on shift w/ types.length == 1
+    // NOTE: potential bug
+    //  types.length > 1 && type[0] equal e.g. another type on shift w/ types.length == 1
     for (const shift of course.shifts) {
       const type = shift.types[0];
       shiftsMap.has(type) ? shiftsMap.get(type).push(shift) : shiftsMap.set(type, [shift]);
@@ -124,10 +121,7 @@ export class SchedulesComponent implements OnInit {
     return classes;
   }
 
-  combineClasses(classes: Class[][]): Schedule[] { // TODO: testing
-    if (classes.length === 0) { return []; }
-    if (classes.length === 1) { return [new Schedule(classes[0])]; }
-
+  combineClasses(classes: Class[][]): Schedule[] {
     // Get combinations of classes & arrange into schedules
     const schedules: Schedule[] = [];
     for (const combination of this.allPossibleCases(classes)) {
@@ -151,7 +145,7 @@ export class SchedulesComponent implements OnInit {
    * https://stackoverflow.com/questions/4331092/finding-all-combinations-cartesian-
    * product-of-javascript-array-values
    * -------------------------------------------------------------------------------- */
-  allPossibleCases(array: any[][]): any[][] { // TODO: testing
+  allPossibleCases(array: any[][]): any[][] {
     return allPossibleCasesHelper(array, true);
 
     function allPossibleCasesHelper(arr: any[][], isFirst: boolean): any[][] {

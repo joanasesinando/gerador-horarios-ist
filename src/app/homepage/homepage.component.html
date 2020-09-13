@@ -1,217 +1,213 @@
-<!--<div class="container-fluid">-->
+<div class="container-fluid">
 
-<!--  <div class="row no-gutter">-->
+  <div class="row no-gutter">
 
-<!--    &lt;!&ndash; Sidebar &ndash;&gt;-->
-<!--    <div class="sidebar d-flex col-md-4 justify-content-center px-4">-->
-<!--      <img class="logo" src="assets/imgs/logo.svg" alt="logo">-->
+    <!-- Sidebar -->
+    <div class="sidebar d-flex col-md-4 justify-content-center px-4">
+      <img class="logo" src="assets/imgs/logo.svg" alt="logo">
 
-<!--      <div class="sidebar-text text-white d-flex flex-column align-items-center">-->
-<!--        <h4 class="text-center px-4">{{'sidebar.header' | translate}}</h4>-->
+      <div class="sidebar-text text-white d-flex flex-column align-items-center">
+        <h4 class="text-center px-4">{{'sidebar.header' | translate}}</h4>
 
-<!--        &lt;!&ndash; Features Horizontal &ndash;&gt;-->
-<!--        <div *ngIf="featuresHorizontal" class="features features-horizontal d-flex justify-content-center mt-4">-->
-<!--          <div class="item d-flex flex-column align-items-center text-dark text-center p-3 mr-3 mb-3 shadow">-->
-<!--            <fa-icon [icon]="faSmileBeam" class="fa-lg mb-2"></fa-icon>-->
-<!--            <span>{{'sidebar.features.f1' | translate}}</span>-->
-<!--          </div>-->
+        <!-- Features Horizontal -->
+        <div *ngIf="featuresHorizontal" class="features features-horizontal d-flex justify-content-center mt-4">
+          <div class="item d-flex flex-column align-items-center text-dark text-center p-3 mr-3 mb-3 shadow">
+            <fa-icon [icon]="faSmileBeam" class="fa-lg mb-2"></fa-icon>
+            <span>{{'sidebar.features.f1' | translate}}</span>
+          </div>
 
-<!--          <div class="item d-flex flex-column align-items-center text-dark text-center p-3 mr-3 mb-3 shadow">-->
-<!--            <fa-icon [icon]="faTh" class="fa-lg mb-2"></fa-icon>-->
-<!--            <span>{{'sidebar.features.f2' | translate}}</span>-->
-<!--          </div>-->
+          <div class="item d-flex flex-column align-items-center text-dark text-center p-3 mr-3 mb-3 shadow">
+            <fa-icon [icon]="faTh" class="fa-lg mb-2"></fa-icon>
+            <span>{{'sidebar.features.f2' | translate}}</span>
+          </div>
 
-<!--          <div class="item d-flex flex-column align-items-center text-dark text-center p-3 mb-3 shadow">-->
-<!--            <fa-icon [icon]="faThumbtack" class="fa-lg mb-2"></fa-icon>-->
-<!--            <span>{{'sidebar.features.f3' | translate}}</span>-->
-<!--          </div>-->
-<!--        </div>-->
+          <div class="item d-flex flex-column align-items-center text-dark text-center p-3 mb-3 shadow">
+            <fa-icon [icon]="faThumbtack" class="fa-lg mb-2"></fa-icon>
+            <span>{{'sidebar.features.f3' | translate}}</span>
+          </div>
+        </div>
 
-<!--        &lt;!&ndash; Features Vertical &ndash;&gt;-->
-<!--        <div *ngIf="!featuresHorizontal" class="features features-vertical mt-4 px-3 w-100">-->
-<!--          <div class="item text-dark p-3 mb-3 shadow">-->
-<!--            <fa-icon [icon]="faSmileBeam" class="fa-lg mr-3"></fa-icon>-->
-<!--            <span>{{'sidebar.features.f1' | translate}}</span>-->
-<!--          </div>-->
+        <!-- Features Vertical -->
+        <div *ngIf="!featuresHorizontal" class="features features-vertical mt-4 px-3 w-100">
+          <div class="item text-dark p-3 mb-3 shadow">
+            <fa-icon [icon]="faSmileBeam" class="fa-lg mr-3"></fa-icon>
+            <span>{{'sidebar.features.f1' | translate}}</span>
+          </div>
 
-<!--          <div class="item text-dark p-3 mb-3 shadow">-->
-<!--            <fa-icon [icon]="faTh" class="fa-lg mr-3"></fa-icon>-->
-<!--            <span>{{'sidebar.features.f2' | translate}}</span>-->
-<!--          </div>-->
+          <div class="item text-dark p-3 mb-3 shadow">
+            <fa-icon [icon]="faTh" class="fa-lg mr-3"></fa-icon>
+            <span>{{'sidebar.features.f2' | translate}}</span>
+          </div>
 
-<!--          <div class="item text-dark p-3 mb-3 shadow">-->
-<!--            <fa-icon [icon]="faThumbtack" class="fa-lg mr-3"></fa-icon>-->
-<!--            <span>{{'sidebar.features.f3' | translate}}</span>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
+          <div class="item text-dark p-3 mb-3 shadow">
+            <fa-icon [icon]="faThumbtack" class="fa-lg mr-3"></fa-icon>
+            <span>{{'sidebar.features.f3' | translate}}</span>
+          </div>
+        </div>
+      </div>
 
-<!--      &lt;!&ndash; Scrolldown &ndash;&gt;-->
-<!--      <a *ngIf="showScrollDown()" class="scrolldown bounce d-flex flex-column align-items-center">-->
-<!--        <fa-icon [icon]="faChevronDown" class=""></fa-icon>-->
-<!--      </a>-->
+      <!-- Scrolldown -->
+      <a *ngIf="showScrollDown()" class="scrolldown bounce d-flex flex-column align-items-center">
+        <fa-icon [icon]="faChevronDown" class=""></fa-icon>
+      </a>
 
-<!--      &lt;!&ndash; Widgets &ndash;&gt;-->
-<!--      <div class="widgets d-flex">-->
-<!--        <a class="icon-wrapper github mr-2" id="widget-github"-->
-<!--           href="https://github.com/joanasesinando/gerador-horarios-ist"-->
-<!--           data-toggle="tooltip" data-placement="top">-->
-<!--          <fa-icon [icon]="faGithub" class="fa-md"></fa-icon>-->
-<!--        </a>-->
+      <!-- Widgets -->
+      <div class="widgets d-flex">
+        <a class="icon-wrapper github mr-2" id="widget-github"
+           href="https://github.com/joanasesinando/gerador-horarios-ist"
+           data-toggle="tooltip" data-placement="top">
+          <fa-icon [icon]="faGithub" class="fa-md"></fa-icon>
+        </a>
 
-<!--        <a class="icon-wrapper feedback mr-2"-->
-<!--           href=""-->
-<!--           data-toggle="tooltip" data-placement="top" title="Feedback">-->
-<!--          <fa-icon [icon]="faCommentAlt" class="fa-md"></fa-icon>-->
-<!--        </a>-->
+        <a class="icon-wrapper feedback mr-2"
+           href=""
+           data-toggle="tooltip" data-placement="top" title="Feedback">
+          <fa-icon [icon]="faCommentAlt" class="fa-md"></fa-icon>
+        </a>
 
-<!--        <a class="icon-wrapper help" id="widget-help"-->
-<!--           href=""-->
-<!--           data-toggle="tooltip" data-placement="top">-->
-<!--          <fa-icon [icon]="faQuestion" class="fa-md"></fa-icon>-->
-<!--        </a>-->
-<!--      </div>-->
-<!--    </div>-->
+        <a class="icon-wrapper help" id="widget-help"
+           href=""
+           data-toggle="tooltip" data-placement="top">
+          <fa-icon [icon]="faQuestion" class="fa-md"></fa-icon>
+        </a>
+      </div>
+    </div>
 
-<!--    &lt;!&ndash; Main Content &ndash;&gt;-->
-<!--    <div class="main-content col-md-8">-->
+    <!-- Main Content -->
+    <div class="main-content col-md-8">
 
-<!--      <div class="content d-flex mt-5 mt-sm-0">-->
+      <div class="content d-flex mt-5 mt-sm-0">
 
-<!--        <div class="container">-->
+        <div class="container">
 
-<!--          <div class="links d-flex align-items-center">-->
-<!--            &lt;!&ndash; About &ndash;&gt;-->
-<!--            <a class="btn btn-outline-primary btn-about mr-2"-->
-<!--               data-toggle="modal" data-target="#aboutModal">{{'main-content.about' | translate}}</a>-->
+          <div class="links d-flex align-items-center">
+            <!-- About -->
+            <a class="btn btn-outline-primary btn-about mr-2"
+               data-toggle="modal" data-target="#aboutModal">{{'main-content.about' | translate}}</a>
 
-<!--            &lt;!&ndash; Language &ndash;&gt;-->
-<!--            <div class="btn-lang">-->
-<!--              <fa-icon [icon]="faGlobeEurope" class="fa-lg dropdown-toggle" type="button" data-toggle="dropdown"></fa-icon>-->
-<!--              <div class="dropdown-menu">-->
-<!--                <a class="dropdown-item d-flex align-items-center" (click)="translateService.use('pt-PT')">-->
-<!--                  <img class="mr-2" src="assets/imgs/pt.svg" alt="portuguese">-->
-<!--                  PT-->
-<!--                </a>-->
+            <!-- Language -->
+            <div class="btn-lang">
+              <fa-icon [icon]="faGlobeEurope" class="fa-lg dropdown-toggle" type="button" data-toggle="dropdown"></fa-icon>
+              <div class="dropdown-menu">
+                <a class="dropdown-item d-flex align-items-center" (click)="translateService.use('pt-PT')">
+                  <img class="mr-2" src="assets/imgs/pt.svg" alt="portuguese">
+                  PT
+                </a>
 
-<!--                <a class="dropdown-item d-flex align-items-center" (click)="translateService.use('en-GB')">-->
-<!--                  <img class="mr-2" src="assets/imgs/en.svg" alt="english">-->
-<!--                  EN-->
-<!--                </a>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
+                <a class="dropdown-item d-flex align-items-center" (click)="translateService.use('en-GB')">
+                  <img class="mr-2" src="assets/imgs/en.svg" alt="english">
+                  EN
+                </a>
+              </div>
+            </div>
+          </div>
 
-<!--          <div class="row">-->
+          <div class="row">
 
-<!--            <div class="col-md-10 col-lg-9 mx-auto">-->
+            <div class="col-md-10 col-lg-9 mx-auto">
 
-<!--              &lt;!&ndash; Pick courses &ndash;&gt;-->
-<!--              <h3 class="pick-courses-heading mb-4">{{'main-content.headers.pick-courses' | translate}}</h3>-->
+              <!-- Pick courses -->
+              <h3 class="pick-courses-heading mb-4">{{'main-content.headers.pick-courses' | translate}}</h3>
 
-<!--              <form id="generateForm" class="mb-5" [formGroup]="generateForm">-->
-<!--                <div class="d-lg-flex align-items-center justify-content-between mb-3">-->
+              <form id="generateForm" class="mb-5" [formGroup]="generateForm">
+                <div class="d-lg-flex align-items-center justify-content-between mb-3">
 
-<!--                  &lt;!&ndash; Academic Term &ndash;&gt;-->
-<!--                  <div class="position-relative w-100 mr-lg-3 mb-4 mb-lg-2">-->
-<!--                    <div class="form-label-group">-->
-<!--                      <label for="inputAcademicTerm">{{'main-content.labels.term' | translate}}</label>-->
-<!--                      <select class="custom-select" id="inputAcademicTerm" autofocus formControlName="academicTerm"-->
-<!--                              (change)="loadDegrees(academicTermFormControl.value)">-->
-<!--                        <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.term' | translate).toLowerCase()}}...</option>-->
-<!--                        <option *ngFor="let term of academicTerms" value="{{term}}">{{term}}</option>-->
-<!--                      </select>-->
-<!--                    </div>-->
-<!--                    <div *ngIf="spinners.academicTerm" class="spinner-border spinner-border-sm text-primary" role="status">-->
-<!--                      <span class="sr-only">Loading...</span>-->
-<!--                    </div>-->
-<!--                  </div>-->
+                  <!-- Academic Term -->
+                  <div class="position-relative w-100 mr-lg-3 mb-4 mb-lg-2">
+                    <div class="form-label-group">
+                      <label for="inputAcademicTerm">{{'main-content.labels.term' | translate}}</label>
+                      <select class="custom-select" id="inputAcademicTerm" autofocus formControlName="academicTerm"
+                              (change)="loadDegrees(academicTermFormControl.value)">
+                        <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.term' | translate).toLowerCase()}}...</option>
+                        <option *ngFor="let term of academicTerms" value="{{term}}">{{term}}</option>
+                      </select>
+                    </div>
+                    <div *ngIf="spinners.academicTerm" class="spinner-border spinner-border-sm text-primary" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                  </div>
 
-<!--                  &lt;!&ndash; Degree &ndash;&gt;-->
-<!--                  <div class="position-relative w-100 ml-lg-3 mb-4 mb-lg-2">-->
-<!--                    <div class="form-label-group">-->
-<!--                      <label for="inputDegree">{{'main-content.labels.degree' | translate}}</label>-->
-<!--                      <select class="custom-select" id="inputDegree" formControlName="degree"-->
-<!--                              (change)="loadCoursesBasicInfo(academicTermFormControl.value, degreeFormControl.value)">-->
-<!--                        <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.degree' | translate).toLowerCase()}}...</option>-->
-<!--                        <option *ngFor="let degree of degrees" value="{{degree.id}}">{{degree.acronym}} - {{degree.name}}</option>-->
-<!--                      </select>-->
-<!--                    </div>-->
-<!--                    <div *ngIf="spinners.degree" class="spinner-border spinner-border-sm text-primary" role="status">-->
-<!--                      <span class="sr-only">Loading...</span>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
+                  <!-- Degree -->
+                  <div class="position-relative w-100 ml-lg-3 mb-4 mb-lg-2">
+                    <div class="form-label-group">
+                      <label for="inputDegree">{{'main-content.labels.degree' | translate}}</label>
+                      <select class="custom-select" id="inputDegree" formControlName="degree"
+                              (change)="loadCoursesBasicInfo(academicTermFormControl.value, degreeFormControl.value)">
+                        <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.degree' | translate).toLowerCase()}}...</option>
+                        <option *ngFor="let degree of degrees" value="{{degree.id}}">{{degree.acronym}} - {{degree.name}}</option>
+                      </select>
+                    </div>
+                    <div *ngIf="spinners.degree" class="spinner-border spinner-border-sm text-primary" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                  </div>
+                </div>
 
-<!--                &lt;!&ndash; Course &ndash;&gt;-->
-<!--                <div class="position-relative">-->
-<!--                  <label for="inputCourse">{{'main-content.labels.course' | translate}}</label>-->
-<!--                  <div class="input-group w-100">-->
-<!--                    <select class="custom-select" id="inputCourse" formControlName="course">-->
-<!--                      <option disabled selected value="{{-1}}">{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.course' | translate).toLowerCase()}}...</option>-->
-<!--                      <option *ngFor="let course of courses" id="{{course.id}}" value="{{course.id}}">[{{course.acronym}}] {{course.name}}</option>-->
-<!--                    </select>-->
-<!--                    <div class="input-group-append">-->
-<!--                      <button id="addBtn" class="btn btn-primary" type="button"-->
-<!--                              [disabled]="hasAcademicTermSelected() && hasDegreeSelected() && courses.length === 0 && !spinners.course"-->
-<!--                              (click)="addCourse(courseFormControl.value)">{{'main-content.add-btn' | translate}}</button>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                  <div *ngIf="spinners.course" class="spinner-border spinner-border-sm text-primary" role="status">-->
-<!--                    <span class="sr-only">Loading...</span>-->
-<!--                  </div>-->
-<!--                  <p *ngIf="hasAcademicTermSelected() && hasDegreeSelected() && courses.length === 0 && !spinners.course"-->
-<!--                     class="text-danger"><small>{{'main-content.no-more-courses' | translate}}</small></p>-->
-<!--                  <p *ngIf="noShiftsFound"-->
-<!--                     class="text-danger"><small>{{'errors.no-shifts-found' | translate}}</small></p>-->
-<!--                </div>-->
-<!--              </form>-->
+                <!-- Course -->
+                <div class="position-relative">
+                  <label for="inputCourse">{{'main-content.labels.course' | translate}}</label>
+                  <div class="input-group w-100">
+                    <select class="custom-select" id="inputCourse" formControlName="course">
+                      <option disabled selected value="{{-1}}">{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.course' | translate).toLowerCase()}}...</option>
+                      <option *ngFor="let course of courses" id="{{course.id}}" value="{{course.id}}">[{{course.acronym}}] {{course.name}}</option>
+                    </select>
+                    <div class="input-group-append">
+                      <button id="addBtn" class="btn btn-primary" type="button"
+                              [disabled]="hasAcademicTermSelected() && hasDegreeSelected() && courses.length === 0 && !spinners.course"
+                              (click)="addCourse(courseFormControl.value)">{{'main-content.add-btn' | translate}}</button>
+                    </div>
+                  </div>
+                  <div *ngIf="spinners.course" class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                  </div>
+                  <p *ngIf="hasAcademicTermSelected() && hasDegreeSelected() && courses.length === 0 && !spinners.course"
+                     class="text-danger"><small>{{'main-content.no-more-courses' | translate}}</small></p>
+                  <p *ngIf="noShiftsFound"
+                     class="text-danger"><small>{{'errors.no-shifts-found' | translate}}</small></p>
+                </div>
+              </form>
 
-<!--              &lt;!&ndash; Selected courses &ndash;&gt;-->
-<!--              <h3 class="pick-courses-heading mb-4">{{'main-content.headers.selected-courses' | translate}}-->
-<!--                <span *ngIf="this.selectedCourses.length > 0" class="ml-2 mt-1">{{this.selectedCourses.length}}</span></h3>-->
-<!--              <p *ngIf="selectedCourses.length === 0"><em>{{'main-content.no-course-selected' | translate}}</em></p>-->
-<!--              <app-course-banner-->
-<!--                [courses]="selectedCourses"-->
-<!--                (campusSelected)="pickCourseCampus($event)"-->
-<!--                (typesOfClassesSelected)="pickTypesOfClasses($event)"-->
-<!--                (removeBtn)="removeCourse($event)"></app-course-banner>-->
-<!--              &lt;!&ndash; TODO: show warning if not enough info from API to generate schedules on given course &ndash;&gt;-->
+              <!-- Selected courses -->
+              <h3 class="pick-courses-heading mb-4">{{'main-content.headers.selected-courses' | translate}}
+                <span *ngIf="this.selectedCourses.length > 0" class="ml-2 mt-1">{{this.selectedCourses.length}}</span></h3>
+              <p *ngIf="selectedCourses.length === 0"><em>{{'main-content.no-course-selected' | translate}}</em></p>
+              <app-course-banner
+                [courses]="selectedCourses"
+                (campusSelected)="pickCourseCampus($event)"
+                (typesOfClassesSelected)="pickTypesOfClasses($event)"
+                (removeBtn)="removeCourse($event)"></app-course-banner>
 
-<!--              &lt;!&ndash; Generate btn &ndash;&gt;-->
-<!--              <button *ngIf="selectedCourses.length !== 0"-->
-<!--                      class="btn btn-lg btn-primary btn-block btn-generate mt-5"-->
-<!--                      type="submit" form="generateForm" (click)="generateSchedules()">{{'main-content.generate-btn' | translate}}</button>-->
+              <!-- Generate btn -->
+              <button *ngIf="selectedCourses.length !== 0"
+                      class="btn btn-lg btn-primary btn-block btn-generate mt-5"
+                      type="submit" form="generateForm" (click)="generateSchedules()">{{'main-content.generate-btn' | translate}}</button>
 
-<!--            </div>-->
-<!--          </div>-->
+            </div>
+          </div>
 
-<!--        </div>-->
-<!--      </div>-->
+        </div>
+      </div>
 
-<!--    </div> &lt;!&ndash; /.main-content &ndash;&gt;-->
+    </div> <!-- /.main-content -->
 
-<!--  </div> &lt;!&ndash; /.row &ndash;&gt;-->
+  </div> <!-- /.row -->
 
-<!--</div> &lt;!&ndash; /.container-fluid &ndash;&gt;-->
+</div> <!-- /.container-fluid -->
 
-<!--<app-about-modal></app-about-modal>-->
-
-
-<!--&lt;!&ndash; Alerts-->
-<!--================================================== &ndash;&gt;-->
-<!--<div id="errorAlert" class="alert alert-danger collapse" role="alert" onclick="$('#errorAlert').hide();">-->
-<!--  <div class="d-flex align-items-center">-->
-<!--    <div class="alert-icon-container">-->
-<!--      <fa-icon [icon]="faBolt" class="fa-md"></fa-icon>-->
-<!--    </div>-->
-<!--    <div class="alert-content">-->
-<!--      <p class="alert-title">Error</p>-->
-<!--      <p class="alert-text"></p>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->
-<!--&lt;!&ndash; ================================================== &ndash;&gt;-->
+<app-about-modal></app-about-modal>
 
 
-<app-timetable></app-timetable>
+<!-- Alerts
+================================================== -->
+<div id="errorAlert" class="alert alert-danger collapse" role="alert" onclick="$('#errorAlert').hide();">
+  <div class="d-flex align-items-center">
+    <div class="alert-icon-container">
+      <fa-icon [icon]="faBolt" class="fa-md"></fa-icon>
+    </div>
+    <div class="alert-content">
+      <p class="alert-title">Error</p>
+      <p class="alert-text"></p>
+    </div>
+  </div>
+</div>
+<!-- ================================================== -->
