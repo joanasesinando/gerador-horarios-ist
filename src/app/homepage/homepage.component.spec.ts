@@ -79,8 +79,7 @@ describe('HomepageComponent', () => {
       hasDegrees: () => of(true).toPromise(),
       getDegrees: () => of(degrees).toPromise(),
       hasCourses: () => of(true).toPromise(),
-      getCourses: () => of(courses).toPromise(),
-      // hasCourseInDegree: () => of(true).toPromise()
+      getCourses: () => of(courses).toPromise()
     };
 
     TestBed.configureTestingModule({
@@ -233,7 +232,7 @@ describe('HomepageComponent', () => {
         const parameters = [
           {description: 'should NOT add a course that doesnt exist on courses', input: 0},
           {description: 'should NOT add a course when courses are empty', input: -1},
-          {description: 'should NOT add a course when no course selected to add', input: null}
+          {description: 'should NOT add a course when no course selected to add', input: null},
         ];
 
         parameters.forEach((parameter) => {
@@ -245,6 +244,21 @@ describe('HomepageComponent', () => {
             expect(component.selectedCoursesIDs.size).toBe(0);
             expect(component.courses).toEqual(courses);
           });
+        });
+
+        it('should NOT add a course that has no shifts', () => {
+          courses.push(new Course(
+            4, 'Course #4', 'C4', [ClassType.THEORY_PT], ['Alameda'],
+            [], { Teórica: 2 }));
+
+          try {
+            component.addCourse(4);
+          } catch (error) {
+            expect(error).toBe('No shifts found. Impossible to generate schedules for course: Course #4');
+            expect(component.selectedCourses).toEqual([]);
+            expect(component.selectedCoursesIDs.size).toBe(0);
+            expect(component.courses).toEqual(courses);
+          }
         });
       });
 
@@ -344,6 +358,7 @@ describe('HomepageComponent', () => {
     });
 
     describe('Preparing courses to generate schedules for', () => {
+      // TODO: patch A / B more tests
       let course: Course;
 
       beforeEach(() => {
