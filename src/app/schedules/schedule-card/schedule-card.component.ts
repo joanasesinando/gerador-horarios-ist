@@ -1,9 +1,9 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, HostListener, Input, OnInit, Output} from '@angular/core';
 
 import {TranslateService} from '@ngx-translate/core';
 import {formatTime} from '../../_util/Time';
 
-import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown, faCaretUp, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import { Schedule } from '../../_domain/Schedule';
 import {ClassType, minifyClassType} from '../../_domain/ClassType';
@@ -19,15 +19,19 @@ declare let $;
 export class ScheduleCardComponent implements OnInit {
 
   @Input() schedule: Schedule;
+  @Output() removeBtn = new EventEmitter<number>();
 
   faCaretDown = faCaretDown;
   faCaretUp = faCaretUp;
+  faTimes = faTimes;
 
   expanded = false;
+  mobileView = false;
 
   constructor(private translateService: TranslateService) { }
 
   ngOnInit(): void {
+    this.onWindowResize();
   }
 
   toggle(): void {
@@ -99,5 +103,15 @@ export class ScheduleCardComponent implements OnInit {
 
     s += ', ' + formatTime(lesson.start) + ' - ' + formatTime(lesson.end);
     return s;
+  }
+
+  removeBtnClicked(): void {
+    this.removeBtn.emit(this.schedule.id);
+    console.log(this.schedule.id);
+  }
+
+  @HostListener('window:resize', [])
+  onWindowResize(): void {
+    this.mobileView = window.innerWidth < 991.98; // phones & tablets
   }
 }

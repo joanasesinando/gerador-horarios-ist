@@ -36,7 +36,7 @@
             <div class="col-md-10 col-lg-9 mx-auto">
 
               <!-- Title -->
-              <h4 class="schedules-gen-heading mb-4">Gerados 512 horários possíveis</h4>
+              <h4 class="schedules-gen-heading mb-4">Gerados {{generatedSchedules.length}} horários possíveis</h4>
 
               <!-- Show options -->
               <div class="show-options d-lg-flex">
@@ -76,8 +76,6 @@
                    class="d-block text-center mt-4">Ver horários escolhidos</a>
               </div>
 
-              <h1>{{scheduleInView + 1}}</h1>
-
             </div>
           </div>
 
@@ -91,14 +89,19 @@
          class="sidebar d-lg-flex flex-column justify-content-between col-lg-3 px-4 py-4">
 
       <!-- Selected schedules -->
-      <h5 class="selected-schedules-heading text-white mb-4">Horários escolhidos</h5>
+      <div class="selected-schedules-heading text-white">
+        <h5>Horários escolhidos</h5>
+        <p *ngIf="schedulesPicked.length === 0" class="mt-3"><em>Nenhum horário escolhido</em></p>
+      </div>
 
       <div class="schedules-deck">
-        <app-schedule-card *ngFor="let schedule of schedulesPicked" [schedule]="schedule"></app-schedule-card>
+        <app-schedule-card *ngFor="let schedule of schedulesPicked"
+                           [schedule]="schedule"
+                           (removeBtn)="removeSchedule($event)"></app-schedule-card>
       </div>
 
       <!-- Finish btn -->
-      <button class="btn btn-primary btn-block btn-lg btn-finish mt-5"
+      <button *ngIf="schedulesPicked.length > 0" class="btn btn-primary btn-block btn-lg btn-finish mt-5"
               type="button" (click)="finish()">Finalizar</button>
 
     </div> <!-- /.sidebar -->

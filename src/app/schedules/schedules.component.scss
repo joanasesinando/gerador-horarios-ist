@@ -56,8 +56,15 @@
   background-position: center;
   position: relative;
 
+  .selected-schedules-heading {
+    p {
+      font-family: 'poppins-regular', sans-serif;
+      opacity: .7;
+    }
+  }
+
   .schedules-deck {
-    overflow-y: scroll;
+    overflow-y: auto;
     @include media-breakpoint-up(lg) {
       height: calc(100vh - 12rem);
     }

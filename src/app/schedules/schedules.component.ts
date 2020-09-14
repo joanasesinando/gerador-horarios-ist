@@ -16,8 +16,8 @@ import {ClassType} from '../_domain/ClassType';
 })
 export class SchedulesComponent implements OnInit {
 
-  selectedCourses: Course[] = [];
   generatedSchedules: Schedule[] = [];
+  selectedCourses: Course[] = [];
 
   scheduleInView = 0;
   schedulesPicked: Schedule[] = [];
@@ -323,11 +323,19 @@ export class SchedulesComponent implements OnInit {
     console.log(event.innerText);
   }
 
-  addSchedule(scheduleIndex: number): void {
+  addSchedule(scheduleID: number): void {
     // TODO: show warning if adding one already added
-    const scheduleToAdd = this.generatedSchedules[scheduleIndex];
+    const scheduleToAdd = this.generatedSchedules[scheduleID];
     if (!this.schedulesPicked.includes(scheduleToAdd)) {
-      this.schedulesPicked.push(this.generatedSchedules[scheduleIndex]);
+      this.schedulesPicked.push(scheduleToAdd);
+    }
+    this.logger.log('schedules picked', this.schedulesPicked);
+  }
+
+  removeSchedule(scheduleID: number): void {
+    const scheduleToRemove = this.generatedSchedules[scheduleID];
+    if (this.schedulesPicked.includes(scheduleToRemove)) {
+      this.schedulesPicked.splice(this.schedulesPicked.indexOf(scheduleToRemove), 1);
     }
     this.logger.log('schedules picked', this.schedulesPicked);
   }
