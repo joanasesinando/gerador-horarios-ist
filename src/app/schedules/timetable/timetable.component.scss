@@ -306,24 +306,24 @@ $columns: 6; // NOTE: change more
 /* --------------------------
    event colors
    -------------------------- */
-.schedule .single-event[data-event="event-1"] {
+.schedule .single-event.event-1 {
   /* this is used to set a background color for the event */
   background: #577F92;
   &:hover { background: #618da1; }
 }
 
-.schedule .single-event[data-event="event-2"] {
+.schedule .single-event.event-2 {
   background: #443453;
   &:hover { background: #513e63; }
 }
 
-.schedule .single-event[data-event="event-3"],
+.schedule .single-event.event-3,
 .schedule [data-event="event-3"] .header-bg {
   background: #A2B9B2;
   &:hover { background: #b1c4be; }
 }
 
-.schedule .single-event[data-event="event-4"],
+.schedule .single-event.event-4,
 .schedule [data-event="event-4"] .header-bg {
   background: #f6b067;
   &:hover { background: #f7bd7f; }

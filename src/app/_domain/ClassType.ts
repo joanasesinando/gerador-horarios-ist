@@ -11,3 +11,33 @@ export enum ClassType {
     TRAINING_PERIOD = 'Training Period',
     NONE = 'NONE FOUND'
 }
+
+export function minifyClassType(type: ClassType): string {
+  switch (type) {
+    case ClassType.THEORY_PT:
+    case ClassType.THEORY_EN:
+      return 'T';
+
+    case ClassType.LAB_PT:
+    case ClassType.LAB_EN:
+      return 'L';
+
+    case ClassType.PROBLEMS_PT:
+    case ClassType.PROBLEMS_EN:
+      return 'PB';
+
+    case ClassType.SEMINARY_PT:
+    case ClassType.SEMINARY_EN:
+      return 'S';
+
+    case ClassType.TUTORIAL_ORIENTATION:
+      return 'O';
+
+    case ClassType.TRAINING_PERIOD:
+      return 'TP';
+
+    case ClassType.NONE:
+    default:
+      return '/NA';
+  }
+}

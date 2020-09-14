@@ -17,6 +17,7 @@ export class SchedulesComponent implements OnInit {
 
   selectedCourses: Course[] = [];
   generatedSchedules: Schedule[] = [];
+  scheduleSelected = 1;
 
   spinner = true;
   generationTime: number = null;
@@ -189,6 +190,11 @@ export class SchedulesComponent implements OnInit {
       }
     }
     return false;
+  }
+
+  test(nr): void {
+    console.log(nr);
+    this.scheduleSelected = nr;
   }
 
 }

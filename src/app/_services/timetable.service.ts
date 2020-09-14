@@ -20,6 +20,11 @@ export class TimetableService {
       });
     }
   }
+
+  updateTimetable(): void {
+    this.timetableSchedulesObjs = [];
+    this.createTimetable();
+  }
 }
 
 export class TimetableSchedule {
