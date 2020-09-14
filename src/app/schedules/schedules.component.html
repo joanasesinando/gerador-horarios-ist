@@ -9,11 +9,10 @@
     <h3>Generated {{generatedSchedules.length}} Schedules</h3>
     <hr>
     <h3 class="container d-flex justify-content-center">#{{scheduleSelected}}</h3>
-<!--    <div *ngFor="let schedule of generatedSchedules; let i = index" class="mb-4">-->
-<!--      <h4>Schedule #{{i+1}}</h4>-->
-<!--      <p *ngFor="let cl of schedule.classes">{{cl.course.name}} -> {{cl}}</p>-->
-<!--    </div>-->
-    <app-timetable [schedules]="generatedSchedules" (scheduleSelected)="test($event)"></app-timetable>
+    <app-timetable *ngIf="generatedSchedules.length > 0"
+                   [schedules]="generatedSchedules"
+                   (scheduleSelected)="scheduleSelected = $event">
+    </app-timetable>
   </div>
 
 </div>

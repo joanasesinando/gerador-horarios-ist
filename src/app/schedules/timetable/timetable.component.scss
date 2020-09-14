@@ -64,8 +64,15 @@ Primary style
 Main Components
 
 -------------------------------- */
-$top-info-height: 50px; // NOTE: change on js as well
-$cell-height: 50px;
+$top-info-height-desktop: 30px;
+$top-info-height-mobile: 25px;
+
+$cell-height-desktop: 25px; // NOTE: change $grid-height-desktop
+$cell-height-mobile: 20px; // NOTE: change $grid-height-mobile
+
+$grid-height-desktop: 599px; // 24 * $cell-height-desktop - 1
+$grid-height-mobile: 479px; // 24 * $cell-height-mobile - 1
+
 $timeline-width: 60px; // NOTE: change more
 $columns: 6; // NOTE: change more
 
@@ -84,7 +91,7 @@ $columns: 6; // NOTE: change more
   }
 
   @media only screen and (min-width: 800px) {
-    width: 90%;
+    width: 850px;
     max-width: 1200px;
     margin: 2em auto;
 
@@ -109,13 +116,13 @@ $columns: 6; // NOTE: change more
   left: 0;
   height: 100%;
   width: 100%;
-  padding-top: $top-info-height;
-  @media only screen and (max-width: 799px) { padding-top: 40px; }
+  padding-top: $top-info-height-desktop;
+  @media only screen and (max-width: 799px) { padding-top: $top-info-height-mobile; }
 
   li {
     position: relative;
-    height: $cell-height;
-    @media only screen and (max-width: 799px) { height: 40px; }
+    height: $cell-height-desktop;
+    @media only screen and (max-width: 799px) { height: $cell-height-mobile; }
 
     &::after {
       // this is used to create the table horizontal lines
@@ -186,8 +193,8 @@ $columns: 6; // NOTE: change more
     > ul {
       position: relative;
       display: block;
-      height: 959px;
-      @media only screen and (min-width: 800px) { height: 1199px; }
+      height: $grid-height-desktop;
+      @media only screen and (max-width: 799px) { height: $grid-height-mobile; }
       overflow: visible;
       padding: 0;
 
@@ -217,8 +224,8 @@ $columns: 6; // NOTE: change more
     width: 100%;
     /* vertically center its content */
     display: table;
-    height: $top-info-height;
-    @media only screen and (max-width: 799px) { height: 40px; }
+    height: $top-info-height-desktop;
+    @media only screen and (max-width: 799px) { height: $top-info-height-mobile; }
     border-bottom: 1px solid #EAEAEA;
     padding: 0;
 
@@ -227,6 +234,7 @@ $columns: 6; // NOTE: change more
       display: table-cell;
       vertical-align: middle;
       text-align: center;
+      font-weight: bold;
 
       @media only screen and (max-width: 799px) {
         font-size: .6rem;
@@ -255,7 +263,7 @@ $columns: 6; // NOTE: change more
     .single-event-div {
       display: block;
       height: 100%;
-      padding: 1.2em;
+      padding: .7em;
       cursor: pointer;
     }
 
@@ -266,48 +274,55 @@ $columns: 6; // NOTE: change more
   }
 }
 
-/* ----------------------
-   loading
-   ---------------------- */
-.schedule.loading .events .single-event {
-  /* the class .loading is added by default to the .schedule element
-	   it is removed as soon as the single events are placed in the schedule plan (using javascript) */
-  opacity: 0;
-}
-
-/* --------------------------
-   event-name & event-date
-   -------------------------- */
+/* ---------------------------------------
+   event-name & event-date & event-place
+   --------------------------------------- */
+.schedule .event-date,
 .schedule .event-name,
-.schedule .event-date {
-  display: block;
+.schedule .event-place {
   color: white;
   font-weight: bold;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.schedule .event-name {
-  font-size: .7rem;
-
-  @media only screen and (min-width: 800px) {
-    font-size: 1rem;
-  }
+.schedule .event-date,
+.schedule .event-place {
+  font-size: .6rem;
+  @media only screen and (max-width: 550px) { font-size: .5rem; }
+  opacity: .7;
 }
 
 .schedule .event-date {
-  font-size: .8rem;
-  opacity: .7;
+  display: block;
   line-height: 1.2;
   margin-bottom: .2em;
+}
+
+.schedule .event-name {
+  display: inline-block;
+  font-size: .7rem;
+  margin-right: 1.5rem;
+  @media only screen and (max-width: 550px) {
+    font-size: .6rem;
+    margin-right: .7rem;
+  }
+}
+
+.schedule .event-place {
+  display: inline-block;
 }
 
 
 /* --------------------------
    event colors
    -------------------------- */
+.schedule .single-event {
+  background: #f6b067;
+  &:hover { background: #f7bd7f; }
+}
+
 .schedule .single-event.event-1 {
-  /* this is used to set a background color for the event */
   background: #577F92;
   &:hover { background: #618da1; }
 }
@@ -317,14 +332,27 @@ $columns: 6; // NOTE: change more
   &:hover { background: #513e63; }
 }
 
-.schedule .single-event.event-3,
-.schedule [data-event="event-3"] .header-bg {
+.schedule .single-event.event-3 {
   background: #A2B9B2;
   &:hover { background: #b1c4be; }
 }
 
-.schedule .single-event.event-4,
-.schedule [data-event="event-4"] .header-bg {
+.schedule .single-event.event-4 {
   background: #f6b067;
   &:hover { background: #f7bd7f; }
+}
+
+.schedule .single-event.event-5 {
+  background: #a26885;
+  &:hover { background: #bf7c9d; }
+}
+
+.schedule .single-event.event-6 {
+  background: #967da0;
+  &:hover { background: #ad91b9; }
+}
+
+.schedule .single-event.event-7 {
+  background: #61816e;
+  &:hover { background: #6d917c; }
 }

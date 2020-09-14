@@ -191,10 +191,4 @@ export class SchedulesComponent implements OnInit {
     }
     return false;
   }
-
-  test(nr): void {
-    console.log(nr);
-    this.scheduleSelected = nr;
-  }
-
 }

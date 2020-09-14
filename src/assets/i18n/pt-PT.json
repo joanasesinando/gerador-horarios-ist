@@ -31,12 +31,22 @@
   },
 
   "week-days": {
-    "monday": "Seg",
-    "tuesday": "Ter",
-    "wednesday": "Qua",
-    "thursday": "Qui",
-    "friday": "Sex",
-    "saturday": "Sáb"
+    "short": {
+      "monday": "Seg",
+      "tuesday": "Ter",
+      "wednesday": "Qua",
+      "thursday": "Qui",
+      "friday": "Sex",
+      "saturday": "Sáb"
+    },
+    "full": {
+      "monday": "Segunda",
+      "tuesday": "Terça",
+      "wednesday": "Quarta",
+      "thursday": "Quinta",
+      "friday": "Sexta",
+      "saturday": "Sábado"
+    }
   },
 
   "errors": {
