@@ -1,0 +1,24 @@
+@import "src/styles/colors";
+
+.wrapper {
+  background-color: white;
+  &:hover { cursor: pointer; }
+}
+
+fa-icon {
+  color: $gh-darkGray;
+}
+
+.schedule-class {
+  color: $gh-gray;
+
+  .class-name {
+    font-size: .95rem;
+  }
+
+  .lesson-type,
+  .lesson-time,
+  .lesson-room {
+    font-size: .9rem;
+  }
+}

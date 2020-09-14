@@ -5,17 +5,21 @@ import { SchedulesRoutingModule } from './schedules-routing.module';
 import { SchedulesComponent } from './schedules.component';
 import { TimetableComponent } from './timetable/timetable.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { ScheduleCardComponent } from './schedule-card/schedule-card.component';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 
 @NgModule({
-  declarations: [SchedulesComponent, TimetableComponent],
+  declarations: [SchedulesComponent, TimetableComponent, ScheduleCardComponent],
   exports: [
-    TimetableComponent
+    TimetableComponent,
+    SchedulesComponent
   ],
-  imports: [
-    CommonModule,
-    SchedulesRoutingModule,
-    TranslateModule
-  ]
+    imports: [
+        CommonModule,
+        SchedulesRoutingModule,
+        TranslateModule,
+        FontAwesomeModule
+    ]
 })
 export class SchedulesModule { }

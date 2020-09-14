@@ -25,6 +25,10 @@
  *
  * ------------------------------------------------------------------- */
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: 'poppins-regular', sans-serif;
 }
@@ -60,6 +64,10 @@ a { color: $gh-blue; }
 .btn-outline-primary {
   color: $gh-blue;
   &:hover, &:focus { color: $gh-blue; }
+}
+
+.btn-lg {
+  letter-spacing: 1px;
 }
 
 
@@ -222,6 +230,25 @@ $scrollbarWidth: 10px;
   }
 
   ::-webkit-scrollbar-thumb {
+    @include border-radius($scrollbarWidth);
+    background-color: $scrollbarColor;
+
+    &:hover {
+      background-color: darken($scrollbarColor, 10%);
+    }
+  }
+
+  .schedules-deck::-webkit-scrollbar {
+    width: $scrollbarWidth - 5px;
+    background-color: transparent;
+  }
+
+  .schedules-deck::-webkit-scrollbar-track {
+    background-color: transparent;
+    @include border-radius($scrollbarWidth);
+  }
+
+  .schedules-deck::-webkit-scrollbar-thumb {
     @include border-radius($scrollbarWidth);
     background-color: $scrollbarColor;
 

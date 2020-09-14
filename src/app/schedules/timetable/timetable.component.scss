@@ -46,6 +46,8 @@ table {
   border-spacing: 0;
 }
 
+
+
 /* style css */
 /* --------------------------------
 
@@ -65,13 +67,13 @@ Main Components
 
 -------------------------------- */
 $top-info-height-desktop: 30px;
-$top-info-height-mobile: 25px;
+$top-info-height-mobile: 30px;
 
 $cell-height-desktop: 25px; // NOTE: change $grid-height-desktop
-$cell-height-mobile: 20px; // NOTE: change $grid-height-mobile
+$cell-height-mobile: 25px; // NOTE: change $grid-height-mobile
 
 $grid-height-desktop: 599px; // 24 * $cell-height-desktop - 1
-$grid-height-mobile: 479px; // 24 * $cell-height-mobile - 1
+$grid-height-mobile: 599px; // 24 * $cell-height-mobile - 1
 
 $timeline-width: 60px; // NOTE: change more
 $columns: 6; // NOTE: change more
@@ -84,13 +86,7 @@ $columns: 6; // NOTE: change more
   width: 95%;
   margin: 2em auto;
 
-  &::before {
-    /* never visible - this is used in js to check the current MQ */
-    content: 'mobile';
-    display: none;
-  }
-
-  @media only screen and (min-width: 800px) {
+  @media only screen and (min-width: 1000px) {
     width: 850px;
     max-width: 1200px;
     margin: 2em auto;
@@ -99,10 +95,6 @@ $columns: 6; // NOTE: change more
       clear: both;
       content: "";
       display: block;
-    }
-
-    &::before {
-      content: 'desktop';
     }
   }
 }
@@ -135,11 +127,12 @@ $columns: 6; // NOTE: change more
       background: #EAEAEA;
     }
 
-    &:last-of-type::after {
-      display: none;
+    &:nth-of-type(2n)::after {
+      height: 3px;
+      @media only screen and (max-width: 450px) { height: 2px; }
     }
 
-    span {
+    &:last-of-type::after {
       display: none;
     }
 

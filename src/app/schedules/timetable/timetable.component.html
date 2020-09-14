@@ -1,6 +1,8 @@
 <div class="timetable d-flex justify-content-center align-items-center">
+  <!-- Previous btn -->
   <button *ngIf="schedules.length >= 2 && currentSchedule > 0"
           type="button" class="btn btn-dark" (click)="prev()"> < </button>
+
   <div class="schedule">
 
     <!-- Timeline -->
@@ -135,6 +137,8 @@
     </div>
 
   </div> <!-- .schedule -->
+
+  <!-- Next btn -->
   <button *ngIf="schedules.length >= 2 && currentSchedule < schedules.length - 1"
           type="button" class="btn btn-dark" (click)="next()"> > </button>
 </div>

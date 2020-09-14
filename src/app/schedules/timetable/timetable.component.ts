@@ -6,6 +6,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {Schedule} from '../../_domain/Schedule';
 import {Event} from '../../_domain/Event';
 import {minifyClassType} from '../../_domain/ClassType';
+import {formatTime} from '../../_util/Time';
 
 @Component({
   selector: 'app-timetable',
@@ -15,7 +16,7 @@ import {minifyClassType} from '../../_domain/ClassType';
 export class TimetableComponent implements OnInit {
 
   SLOT_HEIGHT_DESKTOP = 25;
-  SLOT_HEIGHT_MOBILE = 20;
+  SLOT_HEIGHT_MOBILE = 25;
 
   TIMELINE_START = '08:00';
   TIMELINE_UNIT_DURATION = 30;
@@ -32,8 +33,10 @@ export class TimetableComponent implements OnInit {
   constructor(private logger: LoggerService, public translateService: TranslateService) { }
 
   ngOnInit(): void {
-    this.createEvents();
-    this.organizeEventsPerWeekday(0);
+    if (this.schedules.length > 0) {
+      this.createEvents();
+      this.organizeEventsPerWeekday(0);
+    }
     this.onWindowResize();
   }
 
@@ -41,19 +44,30 @@ export class TimetableComponent implements OnInit {
     const timeline: string[] = [];
     let current = start;
 
-    while (current !== end + 1) {
-      let s = '';
-      if (current.toString().length === 1) { s += '0'; }
-      s += current + ':00';
-      timeline.push(s);
-
-      if (current !== end) {
-        s = '';
-        if (current.toString().length === 1) { s += '0'; }
-        s += current + ':30';
-        timeline.push(s);
+    if (window.innerWidth < 1000) {
+      while (current !== end + 1) {
+        timeline.push(current + 'H');
+        if (current !== end) {
+          timeline.push(current + ':30H');
+        }
+        current++;
       }
-      current++;
+
+    } else {
+      while (current !== end + 1) {
+        let s = '';
+        if (current.toString().length === 1) { s += '0'; }
+        s += current + ':00';
+        timeline.push(s);
+
+        if (current !== end) {
+          s = '';
+          if (current.toString().length === 1) { s += '0'; }
+          s += current + ':30';
+          timeline.push(s);
+        }
+        current++;
+      }
     }
     return timeline;
   }
@@ -71,8 +85,8 @@ export class TimetableComponent implements OnInit {
 
           shift.lessons.forEach(lesson => {
             const weekday = this.getWeekday(lesson.start.getDay());
-            const start = this.formatTime(lesson.start);
-            const end = this.formatTime(lesson.end);
+            const start = formatTime(lesson.start);
+            const end = formatTime(lesson.end);
             const name = acronym.replace(/[0-9]/g, '') + ' (' + type + ')';
             const place = lesson.room;
             this.eventsPerSchedule.has(i) ?
@@ -113,15 +127,6 @@ export class TimetableComponent implements OnInit {
       case 7:
         return 'sunday';
     }
-  }
-
-  formatTime(date: Date): string {
-    let hours: any = date.getHours();
-    let min: any = date.getMinutes();
-
-    if (hours < 10) { hours = '0' + hours; }
-    if (min < 10) { min = '0' + min; }
-    return hours + ':' + min;
   }
 
   prev(): void {
@@ -169,7 +174,7 @@ export class TimetableComponent implements OnInit {
   }
 
   schedulePicked(): void {
-    this.scheduleSelected.emit(this.currentSchedule + 1);
+    this.scheduleSelected.emit(this.currentSchedule);
   }
 
   @HostListener('window:resize', [])
