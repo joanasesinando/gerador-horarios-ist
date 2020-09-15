@@ -1,0 +1,55 @@
+@import "src/styles/colors";
+
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+
+.wrapper {
+  position: relative;
+  background-color: white;
+  &:hover { cursor: pointer; }
+
+  @include media-breakpoint-down(md) {
+    border-top-right-radius: 0 !important;
+    border-top-left-radius: 0 !important;
+  }
+}
+
+.remove {
+  position: absolute;
+  right: .7rem;
+  top: .2rem;
+}
+
+.btn-remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 0;
+  z-index: 5;
+}
+
+.btn-remove-mobile {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  z-index: 5;
+}
+
+.arrow {
+  color: $gh-darkGray;
+}
+
+.schedule-class {
+  color: $gh-gray;
+
+  .class-name {
+    font-size: .95rem;
+  }
+
+  .lesson-type,
+  .lesson-time,
+  .lesson-room {
+    font-size: .9rem;
+  }
+}

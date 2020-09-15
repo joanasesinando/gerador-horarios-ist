@@ -1,3 +1,76 @@
+@import "src/styles/colors";
+
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+
+
+.content,
+.sidebar {
+  min-height: 100vh;
+}
+
+.main-content {
+  @include media-breakpoint-up(lg) {
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .content {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+
+    @include media-breakpoint-down(md) {
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+    }
+
+    .logo {
+      position: absolute;
+      top: 1.5rem;
+      right: 2.5rem;
+      @include media-breakpoint-down(xs) { right: auto; left: 1.5rem; }
+      height: 3rem;
+      z-index: 5;
+    }
+
+    .schedules-gen-heading {
+      font-family: 'poppins-semiBold', sans-serif;
+    }
+
+    .btn-add {
+      button {
+        padding: .375rem 3rem;
+      }
+       a {
+         text-decoration: underline;
+         &:hover, &:focus { color: $gh-blue; }
+       }
+    }
+  }
+}
+
+.sidebar {
+  background-color: $gh-darkGray;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+
+  .selected-schedules-heading {
+    p {
+      font-family: 'poppins-regular', sans-serif;
+      opacity: .7;
+    }
+  }
+
+  .schedules-deck {
+    overflow-y: auto;
+    @include media-breakpoint-up(lg) {
+      height: calc(100vh - 12rem);
+    }
+  }
+}
+
 .spinner-wrapper {
   position: absolute;
   top: 50%;

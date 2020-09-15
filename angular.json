@@ -28,7 +28,8 @@
               "@firebase/app",
               "@firebase/firestore",
               "@firebase/component",
-              "@firebase/util"
+              "@firebase/util",
+              "hammerjs"
             ],
             "assets": [
               "src/favicon",

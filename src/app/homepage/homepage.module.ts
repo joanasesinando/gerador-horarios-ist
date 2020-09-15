@@ -10,7 +10,7 @@ import { CourseCardComponent } from './course-card/course-card.component';
 import { CoursesBannerComponent } from './courses-banner/courses-banner.component';
 import { AboutModalComponent } from './about-modal/about-modal.component';
 import { TranslateModule } from '@ngx-translate/core';
-import {SchedulesModule} from '../schedules/schedules.module';
+import { HelpModalComponent } from './help-modal/help-modal.component';
 
 
 @NgModule({
@@ -18,15 +18,15 @@ import {SchedulesModule} from '../schedules/schedules.module';
     HomepageComponent,
     CourseCardComponent,
     CoursesBannerComponent,
-    AboutModalComponent
+    AboutModalComponent,
+    HelpModalComponent
   ],
-  imports: [
-    CommonModule,
-    HomepageRoutingModule,
-    TranslateModule,
-    FontAwesomeModule,
-    ReactiveFormsModule,
-    SchedulesModule
-  ]
+    imports: [
+        CommonModule,
+        HomepageRoutingModule,
+        TranslateModule,
+        FontAwesomeModule,
+        ReactiveFormsModule
+    ]
 })
 export class HomepageModule { }

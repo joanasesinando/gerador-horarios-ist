@@ -5,13 +5,94 @@
     <h5>Generating . . .</h5>
   </div>
 
-  <div *ngIf="!spinner">
-    <h3>Generated {{generatedSchedules.length}} Schedules</h3>
-    <hr>
-    <div *ngFor="let schedule of generatedSchedules; let i = index" class="mb-4">
-      <h4>Schedule #{{i+1}}</h4>
-      <p *ngFor="let cl of schedule.classes">{{cl.course.name}} -> {{cl}}</p>
-    </div>
-  </div>
+  <div *ngIf="!spinner" class="row no-gutter">
 
-</div>
+    <!-- Main Content -->
+    <div class="main-content col-lg-9">
+
+      <div class="content d-flex mt-5 mt-md-0">
+
+        <div class="container">
+
+          <img class="logo" src="assets/imgs/logo-dark.svg" alt="logo">
+
+          <div class="row">
+
+            <div class="col-md-10 col-lg-9 mx-auto">
+
+              <!-- Title -->
+              <h4 *ngIf="generatedSchedules.length !== 0"
+                  class="schedules-gen-heading mb-4">Gerados {{generatedSchedules.length}} horários possíveis</h4>
+
+              <!-- Show options -->
+              <div class="show-options d-lg-flex">
+                <span class="mr-lg-4 mb-2 mb-lg-0"><b>Mostrar:</b></span>
+
+                <div class="options">
+
+                  <div class="custom-control custom-radio custom-control-inline mr-4 mb-2 mt-2 mt-lg-0">
+                    <input type="radio" id="show-options-100Compact" name="show-options"
+                           class="custom-control-input" [checked]="true" (change)="pickShowOption($event)">
+                    <label class="custom-control-label" for="show-options-100Compact">100 mais compactos</label>
+                  </div>
+
+                  <div class="custom-control custom-radio custom-control-inline mr-4 mb-2">
+                    <input type="radio" id="show-options-500Compact" name="show-options"
+                           class="custom-control-input" [checked]="false" (change)="pickShowOption($event)">
+                    <label class="custom-control-label" for="show-options-500Compact">500 mais compactos</label>
+                  </div>
+
+                  <div class="custom-control custom-radio custom-control-inline mr-0 mb-2">
+                    <input type="radio" id="show-options-all" name="show-options"
+                           class="custom-control-input" [checked]="false" (change)="pickShowOption($event)">
+                    <label class="custom-control-label" for="show-options-all">Todos</label>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Timetable -->
+              <app-timetable *ngIf="generatedSchedules.length !== 0"
+                             [schedules]="generatedSchedules" (scheduleSelected)="scheduleInView = $event"></app-timetable>
+
+              <!-- Add btn -->
+              <div class="btn-add d-flex flex-column align-items-center">
+                <button class="btn btn-primary mt-4" [ngClass]="{'btn-block': mobileView}"
+                        type="button" (click)="addSchedule(scheduleInView)">Adicionar Horário</button>
+                <a *ngIf="mobileView" href="#selected-schedules"
+                   class="d-block text-center mt-4">Ver horários escolhidos</a>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div> <!-- /.main-content -->
+
+    <!-- Sidebar -->
+    <div id="selected-schedules"
+         class="sidebar d-lg-flex flex-column justify-content-between col-lg-3 px-4 py-4">
+
+      <!-- Selected schedules -->
+      <div class="selected-schedules-heading text-white">
+        <h5 class="mb-4 mb-lg-2">Horários escolhidos</h5>
+        <p *ngIf="schedulesPicked.length === 0" class="mt-3"><em>Nenhum horário escolhido</em></p>
+      </div>
+
+      <div class="schedules-deck">
+        <app-schedule-card *ngFor="let schedule of schedulesPicked"
+                           [schedule]="schedule"
+                           (removeBtn)="removeSchedule($event)"></app-schedule-card>
+      </div>
+
+      <!-- Finish btn -->
+      <button *ngIf="schedulesPicked.length > 0" class="btn btn-primary btn-block btn-lg btn-finish mt-5"
+              type="button" (click)="finish()">Finalizar</button>
+
+    </div> <!-- /.sidebar -->
+
+  </div> <!-- /.row -->
+
+</div> <!-- /.container-fluid -->

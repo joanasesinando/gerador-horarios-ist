@@ -2,9 +2,9 @@
   "sidebar": {
     "header": "Generate all possible schedules and pick the best one",
     "features": {
-      "f1": "Easy to use",
-      "f2": "Compact schedules",
-      "f3": "Pinned courses"
+      "f1": "Compact schedules",
+      "f2": "Pinned courses",
+      "f3": "Save for later"
     },
     "widgets": {
       "repo": "Repository",
@@ -31,12 +31,22 @@
   },
 
   "week-days": {
-    "monday": "Mon",
-    "tuesday": "Tue",
-    "wednesday": "Wed",
-    "thursday": "Thu",
-    "friday": "Fri",
-    "saturday": "Sat"
+    "short": {
+      "monday": "Mon",
+      "tuesday": "Tue",
+      "wednesday": "Wed",
+      "thursday": "Thu",
+      "friday": "Fri",
+      "saturday": "Sat"
+    },
+    "full": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday"
+    }
   },
 
   "errors": {
