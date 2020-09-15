@@ -21,7 +21,8 @@
             <div class="col-md-10 col-lg-9 mx-auto">
 
               <!-- Title -->
-              <h4 class="schedules-gen-heading mb-4">Gerados {{generatedSchedules.length}} horários possíveis</h4>
+              <h4 *ngIf="generatedSchedules.length !== 0"
+                  class="schedules-gen-heading mb-4">Gerados {{generatedSchedules.length}} horários possíveis</h4>
 
               <!-- Show options -->
               <div class="show-options d-lg-flex">
@@ -51,7 +52,8 @@
               </div>
 
               <!-- Timetable -->
-              <app-timetable [schedules]="generatedSchedules" (scheduleSelected)="scheduleInView = $event"></app-timetable>
+              <app-timetable *ngIf="generatedSchedules.length !== 0"
+                             [schedules]="generatedSchedules" (scheduleSelected)="scheduleInView = $event"></app-timetable>
 
               <!-- Add btn -->
               <div class="btn-add d-flex flex-column align-items-center">

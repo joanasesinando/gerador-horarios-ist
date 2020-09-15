@@ -2,9 +2,9 @@
   "sidebar": {
     "header": "Gera todos os horários possíveis e escolhe o melhor",
     "features": {
-      "f1": "Fácil de usar",
-      "f2": "Horários compactos",
-      "f3": "Slots de aulas fixas"
+      "f1": "Horários compactos",
+      "f2": "Slots de aulas fixas",
+      "f3": "Guardar horários"
     },
     "widgets": {
       "repo": "Repositório",

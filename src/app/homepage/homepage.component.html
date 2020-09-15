@@ -12,36 +12,42 @@
         <!-- Features Horizontal -->
         <div *ngIf="featuresHorizontal" class="features features-horizontal d-flex justify-content-center mt-4">
           <div class="item d-flex flex-column align-items-center text-dark text-center p-3 mr-3 mb-3 shadow">
-            <fa-icon [icon]="faSmileBeam" class="fa-lg mb-2"></fa-icon>
+            <fa-icon [icon]="faTh" class="fa-lg mb-2"></fa-icon>
             <span>{{'sidebar.features.f1' | translate}}</span>
+            <small class="text-danger">Brevemente</small>
           </div>
 
           <div class="item d-flex flex-column align-items-center text-dark text-center p-3 mr-3 mb-3 shadow">
-            <fa-icon [icon]="faTh" class="fa-lg mb-2"></fa-icon>
+            <fa-icon [icon]="faThumbtack" class="fa-lg mb-2"></fa-icon>
             <span>{{'sidebar.features.f2' | translate}}</span>
+            <small class="text-danger">Brevemente</small>
           </div>
 
           <div class="item d-flex flex-column align-items-center text-dark text-center p-3 mb-3 shadow">
-            <fa-icon [icon]="faThumbtack" class="fa-lg mb-2"></fa-icon>
+            <fa-icon [icon]="faFileExport" class="fa-lg mb-2"></fa-icon>
             <span>{{'sidebar.features.f3' | translate}}</span>
+            <small class="text-danger">Brevemente</small>
           </div>
         </div>
 
         <!-- Features Vertical -->
         <div *ngIf="!featuresHorizontal" class="features features-vertical mt-4 px-3 w-100">
           <div class="item text-dark p-3 mb-3 shadow">
-            <fa-icon [icon]="faSmileBeam" class="fa-lg mr-3"></fa-icon>
-            <span>{{'sidebar.features.f1' | translate}}</span>
-          </div>
-
-          <div class="item text-dark p-3 mb-3 shadow">
             <fa-icon [icon]="faTh" class="fa-lg mr-3"></fa-icon>
-            <span>{{'sidebar.features.f2' | translate}}</span>
+            <span>{{'sidebar.features.f1' | translate}}</span>
+            <small class="text-danger ml-2">Brevemente</small>
           </div>
 
           <div class="item text-dark p-3 mb-3 shadow">
             <fa-icon [icon]="faThumbtack" class="fa-lg mr-3"></fa-icon>
+            <span>{{'sidebar.features.f2' | translate}}</span>
+            <small class="text-danger ml-2">Brevemente</small>
+          </div>
+
+          <div class="item text-dark p-3 mb-3 shadow">
+            <fa-icon [icon]="faFileExport" class="fa-lg mr-3"></fa-icon>
             <span>{{'sidebar.features.f3' | translate}}</span>
+            <small class="text-danger ml-2">Brevemente</small>
           </div>
         </div>
       </div>
@@ -66,8 +72,7 @@
         </a>
 
         <a class="icon-wrapper help" id="widget-help"
-           href=""
-           data-toggle="tooltip" data-placement="top">
+           href="" data-toggle="tooltip" data-toggle="modal" data-target="#helpModal" data-placement="top">
           <fa-icon [icon]="faQuestion" class="fa-md"></fa-icon>
         </a>
       </div>
@@ -195,3 +200,4 @@
 </div> <!-- /.container-fluid -->
 
 <app-about-modal></app-about-modal>
+<app-help-modal></app-help-modal>

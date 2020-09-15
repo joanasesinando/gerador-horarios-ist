@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {AfterViewInit, Component, HostListener, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 
 import {LoggerService} from '../_util/logger.service';
@@ -15,7 +15,7 @@ import {AlertService} from '../_util/alert.service';
   templateUrl: './schedules.component.html',
   styleUrls: ['./schedules.component.scss']
 })
-export class SchedulesComponent implements OnInit {
+export class SchedulesComponent implements OnInit, AfterViewInit {
 
   generatedSchedules: Schedule[] = [];
   selectedCourses: Course[] = [];
@@ -37,14 +37,27 @@ export class SchedulesComponent implements OnInit {
     if (!data) { this.router.navigate(['/']); return; }
     this.selectedCourses = this.parseCourses(data);
     this.logger.log('courses to generate', this.selectedCourses);
+  }
 
-    // Generate schedules
-    this.generatedSchedules = this.generateSchedules();
-    this.logger.log('generated schedules', this.generatedSchedules);
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      // Generate schedules
+      this.generatedSchedules = this.generateSchedules();
+      this.logger.log('generated schedules', this.generatedSchedules);
 
-    // Fake staling for UX
-    this.generationTime != null && this.generationTime < 1000 ?
-      setTimeout(() => this.spinner = false, 1000) : this.spinner = false;
+      if (this.generatedSchedules.length === 0) {
+        this.alertService.showAlert(
+          'Sem horários',
+          'Não existe nenhum horário possível com todas estas cadeiras. Remove alguma e tenta de novo.',
+          'warning');
+        this.router.navigate(['/']);
+        return;
+      }
+
+      // Fake staling for UX
+      this.generationTime != null && this.generationTime < 1000 ?
+        setTimeout(() => this.spinner = false, 1000) : this.spinner = false;
+    }, 0);
   }
 
   parseCourses(data: {_id, _name, _acronym, _types, _campus, _shifts, _courseLoads}[]): Course[] {
@@ -95,8 +108,8 @@ export class SchedulesComponent implements OnInit {
 
     this.logger.log('done');
     const t1 = performance.now();
-    this.generationTime = t1 - t0;
-    this.logger.log('generated in (milliseconds)', this.generationTime);
+    this.generationTime = (t1 - t0) / 100;
+    this.logger.log('generated in (seconds)', this.generationTime);
 
     return schedules;
   }

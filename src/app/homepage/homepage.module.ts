@@ -10,6 +10,7 @@ import { CourseCardComponent } from './course-card/course-card.component';
 import { CoursesBannerComponent } from './courses-banner/courses-banner.component';
 import { AboutModalComponent } from './about-modal/about-modal.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { HelpModalComponent } from './help-modal/help-modal.component';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { TranslateModule } from '@ngx-translate/core';
     HomepageComponent,
     CourseCardComponent,
     CoursesBannerComponent,
-    AboutModalComponent
+    AboutModalComponent,
+    HelpModalComponent
   ],
     imports: [
         CommonModule,

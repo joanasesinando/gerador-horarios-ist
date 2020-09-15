@@ -14,9 +14,9 @@ import {faGithub} from '@fortawesome/free-brands-svg-icons';
 import {
   faCommentAlt,
   faChevronDown,
-  faSmileBeam,
   faTh,
   faThumbtack,
+  faFileExport,
   faQuestion,
   faGlobeEurope,
   faBolt
@@ -66,9 +66,9 @@ export class HomepageComponent implements OnInit {
   faGithub = faGithub;
   faCommentAlt = faCommentAlt;
   faChevronDown = faChevronDown;
-  faSmileBeam = faSmileBeam;
   faThumbtack = faThumbtack;
   faTh = faTh;
+  faFileExport = faFileExport;
   faQuestion = faQuestion;
   faGlobeEurope = faGlobeEurope;
   faBolt = faBolt;
