@@ -4,7 +4,7 @@ import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 
 import {LoggerService} from '../_util/logger.service';
-import {Course} from '../_domain/Course';
+import {Course, parseCourses} from '../_domain/Course';
 import {Degree} from '../_domain/Degree';
 
 import {FenixService} from '../_services/fenix.service';
@@ -59,7 +59,8 @@ export class HomepageComponent implements OnInit {
   spinners = {
     academicTerm: true,
     degree: false,
-    course: false
+    course: false,
+    loadingPage: false
   };
 
   // FontAwesome icons
@@ -79,6 +80,8 @@ export class HomepageComponent implements OnInit {
     public translateService: TranslateService,
     public firebaseService: FirebaseService,
     private router: Router) {
+
+    this.spinners.loadingPage = true;
 
     // Translation
     translateService.addLangs(['pt-PT', 'en-GB']);
@@ -101,6 +104,11 @@ export class HomepageComponent implements OnInit {
       widget.tooltip();
     });
 
+    const data = history.state.data;
+    if (!data) {
+      this.spinners.loadingPage = false;
+    }
+
     // Get academic terms
     // TODO: only show current and next (API about)
     this.fenixService.getAcademicTerms().then(academicTerms => {
@@ -108,6 +116,24 @@ export class HomepageComponent implements OnInit {
       this.academicTermFormControl.enable();
       this.spinners.academicTerm = false;
       this.logger.log('academic terms', this.academicTerms);
+
+      // Reset state if coming back
+      if (data) {
+        this.selectedCourses = parseCourses(data.selectedCourses);
+        this.selectedCoursesIDs.clear();
+        for (const course of this.selectedCourses) {
+          this.selectedCoursesIDs.set(course.id, true);
+        }
+
+        this.academicTermFormControl.patchValue(data.academicTerm);
+        this.loadDegrees(this.academicTermFormControl.value).then(() => {
+          this.degreeFormControl.patchValue(data.degreeID);
+          this.loadCoursesBasicInfo(this.academicTermFormControl.value, this.degreeFormControl.value).then(() => {
+            this.spinners.loadingPage = false;
+          });
+        });
+
+      }
     });
   }
 
@@ -252,6 +278,12 @@ export class HomepageComponent implements OnInit {
     // Course to remove is not selected
     if (courseIndex == null) { return of(null).toPromise(); }
 
+    // If coming back from generation empty
+    if (!academicTerm || !degreeID) {
+      remove(this.selectedCourses, this.selectedCoursesIDs, this.logger);
+      return;
+    }
+
     return this.firebaseService.hasCourseInDegree(academicTerm, degreeID, courseID).then(has => {
       // Add back to select if same degree
       if (has) {
@@ -260,10 +292,14 @@ export class HomepageComponent implements OnInit {
         this.courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
       }
 
-      this.selectedCourses.splice(courseIndex, 1);
-      this.selectedCoursesIDs.delete(courseID);
-      this.logger.log('selected courses', this.selectedCourses);
+      remove(this.selectedCourses, this.selectedCoursesIDs, this.logger);
     });
+
+    function remove(selectedCourses, selectedCoursesIDs, logger): void {
+      selectedCourses.splice(courseIndex, 1);
+      selectedCoursesIDs.delete(courseID);
+      logger.log('selected courses', selectedCourses);
+    }
   }
 
   findCourseIndex(courseID: number, courses: Course[]): number {
@@ -286,7 +322,16 @@ export class HomepageComponent implements OnInit {
   generateSchedules(): void {
     if (this.selectedCourses.length > 0) {
       this.prepareCoursesToGenerate();
-      this.router.navigate(['/generate-schedules'], {state: {data: this.selectedCourses}});
+      this.router.navigate(['/generate-schedules'],
+        {
+          state: {
+            data: {
+              selectedCourses: this.selectedCourses,
+              academicTerm: this.academicTermFormControl.value,
+              degreeID: this.degreeFormControl.value
+            }
+          }
+        });
     }
   }
 

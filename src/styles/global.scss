@@ -7,6 +7,7 @@
  *    4. Dropdowns
  *    5. Alerts
  *    6. Scrollbar
+ *    7. Loading page
  *
  * =================================================================== */
 
@@ -256,4 +257,18 @@ $scrollbarWidth: 10px;
       background-color: darken($scrollbarColor, 10%);
     }
   }
+}
+
+
+
+/* ===================================================================
+ *  7. Loading page
+ *
+ * ------------------------------------------------------------------- */
+
+.loading-page {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }

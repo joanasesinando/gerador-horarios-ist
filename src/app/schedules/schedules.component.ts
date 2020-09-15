@@ -5,10 +5,8 @@ import {LoggerService} from '../_util/logger.service';
 import {AlertService} from '../_util/alert.service';
 import {SchedulesGenerationService} from '../_services/schedules-generation.service';
 
-import {Course} from '../_domain/Course';
+import {Course, parseCourses} from '../_domain/Course';
 import {Schedule} from '../_domain/Schedule';
-import {Lesson} from '../_domain/Lesson';
-import {Shift} from '../_domain/Shift';
 
 @Component({
   selector: 'app-schedules',
@@ -26,6 +24,9 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
   spinner = true;
   generationTime: number = null;
 
+  data: {selectedCourses: any, academicTerm: string, degreeID: number};
+  previousState: {selectedCourses: Course[], academicTerm: string, degreeID: number};
+
   mobileView = false;
 
   constructor(
@@ -36,15 +37,31 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.onWindowResize();
+
     // Receive selected courses
-    const data = history.state.data;
-    if (!data) { this.router.navigate(['/']); return; }
-    this.selectedCourses = this.parseCourses(data);
+    this.data = history.state.data;
+    if (!this.data) { this.router.navigate(['/']); return; }
+    this.selectedCourses = parseCourses(this.data.selectedCourses);
     this.logger.log('courses to generate', this.selectedCourses);
+
+    // Save previous state
+    this.previousState = {
+      selectedCourses: this.selectedCourses,
+      academicTerm: this.data.academicTerm,
+      degreeID: this.data.degreeID
+    };
   }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
+      if (!this.data) {
+        this.alertService.showAlert(
+          'Acção inválida',
+          'Não é possível andar para a frente. Por favor, preenche os campos de novo.',
+          'danger');
+        return;
+      }
+
       // Generate schedules
       const t0 = performance.now();
       this.generatedSchedules = this.schedulesGenerationService.generateSchedules(this.selectedCourses);
@@ -58,7 +75,7 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
           'Sem horários',
           'Não existe nenhum horário possível com todas estas cadeiras. Remove alguma e tenta de novo.',
           'warning');
-        this.router.navigate(['/']);
+        this.goBack();
         return;
       }
 
@@ -66,30 +83,6 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
       this.generationTime != null && this.generationTime < 1000 ?
         setTimeout(() => this.spinner = false, 1000) : this.spinner = false;
     }, 0);
-  }
-
-  parseCourses(data: {_id, _name, _acronym, _types, _campus, _shifts, _courseLoads}[]): Course[] {
-    const courses: Course[] = [];
-    for (const obj of data) {
-      const course = new Course(obj._id, obj._name, obj._acronym, obj._types, obj._campus);
-
-      // Parse shifts
-      const shifts: Shift[] = [];
-      if (obj._shifts && obj._shifts !== []) {
-        for (const shift of obj._shifts) {
-          const lessons: Lesson[] = [];
-          for (const lesson of shift._lessons) {
-            lessons.push(new Lesson(new Date(lesson._start), new Date(lesson._end), lesson._room, lesson._campus));
-          }
-          shifts.push(new Shift(shift._name, shift._types, lessons, shift._campus));
-        }
-      }
-      course.shifts = shifts;
-
-      course.courseLoads = obj._courseLoads;
-      courses.push(course);
-    }
-    return courses;
   }
 
   pickShowOption(event): void {
@@ -124,8 +117,26 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     console.log('finish');
   }
 
+  goBack(): void {
+    this.router.navigate(['/'],
+      {
+        state: {
+          data: {
+            selectedCourses: this.previousState.selectedCourses,
+            academicTerm: this.previousState.academicTerm,
+            degreeID: this.previousState.degreeID
+          }
+        }
+      });
+  }
+
   @HostListener('window:resize', [])
   onWindowResize(): void {
     this.mobileView = window.innerWidth <= 991.98; // phones & tablets
+  }
+
+  @HostListener('window:popstate', [])
+  onPopState(): void {
+    this.goBack();
   }
 }

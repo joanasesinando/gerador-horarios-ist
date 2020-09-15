@@ -1,6 +1,11 @@
 <div class="container-fluid">
 
-  <div class="row no-gutter">
+  <div *ngIf="this.spinners.loadingPage" class="loading-page text-center">
+    <div class="spinner-border text-primary mb-4" role="status"></div>
+    <h5>Loading . . .</h5>
+  </div>
+
+  <div *ngIf="!this.spinners.loadingPage"class="row no-gutter">
 
     <!-- Sidebar -->
     <div class="sidebar d-flex col-md-4 justify-content-center px-4">
