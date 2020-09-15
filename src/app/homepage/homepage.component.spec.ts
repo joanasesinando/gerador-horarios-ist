@@ -82,6 +82,8 @@ describe('HomepageComponent', () => {
       getCourses: () => of(courses).toPromise()
     };
 
+    window.history.pushState(null, '', '');
+
     TestBed.configureTestingModule({
       imports: [
         TranslateModule.forRoot({

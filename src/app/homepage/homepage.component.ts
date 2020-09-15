@@ -104,9 +104,10 @@ export class HomepageComponent implements OnInit {
       widget.tooltip();
     });
 
-    const data = history.state.data;
-    if (!data) {
-      this.spinners.loadingPage = false;
+    let data;
+    if (history.state) {
+      data = history.state.data;
+      if (!data) { this.spinners.loadingPage = false; }
     }
 
     // Get academic terms
