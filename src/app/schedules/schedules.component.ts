@@ -168,6 +168,17 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
    * product-of-javascript-array-values
    * -------------------------------------------------------------------------------- */
   allPossibleCases(array: any[][]): any[][] {
+    // Clean array: if any is [] remove
+    for (let i = array.length - 1; i >= 0; i--) {
+      const arrayToCheck = array[i];
+      if (arrayToCheck.length === 0) {
+        array.splice(i, 1);
+      }
+    }
+
+    // Nothing to combine
+    if (array.length === 0) { return []; }
+
     return allPossibleCasesHelper(array, true);
 
     function allPossibleCasesHelper(arr: any[][], isFirst: boolean): any[][] {

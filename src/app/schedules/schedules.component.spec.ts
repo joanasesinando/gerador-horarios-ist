@@ -144,7 +144,12 @@ describe('SchedulesComponent', () => {
         {
           description: 'should get all combinations: array = [ [1, 2, 3], [] ]',
           input: [ [1, 2, 3], [] ],
-          result: []
+          result: [ [1], [2], [3] ]
+        },
+        {
+          description: 'should get all combinations: array = [ [1, 2, 3], [], [4] ]',
+          input: [ [1, 2, 3], [], [4] ],
+          result: [ [1, 4], [2, 4], [3, 4] ]
         },
         {
           description: 'should get all combinations: array = [ [1], [2, 3, 4] ]',
@@ -318,6 +323,12 @@ describe('SchedulesComponent', () => {
         expect(classes[0].shifts).toEqual(course.shifts);
       });
 
+      it('should combine shifts correctly: no shifts', () => {
+        course.shifts = [];
+        const classes = component.combineShifts(course);
+        expect((classes).length).toBe(0);
+      });
+
     });
 
     describe('Combining classes', () => {
@@ -418,6 +429,30 @@ describe('SchedulesComponent', () => {
           ).toBeTrue();
           expect(schedule.classes.includes(c1Class1) && schedule.classes.includes(c2Class2)).toBeFalse();
         });
+      });
+
+      it('should combine classes correctly: empty class', () => {
+        const schedules = component.combineClasses([ [] ]);
+        expect(schedules.length).toBe(0);
+      });
+
+      it('should combine classes correctly: multiple empty classes', () => {
+        const schedules = component.combineClasses([ [], [] ]);
+        expect(schedules.length).toBe(0);
+      });
+
+      it('should combine classes correctly: empty class & non-empty classes', () => {
+        const classesPerCourse: Class[][] = [];
+        classesPerCourse.push(component.combineShifts(courses[0]));
+        classesPerCourse.push([]);
+
+        const schedules = component.combineClasses(classesPerCourse);
+        expect(schedules.length).toBe(2);
+      });
+
+      it('should combine classes correctly: no classes', () => {
+        const schedules = component.combineClasses([ ]);
+        expect(schedules.length).toBe(0);
       });
 
     });
