@@ -60,6 +60,10 @@ Primary style
 
 -------------------------------- */
 
+.timetable {
+  touch-action: pan-y !important; // allow scrolling bc of hammerjs
+}
+
 .single-event-div {
   font-size: .8rem;
   color: white;
@@ -73,12 +77,14 @@ fa-icon {
   color: $gh-darkGray;
 
   &.prev {
-    left: -20px;
-    @include media-breakpoint-up(lg) { left: -40px; }
+    left: -40px;
+    @include media-breakpoint-down(md) { left: -20px; }
+    @include media-breakpoint-down(sm) { left: -10px; }
   }
   &.next {
-    right: -20px;
-    @include media-breakpoint-up(lg) { right: -40px; }
+    right: -40px;
+    @include media-breakpoint-down(md) { right: -20px; }
+    @include media-breakpoint-down(sm) { right: -10px; }
   }
 
   &:hover {
@@ -115,12 +121,6 @@ $columns: 5;
   @include media-breakpoint-up(lg) {
     width: 850px;
     max-width: 1200px;
-
-    &::after { // FIXME: maybe remove
-      clear: both;
-      content: "";
-      display: block;
-    }
   }
 }
 
@@ -188,10 +188,6 @@ $columns: 5;
         display: none;
       }
     }
-  }
-
-  @media only screen and (min-width: 800px) {
-    display: block;
   }
 }
 
@@ -295,11 +291,6 @@ $columns: 5;
       }
       cursor: pointer;
     }
-
-    .selected-event {
-      /* the .selected-event class is added when a user selects the event */
-      visibility: hidden;
-    }
   }
 }
 
@@ -346,8 +337,8 @@ $columns: 5;
    event colors
    -------------------------- */
 .schedule .single-event {
-  background: #f6b067;
-  &:hover { background: #f7bd7f; }
+  background: $gh-darkBlue;
+  &:hover { background: lighten($gh-darkBlue, 5%); }
 }
 
 .schedule .single-event.event-1 {
