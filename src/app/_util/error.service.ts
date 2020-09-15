@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import {AlertService} from './alert.service';
 
 declare let $;
 
@@ -7,11 +8,10 @@ declare let $;
 })
 export class ErrorService {
 
+  constructor(private alertService: AlertService) { }
+
   public showError(error: string): void {
     console.error(error);
-    $('.alert-text').text(error);
-    const alert = $('#errorAlert');
-    alert.show();
-    window.setTimeout(() => alert.hide(), 8000);
+    this.alertService.showAlert('Error', error, 'danger');
   }
 }

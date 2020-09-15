@@ -2,12 +2,13 @@ import {Component, HostListener, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 
 import {LoggerService} from '../_util/logger.service';
+
 import {Course} from '../_domain/Course';
 import {Schedule} from '../_domain/Schedule';
 import {Lesson} from '../_domain/Lesson';
 import {Shift} from '../_domain/Shift';
 import {Class} from '../_domain/Class';
-import {ClassType} from '../_domain/ClassType';
+import {AlertService} from '../_util/alert.service';
 
 @Component({
   selector: 'app-schedules',
@@ -27,132 +28,13 @@ export class SchedulesComponent implements OnInit {
 
   mobileView = false;
 
-  constructor(private logger: LoggerService, private router: Router) { }
+  constructor(private logger: LoggerService, private router: Router, private alertService: AlertService) { }
 
   ngOnInit(): void {
     this.onWindowResize();
     // Receive selected courses
-    const data = [ // FIXME: remove
-      {
-        _id: 1,
-        _name: 'Course #1',
-        _acronym: 'CArq123',
-        _types: [ClassType.THEORY_PT, ClassType.LAB_PT],
-        _campus: ['Alameda'],
-        _shifts: [
-          {
-            _name: 'T01',
-            _types: [ClassType.THEORY_PT],
-            _lessons: [
-              {
-                _start: 'Mon Sep 07 2020 09:00:00 GMT+0100 (Western European Summer Time)',
-                _end: 'Mon Sep 07 2020 10:00:00 GMT+0100 (Western European Summer Time)',
-                _room: 'R1',
-                _campus: 'Alameda'
-              },
-              {
-                _start: 'Wed Sep 09 2020 18:30:00 GMT+0100 (Western European Summer Time)',
-                _end: 'Wed Sep 09 2020 20:00:00 GMT+0100 (Western European Summer Time)',
-                _room: 'R1',
-                _campus: 'Alameda'
-              }
-            ],
-            _campus: 'Alameda'
-          },
-          {
-            _name: 'L01',
-            _types: [ClassType.LAB_PT],
-            _lessons: [
-              {
-                _start: 'Tue Sep 08 2020 09:30:00 GMT+0100 (Western European Summer Time)',
-                _end: 'Tue Sep 08 2020 13:00:00 GMT+0100 (Western European Summer Time)',
-                _room: 'R2',
-                _campus: 'Alameda'
-              }
-            ],
-            _campus: 'Alameda'
-          },
-          {
-            _name: 'L01',
-            _types: [ClassType.LAB_PT],
-            _lessons: [
-              {
-                _start: 'Fri Sep 11 2020 09:30:00 GMT+0100 (Western European Summer Time)',
-                _end: 'Fri Sep 11 2020 13:00:00 GMT+0100 (Western European Summer Time)',
-                _room: 'R2',
-                _campus: 'Alameda'
-              }
-            ],
-            _campus: 'Alameda'
-          },
-          {
-            _name: 'L01',
-            _types: [ClassType.LAB_PT],
-            _lessons: [
-              {
-                _start: 'Fri Sep 11 2020 13:30:00 GMT+0100 (Western European Summer Time)',
-                _end: 'Fri Sep 11 2020 14:30:00 GMT+0100 (Western European Summer Time)',
-                _room: 'R2',
-                _campus: 'Alameda'
-              }
-            ],
-            _campus: 'Alameda'
-          }
-        ],
-        _courseLoads: { Teórica: 3, Laboratorial: 1.5 }
-      },
-      {
-        _id: 2,
-        _name: 'Course #2',
-        _acronym: 'BD123',
-        _types: [ClassType.THEORY_PT],
-        _campus: ['Alameda'],
-        _shifts: [
-          {
-            _name: 'T01',
-            _types: [ClassType.THEORY_PT],
-            _lessons: [
-              {
-                _start: 'Mon Sep 07 2020 13:00:00 GMT+0100 (Western European Summer Time)',
-                _end: 'Mon Sep 07 2020 14:00:00 GMT+0100 (Western European Summer Time)',
-                _room: 'R1',
-                _campus: 'Alameda'
-              }
-            ],
-            _campus: 'Alameda'
-          },
-          {
-            _name: 'T01',
-            _types: [ClassType.THEORY_PT],
-            _lessons: [
-              {
-                _start: 'Mon Sep 07 2020 14:00:00 GMT+0100 (Western European Summer Time)',
-                _end: 'Mon Sep 07 2020 15:00:00 GMT+0100 (Western European Summer Time)',
-                _room: 'R1',
-                _campus: 'Alameda'
-              }
-            ],
-            _campus: 'Alameda'
-          },
-          {
-            _name: 'T01',
-            _types: [ClassType.THEORY_PT],
-            _lessons: [
-              {
-                _start: 'Mon Sep 07 2020 16:00:00 GMT+0100 (Western European Summer Time)',
-                _end: 'Mon Sep 07 2020 17:00:00 GMT+0100 (Western European Summer Time)',
-                _room: 'R1',
-                _campus: 'Alameda'
-              }
-            ],
-            _campus: 'Alameda'
-          }
-        ],
-        _courseLoads: { Teórica: 1 }
-      }
-    ];
-    // const data = history.state.data; // FIXME: uncomment
-    // if (!data) { this.router.navigate(['/']); return; } // FIXME: uncomment
+    const data = history.state.data;
+    if (!data) { this.router.navigate(['/']); return; }
     this.selectedCourses = this.parseCourses(data);
     this.logger.log('courses to generate', this.selectedCourses);
 
@@ -319,15 +201,16 @@ export class SchedulesComponent implements OnInit {
   }
 
   pickShowOption(event): void {
-    // TODO;
+    // TODO
     console.log(event.innerText);
   }
 
   addSchedule(scheduleID: number): void {
-    // TODO: show warning if adding one already added
     const scheduleToAdd = this.generatedSchedules[scheduleID];
     if (!this.schedulesPicked.includes(scheduleToAdd)) {
       this.schedulesPicked.push(scheduleToAdd);
+    } else {
+      this.alertService.showAlert('Atenção', 'Este horário já foi adicionado!', 'warning');
     }
     this.logger.log('schedules picked', this.schedulesPicked);
   }
@@ -342,6 +225,10 @@ export class SchedulesComponent implements OnInit {
 
   finish(): void {
     // TODO
+    this.alertService.showAlert(
+      'Brevemente 😄',
+      'Esta funcionalidade está ainda em desenvolvimento. Se quiseres contribuir passa pelo repositório no Github!',
+      'info');
     console.log('finish');
   }
 

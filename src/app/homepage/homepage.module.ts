@@ -10,7 +10,6 @@ import { CourseCardComponent } from './course-card/course-card.component';
 import { CoursesBannerComponent } from './courses-banner/courses-banner.component';
 import { AboutModalComponent } from './about-modal/about-modal.component';
 import { TranslateModule } from '@ngx-translate/core';
-import {SchedulesModule} from '../schedules/schedules.module';
 
 
 @NgModule({
@@ -25,8 +24,7 @@ import {SchedulesModule} from '../schedules/schedules.module';
         HomepageRoutingModule,
         TranslateModule,
         FontAwesomeModule,
-        ReactiveFormsModule,
-        SchedulesModule, // FIXME: remove
+        ReactiveFormsModule
     ]
 })
 export class HomepageModule { }
