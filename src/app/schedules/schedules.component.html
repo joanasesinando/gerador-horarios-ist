@@ -1,26 +1,11 @@
-<!--<div class="container-fluid">-->
-
-<!--  <div *ngIf="spinner" class="spinner-wrapper text-center">-->
-<!--    <div class="spinner-border text-primary mb-4" role="status"></div>-->
-<!--    <h5>Generating . . .</h5>-->
-<!--  </div>-->
-
-<!--  <div *ngIf="!spinner">-->
-<!--    <h3>Generated {{generatedSchedules.length}} Schedules</h3>-->
-<!--    <hr>-->
-<!--    <h3 class="container d-flex justify-content-center">#{{scheduleSelected}}</h3>-->
-<!--    <app-timetable *ngIf="generatedSchedules.length > 0"-->
-<!--                   [schedules]="generatedSchedules"-->
-<!--                   (scheduleSelected)="scheduleSelected = $event">-->
-<!--    </app-timetable>-->
-<!--  </div>-->
-
-<!--</div>-->
-
-
 <div class="container-fluid">
 
-  <div class="row no-gutter">
+  <div *ngIf="spinner" class="spinner-wrapper text-center">
+    <div class="spinner-border text-primary mb-4" role="status"></div>
+    <h5>Generating . . .</h5>
+  </div>
+
+  <div *ngIf="!spinner" class="row no-gutter">
 
     <!-- Main Content -->
     <div class="main-content col-lg-9">
@@ -70,7 +55,7 @@
 
               <!-- Add btn -->
               <div class="btn-add d-flex flex-column align-items-center">
-                <button class="btn btn-primary mt-5" [ngClass]="{'btn-block': mobileView}"
+                <button class="btn btn-primary mt-4" [ngClass]="{'btn-block': mobileView}"
                         type="button" (click)="addSchedule(scheduleInView)">Adicionar</button>
                 <a *ngIf="mobileView" href="#selected-schedules"
                    class="d-block text-center mt-4">Ver horários escolhidos</a>
@@ -90,7 +75,7 @@
 
       <!-- Selected schedules -->
       <div class="selected-schedules-heading text-white">
-        <h5>Horários escolhidos</h5>
+        <h5 class="mb-4 mb-lg-2">Horários escolhidos</h5>
         <p *ngIf="schedulesPicked.length === 0" class="mt-3"><em>Nenhum horário escolhido</em></p>
       </div>
 

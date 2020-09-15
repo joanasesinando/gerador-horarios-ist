@@ -3,10 +3,12 @@ import {Component, EventEmitter, HostListener, Input, OnInit, Output} from '@ang
 import {LoggerService} from '../../_util/logger.service';
 import {TranslateService} from '@ngx-translate/core';
 
+import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons';
+
 import {Schedule} from '../../_domain/Schedule';
 import {Event} from '../../_domain/Event';
 import {minifyClassType} from '../../_domain/ClassType';
-import {formatTime} from '../../_util/Time';
+import {formatTime, getWeekday} from '../../_util/Time';
 
 @Component({
   selector: 'app-timetable',
@@ -15,7 +17,7 @@ import {formatTime} from '../../_util/Time';
 })
 export class TimetableComponent implements OnInit {
 
-  SLOT_HEIGHT_DESKTOP = 25;
+  SLOT_HEIGHT_DESKTOP = 27;
   SLOT_HEIGHT_MOBILE = 25;
 
   TIMELINE_START = '08:00';
@@ -29,6 +31,9 @@ export class TimetableComponent implements OnInit {
   eventsPerWeekday: Map<string, Event[]> = new Map();
 
   mobileView = false;
+
+  faCaretRight = faCaretRight;
+  faCaretLeft = faCaretLeft;
 
   constructor(private logger: LoggerService, public translateService: TranslateService) { }
 
@@ -44,30 +49,19 @@ export class TimetableComponent implements OnInit {
     const timeline: string[] = [];
     let current = start;
 
-    if (window.innerWidth < 1000) {
-      while (current !== end + 1) {
-        timeline.push(current + 'H');
-        if (current !== end) {
-          timeline.push(current + ':30H');
-        }
-        current++;
-      }
+    while (current !== end + 1) {
+      let s = '';
+      if (current.toString().length === 1) { s += '0'; }
+      s += current + ':00';
+      timeline.push(s);
 
-    } else {
-      while (current !== end + 1) {
-        let s = '';
+      if (current !== end) {
+        s = '';
         if (current.toString().length === 1) { s += '0'; }
-        s += current + ':00';
+        s += current + ':30';
         timeline.push(s);
-
-        if (current !== end) {
-          s = '';
-          if (current.toString().length === 1) { s += '0'; }
-          s += current + ':30';
-          timeline.push(s);
-        }
-        current++;
       }
+      current++;
     }
     return timeline;
   }
@@ -84,7 +78,7 @@ export class TimetableComponent implements OnInit {
           const type = minifyClassType(shift.types[0]); // NOTE: potential bug
 
           shift.lessons.forEach(lesson => {
-            const weekday = this.getWeekday(lesson.start.getDay());
+            const weekday = getWeekday(lesson.start.getDay());
             const start = formatTime(lesson.start);
             const end = formatTime(lesson.end);
             const name = acronym.replace(/[0-9]/g, '') + ' (' + type + ')';
@@ -108,25 +102,6 @@ export class TimetableComponent implements OnInit {
         this.eventsPerWeekday.get(ev.weekday).push(ev) : this.eventsPerWeekday.set(ev.weekday, [ev]);
     });
     this.logger.log('events per weekday', this.eventsPerWeekday);
-  }
-
-  getWeekday(day: number): string {
-    switch (day) {
-      case 1:
-        return 'monday';
-      case 2:
-        return 'tuesday';
-      case 3:
-        return 'wednesday';
-      case 4:
-        return 'thursday';
-      case 5:
-        return 'friday';
-      case 6:
-        return 'saturday';
-      case 7:
-        return 'sunday';
-    }
   }
 
   prev(): void {
@@ -158,6 +133,11 @@ export class TimetableComponent implements OnInit {
     return eventSlotHeight * duration / this.TIMELINE_UNIT_DURATION + 'px';
   }
 
+  isTallEnough(start, end): boolean {
+    const height = parseInt(this.getHeight(start, end).replace('px', ''), 10);
+    return height > this.SLOT_HEIGHT_DESKTOP * 2;
+  }
+
   /* ----------------------------------------------------------
    * Converts time to timestamp. Accepts HH:mm format.
    * ---------------------------------------------------------- */
@@ -179,6 +159,6 @@ export class TimetableComponent implements OnInit {
 
   @HostListener('window:resize', [])
   onWindowResize(): void {
-    this.mobileView = window.innerWidth < 800; // phones & tablets
+    this.mobileView = window.innerWidth < 991.98; // phones & tablets
   }
 }

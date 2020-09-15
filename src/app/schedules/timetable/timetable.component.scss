@@ -1,3 +1,9 @@
+@import "src/styles/colors";
+
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+
 /* reset css */
 /* https://meyerweb.com/eric/tools/css/reset/
    v2.0 | 20110126
@@ -20,7 +26,6 @@ time, mark, audio, video {
   margin: 0;
   padding: 0;
   border: 0;
-  font: inherit;
   vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
@@ -54,10 +59,32 @@ table {
 Primary style
 
 -------------------------------- */
+
 .single-event-div {
   font-size: .8rem;
   color: white;
   text-decoration: none;
+}
+
+fa-icon {
+  position: absolute;
+  font-size: 3.5rem;
+  @include media-breakpoint-down(md) { font-size: 2rem; }
+  color: $gh-darkGray;
+
+  &.prev {
+    left: -20px;
+    @include media-breakpoint-up(lg) { left: -40px; }
+  }
+  &.next {
+    right: -20px;
+    @include media-breakpoint-up(lg) { right: -40px; }
+  }
+
+  &:hover {
+    cursor: pointer;
+    color: lighten($gh-darkGray, 10%);
+  }
 }
 
 
@@ -69,27 +96,25 @@ Main Components
 $top-info-height-desktop: 30px;
 $top-info-height-mobile: 30px;
 
-$cell-height-desktop: 25px; // NOTE: change $grid-height-desktop
-$cell-height-mobile: 25px; // NOTE: change $grid-height-mobile
+$cell-height-desktop: 27px; // NOTE: change on .ts SLOT_HEIGHT_DESKTOP
+$cell-height-mobile: 25px; // NOTE: change on .ts SLOT_HEIGHT_MOBILE
 
-$grid-height-desktop: 599px; // 24 * $cell-height-desktop - 1
-$grid-height-mobile: 599px; // 24 * $cell-height-mobile - 1
+$grid-height-desktop: 24 * $cell-height-desktop;
+$grid-height-mobile: 24 * $cell-height-mobile;
 
 $timeline-width: 60px; // NOTE: change more
-$columns: 6; // NOTE: change more
+$columns: 5;
 
 /* ----------------------
    schedule
    ---------------------- */
 .schedule {
   position: relative;
-  width: 95%;
-  margin: 2em auto;
+  width: 100%;
 
-  @media only screen and (min-width: 1000px) {
+  @include media-breakpoint-up(lg) {
     width: 850px;
     max-width: 1200px;
-    margin: 2em auto;
 
     &::after { // FIXME: maybe remove
       clear: both;
@@ -109,12 +134,12 @@ $columns: 6; // NOTE: change more
   height: 100%;
   width: 100%;
   padding-top: $top-info-height-desktop;
-  @media only screen and (max-width: 799px) { padding-top: $top-info-height-mobile; }
+  @include media-breakpoint-down(md){ padding-top: $top-info-height-mobile; }
 
   li {
     position: relative;
     height: $cell-height-desktop;
-    @media only screen and (max-width: 799px) { height: $cell-height-mobile; }
+    @include media-breakpoint-down(md) { height: $cell-height-mobile; }
 
     &::after {
       // this is used to create the table horizontal lines
@@ -127,16 +152,24 @@ $columns: 6; // NOTE: change more
       background: #EAEAEA;
     }
 
-    &:nth-of-type(2n)::after {
-      height: 3px;
-      @media only screen and (max-width: 450px) { height: 2px; }
+    //&:nth-of-type(2n)::after {
+    //  height: 3px;
+    //  @media only screen and (max-width: 450px) { height: 2px; }
+    //}
+
+    &:last-of-type {
+      height: 0;
     }
 
     &:last-of-type::after {
       display: none;
     }
 
-    @media only screen and (min-width: 1000px) {
+    span {
+      display: none;
+    }
+
+    @include media-breakpoint-up(lg) {
       &::after {
         // NOTE: $timeline-width -> 60px
         width: calc(100% - 60px);
@@ -171,14 +204,14 @@ $columns: 6; // NOTE: change more
   width: 100%;
   z-index: 1;
 
-  @media only screen and (min-width: 1000px) {
+  @include media-breakpoint-up(lg) {
     // NOTE: $timeline-width -> 60px
     width: calc(100% - 60px);
     margin-left: $timeline-width;
   }
 
   .events-group {
-    width: calc(100% / 6); // NOTE: $columns -> 6
+    width: 100% / $columns;
     float: left;
     border: 1px solid #EAEAEA;
     margin-bottom: 0;
@@ -187,7 +220,7 @@ $columns: 6; // NOTE: change more
       position: relative;
       display: block;
       height: $grid-height-desktop;
-      @media only screen and (max-width: 799px) { height: $grid-height-mobile; }
+      @include media-breakpoint-down(md) { height: $grid-height-mobile; }
       overflow: visible;
       padding: 0;
 
@@ -218,7 +251,7 @@ $columns: 6; // NOTE: change more
     /* vertically center its content */
     display: table;
     height: $top-info-height-desktop;
-    @media only screen and (max-width: 799px) { height: $top-info-height-mobile; }
+    @include media-breakpoint-down(md) { height: $top-info-height-mobile; }
     border-bottom: 1px solid #EAEAEA;
     padding: 0;
 
@@ -229,8 +262,8 @@ $columns: 6; // NOTE: change more
       text-align: center;
       font-weight: bold;
 
-      @media only screen and (max-width: 799px) {
-        font-size: .6rem;
+      @include media-breakpoint-down(md) {
+        font-size: .9rem;
       }
     }
   }
@@ -257,6 +290,9 @@ $columns: 6; // NOTE: change more
       display: block;
       height: 100%;
       padding: .7em;
+      @include media-breakpoint-down(sm) {
+        padding: .5em;
+      }
       cursor: pointer;
     }
 
@@ -281,13 +317,13 @@ $columns: 6; // NOTE: change more
 
 .schedule .event-date,
 .schedule .event-place {
-  font-size: .6rem;
-  @media only screen and (max-width: 550px) { font-size: .5rem; }
   opacity: .7;
 }
 
 .schedule .event-date {
   display: block;
+  font-size: .6rem;
+  @media only screen and (max-width: 550px) { font-size: .5rem; }
   line-height: 1.2;
   margin-bottom: .2em;
 }
@@ -295,15 +331,14 @@ $columns: 6; // NOTE: change more
 .schedule .event-name {
   display: inline-block;
   font-size: .7rem;
-  margin-right: 1.5rem;
-  @media only screen and (max-width: 550px) {
-    font-size: .6rem;
-    margin-right: .7rem;
-  }
+  @media only screen and (max-width: 550px) { font-size: .6rem; }
 }
 
 .schedule .event-place {
-  display: inline-block;
+  display: block;
+  font-size: .7rem;
+  @media only screen and (max-width: 550px) { font-size: .6rem; }
+  margin-top: .2em
 }
 
 
