@@ -116,9 +116,9 @@ export class HomepageComponent implements OnInit {
     let tookToLong = true;
     setTimeout(() => {
       if (tookToLong) {
-        alertService.showAlert('Serviço indisponível', 'O gerador encontra-se em baixo. Por favor, tenta de novo daqui a 10min. Desculpa o incómodo.', 'danger');
+        alertService.showAlert('Serviço indisponível', 'O gerador encontra-se em baixo. Por favor, tenta de novo daqui a 10min.', 'danger');
       }
-    }, 10);
+    }, 10000);
 
     // Get academic terms
     // TODO: only show current and next (API about)
@@ -130,6 +130,7 @@ export class HomepageComponent implements OnInit {
       tookToLong = false;
 
       // Reset state if coming back
+      // TODO: put into function
       if (data) {
         this.selectedCourses = parseCourses(data.selectedCourses);
         this.selectedCoursesIDs.clear();

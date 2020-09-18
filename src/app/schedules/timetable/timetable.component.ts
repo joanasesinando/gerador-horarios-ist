@@ -8,7 +8,7 @@ import { faCaretRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import {Schedule} from '../../_domain/Schedule';
 import {Event} from '../../_domain/Event';
 import {minifyClassType} from '../../_domain/ClassType';
-import {formatTime, getWeekday} from '../../_util/Time';
+import {formatTime, getTimestamp, getWeekday} from '../../_util/Time';
 
 @Component({
   selector: 'app-timetable',
@@ -122,31 +122,20 @@ export class TimetableComponent implements OnInit {
 
   getTop(start: string): string {
     const eventSlotHeight = this.mobileView ? this.SLOT_HEIGHT_MOBILE : this.SLOT_HEIGHT_DESKTOP;
-    const begin = this.getTimestamp(start);
-    return eventSlotHeight * (begin - this.getTimestamp(this.TIMELINE_START)) / this.TIMELINE_UNIT_DURATION + 'px';
+    const begin = getTimestamp(start);
+    return eventSlotHeight * (begin - getTimestamp(this.TIMELINE_START)) / this.TIMELINE_UNIT_DURATION + 'px';
   }
 
   getHeight(start: string, end: string): string {
     const eventSlotHeight = this.mobileView ? this.SLOT_HEIGHT_MOBILE : this.SLOT_HEIGHT_DESKTOP;
-    const begin = this.getTimestamp(start);
-    const duration = this.getTimestamp(end) - begin;
+    const begin = getTimestamp(start);
+    const duration = getTimestamp(end) - begin;
     return eventSlotHeight * duration / this.TIMELINE_UNIT_DURATION + 'px';
   }
 
   isTallEnough(start, end): boolean {
     const height = parseInt(this.getHeight(start, end).replace('px', ''), 10);
     return height > this.SLOT_HEIGHT_DESKTOP * 2;
-  }
-
-  /* ----------------------------------------------------------
-   * Converts time to timestamp. Accepts HH:mm format.
-   * ---------------------------------------------------------- */
-  getTimestamp(time: string): number {
-    time = time.replace(/ /g, '');
-    const timeArray = time.split(':');
-    const hours = timeArray[0];
-    const min = timeArray[1];
-    return parseInt(hours, 10) * 60 + parseInt(min, 10);
   }
 
   pin(): void {
