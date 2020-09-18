@@ -30,14 +30,14 @@ describe('SchedulesGenerationService', () => {
           result: [ [1, 4, 5], [2, 4, 5], [3, 4, 5], [1, 4, 6], [2, 4, 6], [3, 4, 6] ]
         },
         {
+          description: 'should get all combinations: array = [ [1, 2, 3], [4, 5] ]',
+          input: [ [1, 2, 3], [4, 5] ],
+          result: [ [1, 4], [2, 4], [3, 4], [1, 5], [2, 5], [3, 5] ]
+        },
+        {
           description: 'should get all combinations: array = [ [1, 2, 3], [4] ]',
           input: [ [1, 2, 3], [4] ],
           result: [ [1, 4], [2, 4], [3, 4] ]
-        },
-        {
-          description: 'should get all combinations: array = [ [1, 2, 3], [] ]',
-          input: [ [1, 2, 3], [] ],
-          result: [ [1], [2], [3] ]
         },
         {
           description: 'should get all combinations: array = [ [1, 2, 3], [], [4] ]',
@@ -65,9 +65,24 @@ describe('SchedulesGenerationService', () => {
           result: [ [1], [2], [3] ]
         },
         {
+          description: 'should get all combinations: array = [ [1, 2, 3], [] ]',
+          input: [ [1, 2, 3], [] ],
+          result: [ [1], [2], [3] ]
+        },
+        {
           description: 'should get all combinations: array = [ [1] ]',
           input: [ [1] ],
           result: [ [1] ]
+        },
+        {
+          description: 'should get all combinations: array = [ [], [1, 2] ]',
+          input: [ [], [1, 2] ],
+          result: [ [1], [2] ]
+        },
+        {
+          description: 'should get all combinations: array = [ [], [] ]',
+          input: [ [], [] ],
+          result: []
         },
         {
           description: 'should get all combinations: array = [ [] ]',
@@ -111,13 +126,20 @@ describe('SchedulesGenerationService', () => {
         const classes = service.combineShifts(course);
 
         expect(classes.length).toBe(2);
-        expect(classes[0].shifts === classes[1].shifts).toBeFalse();
+        expect(classes[0].shifts).not.toEqual(classes[1].shifts);
+
+        let t1Included = false;
 
         classes.forEach(cl => {
           expect(cl.course).toEqual(course);
           expect(cl.shifts.length).toBe(2);
           expect(cl.shifts.includes(lab)).toBeTrue();
-          expect(cl.shifts.includes(t1) || cl.shifts.includes(t2)).toBeTrue();
+          if (t1Included) {
+            expect(cl.shifts.includes(t2)).toBeTrue();
+          } else {
+            expect(cl.shifts.includes(t1)).toBeTrue();
+            t1Included = true;
+          }
         });
       });
 
@@ -143,9 +165,9 @@ describe('SchedulesGenerationService', () => {
         const classes = service.combineShifts(course);
 
         expect(classes.length).toBe(3);
-        expect(classes[0].shifts === classes[1].shifts).toBeFalse();
-        expect(classes[0].shifts === classes[2].shifts).toBeFalse();
-        expect(classes[1].shifts === classes[2].shifts).toBeFalse();
+        expect(classes[0].shifts).not.toEqual(classes[1].shifts);
+        expect(classes[0].shifts).not.toEqual(classes[2].shifts);
+        expect(classes[1].shifts).not.toEqual(classes[2].shifts);
 
         classes.forEach(cl => {
           expect(cl.course).toEqual(course);
@@ -193,7 +215,7 @@ describe('SchedulesGenerationService', () => {
         const classes = service.combineShifts(course);
 
         expect(classes.length).toBe(2);
-        expect(classes[0].shifts === classes[1].shifts).toBeFalse();
+        expect(classes[0].shifts).not.toEqual(classes[1].shifts);
 
         classes.forEach(cl => {
           expect(cl.course).toEqual(course);
@@ -244,7 +266,7 @@ describe('SchedulesGenerationService', () => {
               ], 'Alameda')
             ], { TEORICA: 1.5, LABORATORIAL: 1.5 }),
           new Course(
-            2, 'Course #2', 'C2', [ClassType.THEORY_PT], ['Taguspark'],
+            2, 'Course #2', 'C2', [ClassType.THEORY_PT, ClassType.LAB_PT], ['Taguspark'],
             [
               new Shift('T01', ClassType.THEORY_PT, [
                 new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R3', 'Taguspark')

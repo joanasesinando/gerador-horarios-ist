@@ -89,7 +89,7 @@ export function parseCourses(data: {_id, _name, _acronym, _types, _campus, _shif
         for (const lesson of shift._lessons) {
           lessons.push(new Lesson(new Date(lesson._start), new Date(lesson._end), lesson._room, lesson._campus));
         }
-        shifts.push(new Shift(shift._name, shift._types, lessons, shift._campus));
+        shifts.push(new Shift(shift._name, shift._type, lessons, shift._campus));
       }
     }
     course.shifts = shifts;
