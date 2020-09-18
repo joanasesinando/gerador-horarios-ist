@@ -98,7 +98,7 @@ describe('SchedulesGenerationService', () => {
       });
     });
 
-    describe('Combining shifts', () => {
+    describe('Combining shifts', () => { // TODO: check total hours is correct also
 
       let course: Course;
 

@@ -22,6 +22,7 @@ import {
   faBolt
 } from '@fortawesome/free-solid-svg-icons';
 import {of} from 'rxjs';
+import {AlertService} from '../_util/alert.service';
 
 declare let $;
 
@@ -79,7 +80,8 @@ export class HomepageComponent implements OnInit {
     private fenixService: FenixService,
     public translateService: TranslateService,
     public firebaseService: FirebaseService,
-    private router: Router) {
+    private router: Router,
+    private alertService: AlertService) {
 
     this.spinners.loadingPage = true;
 
@@ -110,6 +112,14 @@ export class HomepageComponent implements OnInit {
       if (!data) { this.spinners.loadingPage = false; }
     }
 
+    // Check if request for academic terms is taking too long
+    let tookToLong = true;
+    setTimeout(() => {
+      if (tookToLong) {
+        alertService.showAlert('Serviço indisponível', 'O gerador encontra-se em baixo. Por favor, tenta de novo daqui a 10min. Desculpa o incómodo.', 'danger');
+      }
+    }, 10);
+
     // Get academic terms
     // TODO: only show current and next (API about)
     this.fenixService.getAcademicTerms().then(academicTerms => {
@@ -117,6 +127,7 @@ export class HomepageComponent implements OnInit {
       this.academicTermFormControl.enable();
       this.spinners.academicTerm = false;
       this.logger.log('academic terms', this.academicTerms);
+      tookToLong = false;
 
       // Reset state if coming back
       if (data) {
@@ -133,7 +144,6 @@ export class HomepageComponent implements OnInit {
             this.spinners.loadingPage = false;
           });
         });
-
       }
     });
   }
