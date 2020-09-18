@@ -66,8 +66,8 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
       const t0 = performance.now();
       this.generatedSchedules = this.schedulesGenerationService.generateSchedules(this.selectedCourses);
       const t1 = performance.now();
-      this.generationTime = (t1 - t0) / 100;
-      this.logger.log('generated in (seconds)', this.generationTime);
+      this.generationTime = t1 - t0;
+      this.logger.log('generated in (milliseconds)', this.generationTime);
       this.logger.log('generated schedules', this.generatedSchedules);
 
       if (this.generatedSchedules.length === 0) {

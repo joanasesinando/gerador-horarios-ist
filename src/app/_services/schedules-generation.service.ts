@@ -44,11 +44,8 @@ export class SchedulesGenerationService {
     const shiftsArray: Shift[][] = [];
 
     // Group shifts based on type of class
-    // NOTE: potential bug
-    //  types.length > 1 && type[0] equal e.g. another type on shift w/ types.length == 1
     for (const shift of course.shifts) {
-      const type = shift.types[0];
-      shiftsMap.has(type) ? shiftsMap.get(type).push(shift) : shiftsMap.set(type, [shift]);
+      shiftsMap.has(shift.type) ? shiftsMap.get(shift.type).push(shift) : shiftsMap.set(shift.type, [shift]);
     }
 
     // Get input ready for combination

@@ -405,10 +405,8 @@ export class HomepageComponent implements OnInit {
     if (this.typesOfClassesPicked.has(course.id)) {
       for (let i = course.shifts.length - 1; i >= 0; i--) {
         const shift = course.shifts[i];
-        for (const type of shift.types) {
-          if (!course.types.includes(type)) {
-            course.shifts.splice(i, 1);
-          }
+        if (!course.types.includes(shift.type)) {
+          course.shifts.splice(i, 1);
         }
       }
     }

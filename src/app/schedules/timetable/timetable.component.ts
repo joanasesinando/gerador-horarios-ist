@@ -75,7 +75,7 @@ export class TimetableComponent implements OnInit {
         const acronym = cl.course.acronym;
 
         cl.shifts.forEach(shift => {
-          const type = minifyClassType(shift.types[0]); // NOTE: potential bug
+          const type = minifyClassType(shift.type);
 
           shift.lessons.forEach(lesson => {
             const weekday = getWeekday(lesson.start.getDay());
