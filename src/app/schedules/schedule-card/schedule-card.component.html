@@ -19,7 +19,7 @@
       <div *ngFor="let shift of cl.shifts">
 
         <div *ngFor="let lesson of shift.lessons" class="d-flex flex-wrap ml-2">
-          <span class="lesson-type font-weight-bold mr-2 mb-1">({{minifyClassType(shift.types[0])}})</span>
+          <span class="lesson-type font-weight-bold mr-2 mb-1">({{minifyClassType(shift.type)}})</span>
           <span class="lesson-time mr-3 mb-1">{{printLesson(lesson)}}</span>
           <span class="lesson-room">{{lesson.room}}</span>
         </div>

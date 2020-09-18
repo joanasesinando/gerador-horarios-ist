@@ -44,31 +44,31 @@ describe('HomepageComponent', () => {
     courses = [
       new Course(1, 'Course #1', 'C1', [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
         [
-          new Shift('T01', [ClassType.THEORY_PT], [
+          new Shift('T01', ClassType.THEORY_PT, [
             new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda'),
             new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Alameda')
           ], 'Alameda'),
-          new Shift('L01', [ClassType.LAB_PT], [
+          new Shift('L01', ClassType.LAB_PT, [
             new Lesson(new Date('2020-09-08 09:30'), new Date('2020-09-07 11:00'), 'R2', 'Alameda')
           ], 'Alameda')
-        ], { Teórica: 3, Laboratorial: 1.5 }),
+        ], { TEORICA: 3, LABORATORIAL: 1.5 }),
       new Course(2, 'Course #2', 'C2', [ClassType.THEORY_PT], ['Taguspark'],
         [
-          new Shift('T01', [ClassType.THEORY_PT], [
+          new Shift('T01', ClassType.THEORY_PT, [
             new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Taguspark'),
             new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Taguspark')
           ], 'Taguspark')
-        ], { Teórica: 3 }),
+        ], { TEORICA: 3 }),
       new Course(3, 'Course #3', 'C3', [ClassType.THEORY_PT, ClassType.PROBLEMS_PT], ['Alameda'],
         [
-          new Shift('T01', [ClassType.THEORY_PT], [
+          new Shift('T01', ClassType.THEORY_PT, [
             new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda'),
             new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Alameda')
           ], 'Alameda'),
-          new Shift('PB01', [ClassType.PROBLEMS_PT], [
+          new Shift('PB01', ClassType.PROBLEMS_PT, [
             new Lesson(new Date('2020-09-08 09:30'), new Date('2020-09-07 11:00'), 'R2', 'Alameda')
           ], 'Alameda')
-        ], { Teórica: 3, Problemas: 1.5 })
+        ], { TEORICA: 3, PROBLEMS: 1.5 })
     ];
 
     fenixServiceStub = {
@@ -251,7 +251,7 @@ describe('HomepageComponent', () => {
         it('should NOT add a course that has no shifts', () => {
           courses.push(new Course(
             4, 'Course #4', 'C4', [ClassType.THEORY_PT], ['Alameda'],
-            [], { Teórica: 2 }));
+            [], { TEORICA: 2 }));
 
           try {
             component.addCourse(4);
@@ -371,22 +371,22 @@ describe('HomepageComponent', () => {
           [ClassType.THEORY_PT, ClassType.LAB_PT],
           ['Alameda', 'Taguspark'],
           [
-            new Shift('T01', [ClassType.THEORY_PT], [
+            new Shift('T01', ClassType.THEORY_PT, [
               new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda'),
               new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Alameda')
             ], 'Alameda'),
-            new Shift('T02', [ClassType.THEORY_PT], [
+            new Shift('T02', ClassType.THEORY_PT, [
               new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Taguspark'),
               new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Taguspark')
             ], 'Taguspark'),
-            new Shift('L01', [ClassType.LAB_PT], [
+            new Shift('L01', ClassType.LAB_PT, [
               new Lesson(new Date('2020-09-08 09:30'), new Date('2020-09-07 11:00'), 'R2', 'Alameda')
             ], 'Alameda'),
-            new Shift('L02', [ClassType.LAB_PT], [
+            new Shift('L02', ClassType.LAB_PT, [
               new Lesson(new Date('2020-09-08 09:30'), new Date('2020-09-07 11:00'), 'R2', 'Taguspark')
             ], 'Taguspark')
           ],
-          { Teórica: 3, Laboratorial: 1.5 });
+          { TEORICA: 3, LABORATORIAL: 1.5 });
 
         // Add course
         component.addCourse(course.id);
@@ -454,9 +454,7 @@ describe('HomepageComponent', () => {
         component.removeShiftsBasedOnTypesOfClasses(course);
         const courseSelected = component.selectedCourses[0];
         courseSelected.shifts.forEach(shift => {
-          shift.types.forEach(type => {
-            expect(typesSelected.includes(type));
-          });
+          expect(typesSelected.includes(shift.type));
         });
       });
 
@@ -483,9 +481,7 @@ describe('HomepageComponent', () => {
         });
 
         courseSelected.shifts.forEach(shift => {
-          shift.types.forEach(type => {
-            expect(typesSelected.includes(type));
-          });
+          expect(typesSelected.includes(shift.type));
         });
       });
 
@@ -497,12 +493,12 @@ describe('HomepageComponent', () => {
           [ClassType.THEORY_PT],
           ['Alameda'],
           [
-            new Shift('T01', [ClassType.THEORY_PT], [
+            new Shift('T01', ClassType.THEORY_PT, [
               new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda'),
               new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Alameda')
             ], 'Alameda')
           ],
-          { Teórica: 3 });
+          { TEORICA: 3 });
 
         // Add course
         component.addCourse(course2.id);
@@ -525,9 +521,7 @@ describe('HomepageComponent', () => {
           });
 
           courseSelected.shifts.forEach(shift => {
-            shift.types.forEach(type => {
-              expect(typesSelected.includes(type));
-            });
+            expect(typesSelected.includes(shift.type));
           });
         });
       });

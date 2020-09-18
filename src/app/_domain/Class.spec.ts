@@ -6,17 +6,17 @@ import {Lesson} from './Lesson';
 
 describe('Class', () => {
   const SHIFTS = [
-    new Shift('T01', [ClassType.THEORY_PT], [
+    new Shift('T01', ClassType.THEORY_PT, [
       new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'QA02.2', 'Alameda'),
       new Lesson(new Date('2020-09-09 10:00'), new Date('2020-09-09 11:30'), 'QA02.2', 'Alameda')
     ], 'Alameda'),
-    new Shift('T02', [ClassType.THEORY_PT], [
+    new Shift('T02', ClassType.THEORY_PT, [
       new Lesson(new Date('2020-09-07 11:00'), new Date('2020-09-07 12:30'), 'QA02.2', 'Alameda'),
       new Lesson(new Date('2020-09-09 11:30'), new Date('2020-09-09 13:00'), 'QA02.2', 'Alameda')
     ], 'Alameda')
   ];
   const COURSE = new Course(846035542878562, 'Bases de Dados', 'BD225179577', [ClassType.THEORY_PT],
-                    ['Alameda'], SHIFTS, { Teórica: 3, Laboratorial: 1.5});
+                    ['Alameda'], SHIFTS, { TEORICA: 3 });
 
   let cl: Class;
 
@@ -34,11 +34,11 @@ describe('Class', () => {
    * ---------------------------- */
   it('should overlap: one shift overlaps', () => {
     const shifts = [
-      new Shift('T01', [ClassType.THEORY_PT], [
+      new Shift('T01', ClassType.THEORY_PT, [
         new Lesson(new Date('2020-09-07 09:00'), new Date('2020-09-07 10:00'), 'QA02.2', 'Alameda'),
         new Lesson(new Date('2020-09-10 10:00'), new Date('2020-09-10 11:30'), 'QA02.2', 'Alameda')
       ], 'Alameda'),
-      new Shift('T02', [ClassType.THEORY_PT], [
+      new Shift('T02', ClassType.THEORY_PT, [
         new Lesson(new Date('2020-09-08 11:00'), new Date('2020-09-08 12:30'), 'QA02.2', 'Alameda'),
         new Lesson(new Date('2020-09-10 11:30'), new Date('2020-09-10 13:00'), 'QA02.2', 'Alameda')
       ], 'Alameda')
@@ -58,11 +58,11 @@ describe('Class', () => {
    * ---------------------------- */
   it('should NOT overlap: same week days', () => {
     const shifts = [
-      new Shift('T01', [ClassType.THEORY_PT], [
+      new Shift('T01', ClassType.THEORY_PT, [
         new Lesson(new Date('2020-09-07 08:00'), new Date('2020-09-07 09:30'), 'QA02.2', 'Alameda'),
         new Lesson(new Date('2020-09-09 08:30'), new Date('2020-09-09 10:00'), 'QA02.2', 'Alameda')
       ], 'Alameda'),
-      new Shift('T02', [ClassType.THEORY_PT], [
+      new Shift('T02', ClassType.THEORY_PT, [
         new Lesson(new Date('2020-09-07 14:00'), new Date('2020-09-07 15:30'), 'QA02.2', 'Alameda'),
         new Lesson(new Date('2020-09-09 15:30'), new Date('2020-09-09 17:00'), 'QA02.2', 'Alameda')
       ], 'Alameda')
@@ -73,11 +73,11 @@ describe('Class', () => {
 
   it('should NOT overlap: different week days', () => {
     const shifts = [
-      new Shift('T01', [ClassType.THEORY_PT], [
+      new Shift('T01', ClassType.THEORY_PT, [
         new Lesson(new Date('2020-09-08 09:30'), new Date('2020-09-08 11:00'), 'QA02.2', 'Alameda'),
         new Lesson(new Date('2020-09-10 10:00'), new Date('2020-09-10 11:30'), 'QA02.2', 'Alameda')
       ], 'Alameda'),
-      new Shift('T02', [ClassType.THEORY_PT], [
+      new Shift('T02', ClassType.THEORY_PT, [
         new Lesson(new Date('2020-09-08 11:00'), new Date('2020-09-08 12:30'), 'QA02.2', 'Alameda'),
         new Lesson(new Date('2020-09-10 11:30'), new Date('2020-09-10 13:00'), 'QA02.2', 'Alameda')
       ], 'Alameda')

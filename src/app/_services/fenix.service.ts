@@ -15,7 +15,7 @@ import {ClassType} from '../_domain/ClassType';
 export class FenixService {
 
   url = 'https://cors-anywhere.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/';
-  errorInAPI = false;
+  totalHoursPerWeekDoNotMatchLessonsTime = false;
 
   constructor(public translateService: TranslateService, public errorService: ErrorService) { }
 
@@ -31,12 +31,12 @@ export class FenixService {
     return academicTerm >= '2003/2004';
   }
 
-  private static parseDegree(degree): Degree {
-    if (!degree.id) { throw new Error('No ID found for degree'); }
-    if (!degree.name) { throw new Error('No name found for degree ' + degree.id); }
-    if (!degree.acronym) { throw new Error('No acronym found for degree ' + degree.id); }
+  private static parseDegree(degreeJson): Degree {
+    if (!degreeJson.id) { throw new Error('No ID found for degree'); }
+    if (!degreeJson.name) { throw new Error('No name found for degree ' + degreeJson.id); }
+    if (!degreeJson.acronym) { throw new Error('No acronym found for degree ' + degreeJson.id); }
 
-    return new Degree(degree.id, degree.name, degree.acronym);
+    return new Degree(degreeJson.id, degreeJson.name, degreeJson.acronym);
   }
 
   private static parseCourseBasicInfo(course): Course {
@@ -89,14 +89,14 @@ export class FenixService {
     return loads;
   }
 
-  private static getCourseCampi(shifts: Shift[]): string[] {
-    const campi: string[] = [];
+  private static getCourseCampus(shifts: Shift[]): string[] {
+    const campus: string[] = [];
     for (const shift of shifts) {
       for (const lesson of shift.lessons) {
-        if (!campi.includes(lesson.campus) && lesson.campus) { campi.push(lesson.campus); }
+        if (!campus.includes(lesson.campus) && lesson.campus) { campus.push(lesson.campus); }
       }
     }
-    return campi;
+    return campus;
   }
 
   private static hasTotalHoursPerWeek(hoursPerWeek: {}, lessons: Lesson[], shiftType: string): boolean {
@@ -124,8 +124,9 @@ export class FenixService {
 
   private static calculateCourseLoads(shifts: Shift[]): {} {
     const courseLoads = {};
+
     for (const shift of shifts) {
-      const type = shift.types[0];
+      const type = shift.type;
       if (!courseLoads[type]) {
         const MILLISECONDS_IN_AN_HOUR = 60 * 60 * 1000;
         let totalHours = 0;
@@ -151,9 +152,9 @@ export class FenixService {
     let shiftLessons: Lesson[] = [];
     let weekIndex = 0;
 
-    while (shiftLessons.length === 0 || !FenixService.hasTotalHoursPerWeek(hoursPerWeek, shiftLessons, shiftType[0])) {
+    while (shiftLessons.length === 0 || !FenixService.hasTotalHoursPerWeek(hoursPerWeek, shiftLessons, shiftType)) {
       if (weekIndex === lessons.length) {
-        this.errorInAPI = true;
+        this.totalHoursPerWeekDoNotMatchLessonsTime = true;
         break;
       }
 
@@ -189,7 +190,7 @@ export class FenixService {
   /* ------------------------------------------------------------
    * Formats the type of class to one that's more readable
    * ------------------------------------------------------------ */
-  private formatType(type: string): ClassType | string {
+  private formatType(type: string): ClassType {
     switch (type) {
       case 'TEORICA':
         if (this.translateService.currentLang === 'pt-PT') { return ClassType.THEORY_PT; }
@@ -208,14 +209,19 @@ export class FenixService {
         return ClassType.SEMINARY_EN;
 
       case 'TUTORIAL_ORIENTATION':
-        return ClassType.TUTORIAL_ORIENTATION;
+        if (this.translateService.currentLang === 'pt-PT') { return ClassType.TUTORIAL_ORIENTATION_PT; }
+        return ClassType.TUTORIAL_ORIENTATION_EN;
 
       case 'TRAINING_PERIOD':
-        return ClassType.TRAINING_PERIOD;
+        if (this.translateService.currentLang === 'pt-PT') { return ClassType.TRAINING_PERIOD_PT; }
+        return ClassType.TRAINING_PERIOD_EN;
+
+      case 'FIELD_WORK':
+        if (this.translateService.currentLang === 'pt-PT') { return ClassType.FIELD_WORK_PT; }
+        return ClassType.FIELD_WORK_EN;
 
       default:
-        const t = type.toLowerCase();
-        return t[0].toUpperCase() + t.substr(1);
+        return ClassType.NONE;
     }
   }
 
@@ -246,7 +252,7 @@ export class FenixService {
           try {
             degree = FenixService.parseDegree(degree);
             degrees.push(degree);
-          } catch (error) { console.error(error); }
+          } catch (error) { this.errorService.showError(error); }
         }
         return degrees.sort((a, b) => a.acronym.localeCompare(b.acronym));
       });
@@ -266,7 +272,7 @@ export class FenixService {
             if (course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9') { continue; }
 
             courses.push(course);
-          } catch (error) { console.error(error); }
+          } catch (error) { this.errorService.showError(error); }
         }
 
         return courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
@@ -291,27 +297,27 @@ export class FenixService {
           for (const shift of scheduleJson.shifts) {
 
             // Get shift types
-            const shiftTypes = this.getShiftTypes(shift.types);
+            const shiftType = this.formatType(shift.types[0]);
 
             // Get shift lessons
-            const shiftLessons = this.getShiftLessons(courseLoads, shift.lessons, shift.types);
+            const shiftLessons = this.getShiftLessons(courseLoads, shift.lessons, shiftType);
 
             // Get shift campus
             const shiftCampus = shiftLessons[0].campus;
 
-            shifts.push(new Shift(shift.name, shiftTypes, shiftLessons, shiftCampus));
+            shifts.push(new Shift(shift.name, shiftType, shiftLessons, shiftCampus));
           }
 
-          // Get campi
-          const campi: string[] = FenixService.getCourseCampi(shifts).reverse();
+          // Get campus
+          const campus: string[] = FenixService.getCourseCampus(shifts).reverse();
 
           // Update courseLoads if inconsistencies found
-          if (this.errorInAPI) {
+          if (this.totalHoursPerWeekDoNotMatchLessonsTime) {
             courseLoads = FenixService.calculateCourseLoads(shifts);
-            this.errorInAPI = false;
+            this.totalHoursPerWeekDoNotMatchLessonsTime = false;
           }
 
-          return FenixService.fillMissingInfo(new Course(course.id, course.name, course.acronym, types, campi, shifts, courseLoads));
+          return FenixService.fillMissingInfo(new Course(course.id, course.name, course.acronym, types, campus, shifts, courseLoads));
 
         } catch (error) { this.errorService.showError(error); }
       });
@@ -324,14 +330,5 @@ export class FenixService {
       types.push(type);
     }
     return types.reverse();
-  }
-
-  private getShiftTypes(types): ClassType[] {
-    const shiftTypes = [];
-    for (const shiftType of types) {
-      const type = this.formatType(shiftType);
-      shiftTypes.push(type);
-    }
-    return shiftTypes;
   }
 }
