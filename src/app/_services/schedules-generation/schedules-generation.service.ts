@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 
-import {LoggerService} from '../_util/logger.service';
+import {LoggerService} from '../../_util/logger.service';
 
-import {Schedule} from '../_domain/Schedule';
-import {Class} from '../_domain/Class';
-import {Course} from '../_domain/Course';
-import {Shift} from '../_domain/Shift';
+import {Schedule} from '../../_domain/Schedule';
+import {Class} from '../../_domain/Class';
+import {Course} from '../../_domain/Course';
+import {Shift} from '../../_domain/Shift';
 
 @Injectable({
   providedIn: 'root'

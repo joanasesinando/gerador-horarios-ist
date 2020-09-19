@@ -1,6 +1,8 @@
 import {Component, Input, Output, EventEmitter, AfterViewInit} from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+
 import {Course} from '../../_domain/Course';
+import {ClassType} from '../../_domain/ClassType';
 
 declare let $;
 
@@ -14,7 +16,7 @@ export class CourseCardComponent implements AfterViewInit {
   @Input() course: Course;
 
   @Output() campusSelected = new EventEmitter<{courseID: number, campus: string}>();
-  @Output() typesOfClassesSelected = new EventEmitter<{courseID: number, types: string[]}>();
+  @Output() typesOfClassesSelected = new EventEmitter<{courseID: number, types: ClassType[]}>();
   @Output() removeBtn = new EventEmitter<number>();
 
   faTimes = faTimes;
@@ -42,7 +44,7 @@ export class CourseCardComponent implements AfterViewInit {
 
   typesOfClassesPicked(course): void {
     const checkboxes = $('input[name^=checkTypeClass-' + this.formatName(course.name) + ']');
-    const typesChecked: string[] = [];
+    const typesChecked: ClassType[] = [];
     for (const box of checkboxes) {
       if (box.checked) {
         typesChecked.push(box.labels[0].innerText);

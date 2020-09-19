@@ -13,8 +13,8 @@ import {TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService}
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {ReactiveFormsModule} from '@angular/forms';
 
-import {FenixService} from '../_services/fenix.service';
-import {FirebaseService} from '../_services/firebase.service';
+import {FenixService} from '../_services/fenix/fenix.service';
+import {FirebaseService} from '../_services/firebase/firebase.service';
 
 import {Degree} from '../_domain/Degree';
 import {Course} from '../_domain/Course';

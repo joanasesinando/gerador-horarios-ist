@@ -1,12 +1,12 @@
 import {Injectable} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
-import {ErrorService} from '../_util/error.service';
+import {ErrorService} from '../../_util/error.service';
 
-import {Course} from '../_domain/Course';
-import {Degree} from '../_domain/Degree';
-import {Lesson} from '../_domain/Lesson';
-import {Shift} from '../_domain/Shift';
-import {ClassType} from '../_domain/ClassType';
+import {Course} from '../../_domain/Course';
+import {Degree} from '../../_domain/Degree';
+import {Lesson} from '../../_domain/Lesson';
+import {Shift} from '../../_domain/Shift';
+import {ClassType} from '../../_domain/ClassType';
 
 
 @Injectable({

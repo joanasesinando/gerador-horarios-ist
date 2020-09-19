@@ -3,13 +3,16 @@ import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import _ from 'lodash';
+import {of} from 'rxjs';
 
 import {LoggerService} from '../_util/logger.service';
-import {Course, parseCourses} from '../_domain/Course';
+import {Course} from '../_domain/Course';
 import {Degree} from '../_domain/Degree';
 
-import {FenixService} from '../_services/fenix.service';
-import {FirebaseService} from '../_services/firebase.service';
+import {FenixService} from '../_services/fenix/fenix.service';
+import {FirebaseService} from '../_services/firebase/firebase.service';
+import {AlertService} from '../_util/alert.service';
+import {StateService} from '../_services/state/state.service';
 
 import {faGithub} from '@fortawesome/free-brands-svg-icons';
 import {
@@ -22,8 +25,7 @@ import {
   faGlobeEurope,
   faBolt
 } from '@fortawesome/free-solid-svg-icons';
-import {of} from 'rxjs';
-import {AlertService} from '../_util/alert.service';
+import {ClassType} from '../_domain/ClassType';
 
 declare let $;
 
@@ -44,9 +46,9 @@ export class HomepageComponent implements OnInit {
   courses: Course[] = [];
 
   selectedCourses: Course[] = [];
-  selectedCoursesIDs = new Map();
-  campusPicked = new Map();
-  typesOfClassesPicked = new Map();
+  selectedCoursesIDs = new Map<number, boolean>();
+  campusPicked = new Map<number, string[]>();
+  typesOfClassesPicked = new Map<number, ClassType[]>();
 
   generateForm = new FormGroup({
     academicTerm: new FormControl({value: null, disabled: true}),
@@ -82,7 +84,8 @@ export class HomepageComponent implements OnInit {
     public translateService: TranslateService,
     public firebaseService: FirebaseService,
     private router: Router,
-    private alertService: AlertService) {
+    private alertService: AlertService,
+    private stateService: StateService) {
 
     this.spinners.loadingPage = true;
 
@@ -107,15 +110,8 @@ export class HomepageComponent implements OnInit {
       widget.tooltip();
     });
 
-    // Initialization for resetting state
-    let data: {
-      originalCourses: {_id, _name, _acronym, _types, _campus, _shifts, _courseLoads}[],
-      academicTerm: string,
-      degreeID: number
-    };
-    if (history.state) {
-      data = history.state.data;
-      if (!data) { this.spinners.loadingPage = false; }
+    if (!this.stateService.hasStateSaved()) {
+      this.spinners.loadingPage = false;
     }
 
     // Check if request for academic terms is taking too long
@@ -136,9 +132,9 @@ export class HomepageComponent implements OnInit {
       tookToLong = false;
 
       // Reset state if coming back
-      // TODO: put into function
-      if (data) {
-        this.resetState(data);
+      if (this.stateService.hasStateSaved()) {
+        this.resetState();
+        this.logger.log('selected courses', this.selectedCourses);
       }
     });
   }
@@ -156,19 +152,17 @@ export class HomepageComponent implements OnInit {
     return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
   }
 
-  resetState(data: { originalCourses: {_id, _name, _acronym, _types, _campus, _shifts, _courseLoads}[],
-      academicTerm: string, degreeID: number }): void {
-
-    this.selectedCourses = parseCourses(data.originalCourses);
-    this.selectedCoursesIDs.clear();
+  resetState(): void {
+    this.selectedCourses = this.stateService.selectedCoursesFullInfo;
+    this.campusPicked.clear();
     for (const course of this.selectedCourses) {
       this.selectedCoursesIDs.set(course.id, true);
     }
 
-    this.academicTermFormControl.patchValue(data.academicTerm);
-    this.loadDegrees(data.academicTerm).then(() => {
-      this.degreeFormControl.patchValue(data.degreeID);
-      this.loadCoursesBasicInfo(data.academicTerm, data.degreeID).then(() => {
+    this.academicTermFormControl.patchValue(this.stateService.academicTermSelected);
+    this.loadDegrees(this.stateService.academicTermSelected).then(() => {
+      this.degreeFormControl.patchValue(this.stateService.degreeIDSelected);
+      this.loadCoursesBasicInfo(this.stateService.academicTermSelected, this.stateService.degreeIDSelected).then(() => {
         this.spinners.loadingPage = false;
       });
     });
@@ -303,8 +297,9 @@ export class HomepageComponent implements OnInit {
     if (courseIndex == null) { return of(null).toPromise(); }
 
     // If coming back from generation empty
+    // TODO: review
     if (!academicTerm || !degreeID) {
-      remove(this.selectedCourses, this.selectedCoursesIDs, this.logger);
+      remove(this.selectedCourses, this.selectedCoursesIDs, this.campusPicked, this.typesOfClassesPicked, this.logger);
       return;
     }
 
@@ -316,12 +311,14 @@ export class HomepageComponent implements OnInit {
         this.courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
       }
 
-      remove(this.selectedCourses, this.selectedCoursesIDs, this.logger);
+      remove(this.selectedCourses, this.selectedCoursesIDs, this.campusPicked, this.typesOfClassesPicked, this.logger);
     });
 
-    function remove(selectedCourses, selectedCoursesIDs, logger): void {
+    function remove(selectedCourses, selectedCoursesIDs, campusPicked, typesOfClassesPicked, logger): void {
       selectedCourses.splice(courseIndex, 1);
       selectedCoursesIDs.delete(courseID);
+      campusPicked.delete(courseID);
+      typesOfClassesPicked.delete(courseID);
       logger.log('selected courses', selectedCourses);
     }
   }
@@ -339,28 +336,21 @@ export class HomepageComponent implements OnInit {
     this.campusPicked.set(selected.courseID, [selected.campus]);
   }
 
-  pickTypesOfClasses(selected: {courseID: number, types: string[]}): void {
+  pickTypesOfClasses(selected: {courseID: number, types: ClassType[]}): void {
     this.typesOfClassesPicked.set(selected.courseID, selected.types);
   }
 
   generateSchedules(): void {
     if (this.selectedCourses.length > 0) {
-      // Save original unaltered selected courses
-      const originalCourses = _.cloneDeep(this.selectedCourses);
+      // Save state
+      this.stateService.selectedCourses = this.selectedCourses;
+      this.stateService.selectedCoursesFullInfo = _.cloneDeep(this.selectedCourses);
+      this.stateService.academicTermSelected = this.academicTermFormControl.value;
+      this.stateService.degreeIDSelected = this.degreeFormControl.value;
 
       // Alter selected courses based on user choices & send
       this.prepareCoursesToGenerate();
-      this.router.navigate(['/generate-schedules'],
-        {
-          state: {
-            data: {
-              originalCourses,
-              selectedCourses: this.selectedCourses,
-              academicTerm: this.academicTermFormControl.value,
-              degreeID: this.degreeFormControl.value
-            }
-          }
-        });
+      this.router.navigate(['/generate-schedules']);
     }
   }
 
