@@ -43,7 +43,6 @@ export class ScheduleCardComponent implements OnInit {
 
   removeBtnClicked(): void {
     this.removeBtn.emit(this.schedule.id);
-    console.log(this.schedule.id);
   }
 
   @HostListener('window:resize', [])

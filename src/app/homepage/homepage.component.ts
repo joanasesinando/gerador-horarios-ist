@@ -2,6 +2,7 @@ import {Component, HostListener, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
+import _ from 'lodash';
 
 import {LoggerService} from '../_util/logger.service';
 import {Course, parseCourses} from '../_domain/Course';
@@ -106,7 +107,12 @@ export class HomepageComponent implements OnInit {
       widget.tooltip();
     });
 
-    let data;
+    // Initialization for resetting state
+    let data: {
+      originalCourses: {_id, _name, _acronym, _types, _campus, _shifts, _courseLoads}[],
+      academicTerm: string,
+      degreeID: number
+    };
     if (history.state) {
       data = history.state.data;
       if (!data) { this.spinners.loadingPage = false; }
@@ -132,19 +138,7 @@ export class HomepageComponent implements OnInit {
       // Reset state if coming back
       // TODO: put into function
       if (data) {
-        this.selectedCourses = parseCourses(data.selectedCourses);
-        this.selectedCoursesIDs.clear();
-        for (const course of this.selectedCourses) {
-          this.selectedCoursesIDs.set(course.id, true);
-        }
-
-        this.academicTermFormControl.patchValue(data.academicTerm);
-        this.loadDegrees(this.academicTermFormControl.value).then(() => {
-          this.degreeFormControl.patchValue(data.degreeID);
-          this.loadCoursesBasicInfo(this.academicTermFormControl.value, this.degreeFormControl.value).then(() => {
-            this.spinners.loadingPage = false;
-          });
-        });
+        this.resetState(data);
       }
     });
   }
@@ -160,6 +154,24 @@ export class HomepageComponent implements OnInit {
 
   showScrollDown(): boolean {
     return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
+  }
+
+  resetState(data: { originalCourses: {_id, _name, _acronym, _types, _campus, _shifts, _courseLoads}[],
+      academicTerm: string, degreeID: number }): void {
+
+    this.selectedCourses = parseCourses(data.originalCourses);
+    this.selectedCoursesIDs.clear();
+    for (const course of this.selectedCourses) {
+      this.selectedCoursesIDs.set(course.id, true);
+    }
+
+    this.academicTermFormControl.patchValue(data.academicTerm);
+    this.loadDegrees(data.academicTerm).then(() => {
+      this.degreeFormControl.patchValue(data.degreeID);
+      this.loadCoursesBasicInfo(data.academicTerm, data.degreeID).then(() => {
+        this.spinners.loadingPage = false;
+      });
+    });
   }
 
   // TODO: same academic term; reset when picking different
@@ -333,11 +345,16 @@ export class HomepageComponent implements OnInit {
 
   generateSchedules(): void {
     if (this.selectedCourses.length > 0) {
+      // Save original unaltered selected courses
+      const originalCourses = _.cloneDeep(this.selectedCourses);
+
+      // Alter selected courses based on user choices & send
       this.prepareCoursesToGenerate();
       this.router.navigate(['/generate-schedules'],
         {
           state: {
             data: {
+              originalCourses,
               selectedCourses: this.selectedCourses,
               academicTerm: this.academicTermFormControl.value,
               degreeID: this.degreeFormControl.value

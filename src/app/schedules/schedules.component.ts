@@ -24,8 +24,12 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
   spinner = true;
   generationTime: number = null;
 
-  data: {selectedCourses: any, academicTerm: string, degreeID: number};
-  previousState: {selectedCourses: Course[], academicTerm: string, degreeID: number};
+  data: {
+    originalCourses: {_id, _name, _acronym, _types, _campus, _shifts, _courseLoads}[],
+    selectedCourses: {_id, _name, _acronym, _types, _campus, _shifts, _courseLoads}[],
+    academicTerm: string,
+    degreeID: number
+  };
 
   mobileView = false;
 
@@ -43,13 +47,6 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     if (!this.data) { this.router.navigate(['/']); return; }
     this.selectedCourses = parseCourses(this.data.selectedCourses);
     this.logger.log('courses to generate', this.selectedCourses);
-
-    // Save previous state
-    this.previousState = {
-      selectedCourses: this.selectedCourses,
-      academicTerm: this.data.academicTerm,
-      degreeID: this.data.degreeID
-    };
   }
 
   ngAfterViewInit(): void {
@@ -85,7 +82,7 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     }, 0);
   }
 
-  pickShowOption(event): void {
+  pickViewOption(event): void {
     // TODO
     console.log(event.innerText);
   }
@@ -122,9 +119,9 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
       {
         state: {
           data: {
-            selectedCourses: this.previousState.selectedCourses,
-            academicTerm: this.previousState.academicTerm,
-            degreeID: this.previousState.degreeID
+            originalCourses: this.data.originalCourses,
+            academicTerm: this.data.academicTerm,
+            degreeID: this.data.degreeID
           }
         }
       });

@@ -29,7 +29,8 @@
               "@firebase/firestore",
               "@firebase/component",
               "@firebase/util",
-              "hammerjs"
+              "hammerjs",
+              "lodash"
             ],
             "assets": [
               "src/favicon",

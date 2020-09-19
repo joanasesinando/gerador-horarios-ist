@@ -39,7 +39,7 @@ export class Course {
     return this.types !== undefined || this.campus !== undefined || this.shifts !== undefined;
   }
 
-  convertShifts(): {}[] {
+  convertShifts(): {}[] { // TODO: complete types
     const shifts: {}[] = [];
     for (const shift of this.shifts) {
       shifts.push(shift.shiftConverter());
