@@ -6,7 +6,6 @@ import {SchedulesComponent} from './schedules.component';
 import {RouterTestingModule} from '@angular/router/testing';
 
 import {ClassType} from '../_domain/ClassType';
-import {parseCourses} from '../_domain/Course';
 
 
 describe('SchedulesComponent', () => {
@@ -59,7 +58,7 @@ describe('SchedulesComponent', () => {
               _campus: 'Alameda'
             }
           ],
-          _courseLoads: { Teórica: 3, Laboratorial: 1.5 }
+          _courseLoads: { TEORICA: 3, LABORATORIAL: 1.5 }
         }
       ],
       academicTerm: '2020/2021',
@@ -92,41 +91,6 @@ describe('SchedulesComponent', () => {
   it('should return to homepage if no data', () => { // TODO
     // window.history.state.pop();
     // const router = TestBed.createComponent(Router);
-  });
-
-  describe('Parsing received data', () => {
-
-    it('should parse data correctly', () => {
-      const receivedCourses = parseCourses(data.selectedCourses);
-      for (let i = 0; i < receivedCourses.length ; i++) {
-        const d = data.selectedCourses[i];
-        const course = receivedCourses[i];
-
-        expect(course.id).toEqual(d._id);
-        expect(course.name).toEqual(d._name);
-        expect(course.acronym).toEqual(d._acronym);
-        expect(course.types).toEqual(d._types);
-        expect(course.campus).toEqual(d._campus);
-        expect(course.courseLoads).toEqual(d._courseLoads);
-
-        for (let j = 0; j < course.shifts.length ; j++) {
-          const shift = course.shifts[j];
-          for (let k = 0; k < shift.lessons.length; k++) {
-            const lesson = shift.lessons[k];
-            const start = d._shifts[j]._lessons[k]._start;
-            const end = d._shifts[j]._lessons[k]._end;
-            const room = d._shifts[j]._lessons[k]._room;
-            const campus = d._shifts[j]._lessons[k]._campus;
-
-            expect(lesson.start).toEqual(new Date(start));
-            expect(lesson.end).toEqual(new Date(end));
-            expect(lesson.room).toEqual(room);
-            expect(lesson.campus).toEqual(campus);
-          }
-        }
-      }
-    });
-
   });
 
 });

@@ -3,9 +3,10 @@ import {Router} from '@angular/router';
 
 import {LoggerService} from '../_util/logger.service';
 import {AlertService} from '../_util/alert.service';
-import {SchedulesGenerationService} from '../_services/schedules-generation.service';
+import {SchedulesGenerationService} from '../_services/schedules-generation/schedules-generation.service';
+import {StateService} from '../_services/state/state.service';
 
-import {Course, parseCourses} from '../_domain/Course';
+import {Course} from '../_domain/Course';
 import {Schedule} from '../_domain/Schedule';
 
 @Component({
@@ -24,43 +25,37 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
   spinner = true;
   generationTime: number = null;
 
-  data: {selectedCourses: any, academicTerm: string, degreeID: number};
-  previousState: {selectedCourses: Course[], academicTerm: string, degreeID: number};
-
   mobileView = false;
 
   constructor(
     private logger: LoggerService,
     private router: Router,
     private alertService: AlertService,
-    private schedulesGenerationService: SchedulesGenerationService) { }
+    private schedulesGenerationService: SchedulesGenerationService,
+    private stateService: StateService
+  ) { }
 
   ngOnInit(): void {
     this.onWindowResize();
 
     // Receive selected courses
-    this.data = history.state.data;
-    if (!this.data) { this.router.navigate(['/']); return; }
-    this.selectedCourses = parseCourses(this.data.selectedCourses);
+    if (!this.stateService.hasStateSaved()) {
+      this.router.navigate(['/']);
+      return;
+    }
+    this.selectedCourses = this.stateService.selectedCourses;
     this.logger.log('courses to generate', this.selectedCourses);
-
-    // Save previous state
-    this.previousState = {
-      selectedCourses: this.selectedCourses,
-      academicTerm: this.data.academicTerm,
-      degreeID: this.data.degreeID
-    };
   }
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      if (!this.data) {
-        this.alertService.showAlert(
-          'Acção inválida',
-          'Não é possível andar para a frente. Por favor, preenche os campos de novo.',
-          'danger');
-        return;
-      }
+      // if (!this.data) { // FIXME
+      //   this.alertService.showAlert(
+      //     'Acção inválida',
+      //     'Não é possível andar para a frente. Por favor, preenche os campos de novo.',
+      //     'danger');
+      //   return;
+      // }
 
       // Generate schedules
       const t0 = performance.now();
@@ -85,7 +80,7 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     }, 0);
   }
 
-  pickShowOption(event): void {
+  pickViewOption(event): void {
     // TODO
     console.log(event.innerText);
   }
@@ -118,16 +113,7 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/'],
-      {
-        state: {
-          data: {
-            selectedCourses: this.previousState.selectedCourses,
-            academicTerm: this.previousState.academicTerm,
-            degreeID: this.previousState.degreeID
-          }
-        }
-      });
+    this.router.navigate(['/']);
   }
 
   @HostListener('window:resize', [])

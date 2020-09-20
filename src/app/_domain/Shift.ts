@@ -22,7 +22,7 @@ export class Shift {
   get campus(): string { return this._campus; }
   set campus(value: string) { this._campus = value; }
 
-  shiftConverter(): {} {
+  shiftConverter(): {} { // TODO: complete types
     const lessons: {}[] = [];
     for (const lesson of this.lessons) {
         lessons.push(lesson.lessonConverter());

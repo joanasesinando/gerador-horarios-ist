@@ -39,7 +39,7 @@ export class Course {
     return this.types !== undefined || this.campus !== undefined || this.shifts !== undefined;
   }
 
-  convertShifts(): {}[] {
+  convertShifts(): {}[] { // TODO: complete types
     const shifts: {}[] = [];
     for (const shift of this.shifts) {
       shifts.push(shift.shiftConverter());
@@ -75,27 +75,3 @@ export const courseConverter = {
     return new Course(data.id, data.name, data.acronym);
   }
 };
-
-export function parseCourses(data: {_id, _name, _acronym, _types, _campus, _shifts, _courseLoads}[]): Course[] {
-  const courses: Course[] = [];
-  for (const obj of data) {
-    const course = new Course(obj._id, obj._name, obj._acronym, obj._types, obj._campus);
-
-    // Parse shifts
-    const shifts: Shift[] = [];
-    if (obj._shifts && obj._shifts !== []) {
-      for (const shift of obj._shifts) {
-        const lessons: Lesson[] = [];
-        for (const lesson of shift._lessons) {
-          lessons.push(new Lesson(new Date(lesson._start), new Date(lesson._end), lesson._room, lesson._campus));
-        }
-        shifts.push(new Shift(shift._name, shift._type, lessons, shift._campus));
-      }
-    }
-    course.shifts = shifts;
-
-    course.courseLoads = obj._courseLoads;
-    courses.push(course);
-  }
-  return courses;
-}

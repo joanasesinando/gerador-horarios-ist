@@ -1,13 +1,11 @@
 import {Component, EventEmitter, HostListener, Input, OnInit, Output} from '@angular/core';
 
-import {TranslateService} from '@ngx-translate/core';
-import {formatTime} from '../../_util/Time';
-
 import { faCaretDown, faCaretUp, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import { Schedule } from '../../_domain/Schedule';
 import {ClassType, minifyClassType} from '../../_domain/ClassType';
-import {Lesson} from '../../_domain/Lesson';
+
+import {TranslateService} from '@ngx-translate/core';
 
 declare let $;
 
@@ -28,7 +26,7 @@ export class ScheduleCardComponent implements OnInit {
   expanded = false;
   mobileView = false;
 
-  constructor(private translateService: TranslateService) { }
+  constructor(public translateService: TranslateService) { }
 
   ngOnInit(): void {
     this.onWindowResize();
@@ -43,71 +41,8 @@ export class ScheduleCardComponent implements OnInit {
     return minifyClassType(type);
   }
 
-  printLesson(lesson: Lesson): string {
-    let s = '';
-    const weekday = lesson.start.getDay();
-
-    if (this.translateService.currentLang === 'pt-PT') {
-      switch (weekday) {
-        case 1:
-          s += 'Seg';
-          break;
-
-        case 2:
-          s += 'Ter';
-          break;
-
-        case 3:
-          s += 'Qua';
-          break;
-
-        case 4:
-          s += 'Qui';
-          break;
-
-        case 5:
-          s += 'Sex';
-          break;
-
-        case 6:
-          s += 'Sáb';
-          break;
-      }
-    } else {
-      switch (weekday) {
-        case 1:
-          s += 'Mon';
-          break;
-
-        case 2:
-          s += 'Tue';
-          break;
-
-        case 3:
-          s += 'Wed';
-          break;
-
-        case 4:
-          s += 'Thu';
-          break;
-
-        case 5:
-          s += 'Fri';
-          break;
-
-        case 6:
-          s += 'Sat';
-          break;
-      }
-    }
-
-    s += ', ' + formatTime(lesson.start) + ' - ' + formatTime(lesson.end);
-    return s;
-  }
-
   removeBtnClicked(): void {
     this.removeBtn.emit(this.schedule.id);
-    console.log(this.schedule.id);
   }
 
   @HostListener('window:resize', [])

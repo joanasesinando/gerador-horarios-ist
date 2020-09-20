@@ -1,5 +1,6 @@
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 import {Course} from '../../_domain/Course';
+import {ClassType} from '../../_domain/ClassType';
 
 @Component({
   selector: 'app-course-banner',
@@ -11,7 +12,7 @@ export class CoursesBannerComponent implements OnInit {
   @Input() courses: Course[];
 
   @Output() campusSelected = new EventEmitter<{courseID: number, campus: string}>();
-  @Output() typesOfClassesSelected = new EventEmitter<{courseID: number, types: string[]}>();
+  @Output() typesOfClassesSelected = new EventEmitter<{courseID: number, types: ClassType[]}>();
   @Output() removeBtn = new EventEmitter<number>();
 
   constructor() { }
@@ -23,7 +24,7 @@ export class CoursesBannerComponent implements OnInit {
     this.campusSelected.emit(campusSelected);
   }
 
-  typesOfClassesPicked(typesSelected: {courseID: number, types: string[]}): void {
+  typesOfClassesPicked(typesSelected: {courseID: number, types: ClassType[]}): void {
     this.typesOfClassesSelected.emit(typesSelected);
   }
 

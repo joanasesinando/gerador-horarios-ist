@@ -2,13 +2,16 @@ import {Component, HostListener, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
+import _ from 'lodash';
 
 import {LoggerService} from '../_util/logger.service';
-import {Course, parseCourses} from '../_domain/Course';
+import {Course} from '../_domain/Course';
 import {Degree} from '../_domain/Degree';
 
-import {FenixService} from '../_services/fenix.service';
-import {FirebaseService} from '../_services/firebase.service';
+import {FenixService} from '../_services/fenix/fenix.service';
+import {FirebaseService} from '../_services/firebase/firebase.service';
+import {AlertService} from '../_util/alert.service';
+import {StateService} from '../_services/state/state.service';
 
 import {faGithub} from '@fortawesome/free-brands-svg-icons';
 import {
@@ -21,8 +24,7 @@ import {
   faGlobeEurope,
   faBolt
 } from '@fortawesome/free-solid-svg-icons';
-import {of} from 'rxjs';
-import {AlertService} from '../_util/alert.service';
+import {ClassType} from '../_domain/ClassType';
 
 declare let $;
 
@@ -43,9 +45,9 @@ export class HomepageComponent implements OnInit {
   courses: Course[] = [];
 
   selectedCourses: Course[] = [];
-  selectedCoursesIDs = new Map();
-  campusPicked = new Map();
-  typesOfClassesPicked = new Map();
+  selectedCoursesIDs = new Map<number, boolean>();
+  campusPicked = new Map<number, string[]>();
+  typesOfClassesPicked = new Map<number, ClassType[]>();
 
   generateForm = new FormGroup({
     academicTerm: new FormControl({value: null, disabled: true}),
@@ -81,7 +83,8 @@ export class HomepageComponent implements OnInit {
     public translateService: TranslateService,
     public firebaseService: FirebaseService,
     private router: Router,
-    private alertService: AlertService) {
+    private alertService: AlertService,
+    private stateService: StateService) {
 
     this.spinners.loadingPage = true;
 
@@ -106,19 +109,21 @@ export class HomepageComponent implements OnInit {
       widget.tooltip();
     });
 
-    let data;
-    if (history.state) {
-      data = history.state.data;
-      if (!data) { this.spinners.loadingPage = false; }
+    // Reset state if coming back
+    if (this.stateService.hasStateSaved()) {
+      this.resetState();
+      this.logger.log('selected courses', this.selectedCourses);
+      this.spinners.loadingPage = false;
+      return;
     }
 
     // Check if request for academic terms is taking too long
     let tookToLong = true;
     setTimeout(() => {
       if (tookToLong) {
-        alertService.showAlert('Serviço indisponível', 'O gerador encontra-se em baixo. Por favor, tenta de novo daqui a 10min. Desculpa o incómodo.', 'danger');
+        alertService.showAlert('Serviço indisponível', 'O gerador encontra-se em baixo. Por favor, tenta de novo daqui a 10min.', 'danger');
       }
-    }, 10);
+    }, 10000);
 
     // Get academic terms
     // TODO: only show current and next (API about)
@@ -129,23 +134,10 @@ export class HomepageComponent implements OnInit {
       this.logger.log('academic terms', this.academicTerms);
       tookToLong = false;
 
-      // Reset state if coming back
-      if (data) {
-        this.selectedCourses = parseCourses(data.selectedCourses);
-        this.selectedCoursesIDs.clear();
-        for (const course of this.selectedCourses) {
-          this.selectedCoursesIDs.set(course.id, true);
-        }
-
-        this.academicTermFormControl.patchValue(data.academicTerm);
-        this.loadDegrees(this.academicTermFormControl.value).then(() => {
-          this.degreeFormControl.patchValue(data.degreeID);
-          this.loadCoursesBasicInfo(this.academicTermFormControl.value, this.degreeFormControl.value).then(() => {
-            this.spinners.loadingPage = false;
-          });
-        });
-      }
+      // Save state
+      this.saveAcademicTermsState(this.academicTerms);
     });
+    this.spinners.loadingPage = false;
   }
 
   ngOnInit(): void {
@@ -161,9 +153,71 @@ export class HomepageComponent implements OnInit {
     return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
   }
 
+  resetState(): void {
+    const academicTerm = this.stateService.academicTermSelected;
+    const degreeID = this.stateService.degreeIDSelected;
+
+    this.academicTerms = this.stateService.academicTermsRepository;
+    this.academicTermFormControl.patchValue(this.stateService.academicTermSelected);
+    this.academicTermFormControl.enable();
+    this.spinners.academicTerm = false;
+
+    this.degrees = this.stateService.degreesRepository.get(academicTerm);
+    this.degreeFormControl.patchValue(degreeID);
+    this.degreeFormControl.enable();
+    this.spinners.degree = false;
+
+    this.courses = this.stateService.coursesRepository.get(academicTerm).get(degreeID);
+    this.courseFormControl.enable();
+    this.spinners.course = false;
+
+    this.selectedCourses = this.stateService.selectedCoursesFullInfo;
+    this.campusPicked.clear();
+    for (const course of this.selectedCourses) {
+      this.selectedCoursesIDs.set(course.id, true);
+    }
+  }
+
+  saveAcademicTermsState(academicTerms: string[]): void {
+    this.stateService.academicTermsRepository = _.cloneDeep(academicTerms);
+    this.logger.log('saved academic terms state', this.stateService.academicTermsRepository);
+  }
+
+  saveDegreesState(academicTerm: string, degrees: Degree[]): void {
+    this.stateService.degreesRepository.set(academicTerm, _.cloneDeep(degrees));
+    this.logger.log('saved degrees state', this.stateService.degreesRepository);
+  }
+
+  saveCoursesState(academicTerm: string, degreeID: number, courses: Course[]): void {
+    this.stateService.coursesRepository.has(academicTerm) ?
+      this.stateService.coursesRepository.get(academicTerm).set(degreeID, _.cloneDeep(courses)) :
+      this.stateService.coursesRepository.set(academicTerm, new Map<number, Course[]>().set(degreeID, _.cloneDeep(courses)));
+    this.logger.log('saved courses state', this.stateService.coursesRepository);
+  }
+
+  updateCourseState(academicTerm: string, degreeID: number, course: Course): void {
+    const courses = this.stateService.coursesRepository.get(academicTerm).get(degreeID);
+    const index = this.findCourseIndex(course.id, courses);
+    courses[index] = course;
+    this.stateService.coursesRepository.get(academicTerm).set(degreeID, _.cloneDeep(courses));
+    this.logger.log('updated course state', this.stateService.coursesRepository);
+  }
+
   // TODO: same academic term; reset when picking different
-  loadDegrees(academicTerm: string): Promise<void | Degree[]> {
+  loadDegrees(academicTerm: string): Promise<void | Degree[]> | void {
     this.spinners.degree = true;
+
+    // If state saved, don't call APIs
+    if (this.stateService.degreesRepository.has(academicTerm)) {
+      this.logger.log('has degrees saved');
+      this.degrees = this.stateService.degreesRepository.get(academicTerm)
+        .sort((a, b) => a.acronym.localeCompare(b.acronym));
+      this.degreeFormControl.enable();
+      this.spinners.degree = false;
+      this.logger.log('degrees', this.degrees);
+      return;
+    }
+
     return this.firebaseService.hasDegrees(academicTerm).then(has => {
       if (has) {
         this.logger.log('has degrees saved');
@@ -172,6 +226,9 @@ export class HomepageComponent implements OnInit {
           this.degreeFormControl.enable();
           this.spinners.degree = false;
           this.logger.log('degrees', this.degrees);
+
+          // Save state
+          this.saveDegreesState(academicTerm, this.degrees);
         });
 
       } else {
@@ -181,6 +238,9 @@ export class HomepageComponent implements OnInit {
           this.degreeFormControl.enable();
           this.spinners.degree = false;
           this.logger.log('degrees', this.degrees);
+
+          // Save state
+          this.saveDegreesState(academicTerm, this.degrees);
 
           // Load to database
           const error = {found: false, type: null};
@@ -192,10 +252,26 @@ export class HomepageComponent implements OnInit {
         });
       }
     });
+
   }
 
   loadCoursesBasicInfo(academicTerm: string, degreeID: number): Promise<void | Course[]> {
     this.spinners.course = true;
+
+    // If state saved, don't call APIs
+    if (this.stateService.coursesRepository.has(academicTerm)
+      && this.stateService.coursesRepository.get(academicTerm).has(degreeID)) {
+
+      this.logger.log('has courses saved');
+      this.courses = this.stateService.coursesRepository.get(academicTerm).get(degreeID)
+        .sort((a, b) => a.acronym.localeCompare(b.acronym))
+        .filter((course) => !this.selectedCoursesIDs.has(course.id));
+      this.courseFormControl.enable();
+      this.spinners.course = false;
+      this.logger.log('courses', this.courses);
+      return;
+    }
+
     return this.firebaseService.hasCourses(academicTerm, degreeID).then(has => {
       if (has) {
         this.logger.log('has courses saved');
@@ -206,6 +282,9 @@ export class HomepageComponent implements OnInit {
           this.courseFormControl.enable();
           this.spinners.course = false;
           this.logger.log('courses', this.courses);
+
+          // Save state
+          this.saveCoursesState(academicTerm, degreeID, this.courses);
         });
       } else {
         this.logger.log('no courses found');
@@ -221,7 +300,14 @@ export class HomepageComponent implements OnInit {
             this.firebaseService.loadCourse(academicTerm, degreeID, course)
               .catch((err) => { error.found = true; error.type = err; });
           }
-          error.found ? this.logger.log('error saving courses:', error.type) : this.logger.log('courses successfully saved');
+          if (error.found) {
+            this.logger.log('error saving courses:', error.type);
+          } else {
+            this.logger.log('courses successfully saved');
+
+            // Save state
+            this.saveCoursesState(academicTerm, degreeID, this.courses);
+          }
         });
       }
     });
@@ -248,14 +334,22 @@ export class HomepageComponent implements OnInit {
           this.spinners.course = false;
           this.addCourseHelper(courseToAdd, courseIndex, addBtn);
 
+          const academicTerm = this.academicTermFormControl.value;
+          const degreeID = this.degreeFormControl.value;
+
           // Load to database
           if (course) {
             const error = {found: false, type: null};
-            const academicTerm = $('#inputAcademicTerm').val();
-            const degreeId = $('#inputDegree').val();
-            this.firebaseService.updateCourse(academicTerm, degreeId, courseToAdd)
+            this.firebaseService.updateCourse(academicTerm, degreeID, courseToAdd)
               .catch((err) => { error.found = true; error.type = err; });
-            error.found ? this.logger.log('error saving courses:', error.type) : this.logger.log('course successfully updated');
+            if (error.found) {
+              this.logger.log('error saving courses:', error.type);
+            } else {
+              this.logger.log('course successfully updated');
+
+              // Save state
+              this.updateCourseState(academicTerm, degreeID, courseToAdd);
+            }
           }
         });
       }
@@ -281,34 +375,35 @@ export class HomepageComponent implements OnInit {
     this.logger.log('selected courses', this.selectedCourses);
   }
 
-  removeCourse(courseID: number): Promise<void> | Promise<null> {
+  removeCourse(courseID: number): Promise<void> | null {
     const academicTerm = this.academicTermFormControl.value;
     const degreeID = this.degreeFormControl.value;
     const courseIndex = this.findCourseIndex(courseID, this.selectedCourses);
 
     // Course to remove is not selected
-    if (courseIndex == null) { return of(null).toPromise(); }
+    if (courseIndex == null) { return null; }
 
     // If coming back from generation empty
+    // TODO: review
     if (!academicTerm || !degreeID) {
-      remove(this.selectedCourses, this.selectedCoursesIDs, this.logger);
+      remove(this.selectedCourses, this.selectedCoursesIDs, this.campusPicked, this.typesOfClassesPicked, this.logger);
       return;
     }
 
-    return this.firebaseService.hasCourseInDegree(academicTerm, degreeID, courseID).then(has => {
-      // Add back to select if same degree
-      if (has) {
-        const courseToRemove = this.selectedCourses[courseIndex];
-        this.courses.push(courseToRemove);
-        this.courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
-      }
+    // Add back to select if same degree
+    if (this.stateService.hasCourseInDegree(academicTerm, degreeID, courseID)) {
+      const courseToRemove = this.selectedCourses[courseIndex];
+      this.courses.push(courseToRemove);
+      this.courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
+    }
 
-      remove(this.selectedCourses, this.selectedCoursesIDs, this.logger);
-    });
+    remove(this.selectedCourses, this.selectedCoursesIDs, this.campusPicked, this.typesOfClassesPicked, this.logger);
 
-    function remove(selectedCourses, selectedCoursesIDs, logger): void {
+    function remove(selectedCourses, selectedCoursesIDs, campusPicked, typesOfClassesPicked, logger): void {
       selectedCourses.splice(courseIndex, 1);
       selectedCoursesIDs.delete(courseID);
+      campusPicked.delete(courseID);
+      typesOfClassesPicked.delete(courseID);
       logger.log('selected courses', selectedCourses);
     }
   }
@@ -326,23 +421,21 @@ export class HomepageComponent implements OnInit {
     this.campusPicked.set(selected.courseID, [selected.campus]);
   }
 
-  pickTypesOfClasses(selected: {courseID: number, types: string[]}): void {
+  pickTypesOfClasses(selected: {courseID: number, types: ClassType[]}): void {
     this.typesOfClassesPicked.set(selected.courseID, selected.types);
   }
 
   generateSchedules(): void {
     if (this.selectedCourses.length > 0) {
+      // Save state
+      this.stateService.selectedCourses = this.selectedCourses;
+      this.stateService.selectedCoursesFullInfo = _.cloneDeep(this.selectedCourses);
+      this.stateService.academicTermSelected = this.academicTermFormControl.value;
+      this.stateService.degreeIDSelected = this.degreeFormControl.value;
+
+      // Alter selected courses based on user choices & send
       this.prepareCoursesToGenerate();
-      this.router.navigate(['/generate-schedules'],
-        {
-          state: {
-            data: {
-              selectedCourses: this.selectedCourses,
-              academicTerm: this.academicTermFormControl.value,
-              degreeID: this.degreeFormControl.value
-            }
-          }
-        });
+      this.router.navigate(['/generate-schedules']);
     }
   }
 

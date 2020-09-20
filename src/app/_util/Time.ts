@@ -1,3 +1,7 @@
+/* ----------------------------------------------------------
+   * Converts date to time in HH:mm format.
+   * date -> HH:mm
+   * ---------------------------------------------------------- */
 export function formatTime(date: Date): string {
   let hours: any = date.getHours();
   let min: any = date.getMinutes();
@@ -7,6 +11,21 @@ export function formatTime(date: Date): string {
   return hours + ':' + min;
 }
 
+/* ----------------------------------------------------------
+   * Converts time to timestamp. Accepts HH:mm format.
+   * HH:mm -> timestamp
+   * ---------------------------------------------------------- */
+export function getTimestamp(time: string): number {
+  time = time.replace(/ /g, '');
+  const timeArray = time.split(':');
+  const hours = timeArray[0];
+  const min = timeArray[1];
+  return parseInt(hours, 10) * 60 + parseInt(min, 10);
+}
+
+/* ----------------------------------------------------------
+   * Gets weekday (full english version)
+   * ---------------------------------------------------------- */
 export function getWeekday(day: number): string {
   switch (day) {
     case 1:
@@ -23,5 +42,46 @@ export function getWeekday(day: number): string {
       return 'saturday';
     case 7:
       return 'sunday';
+  }
+}
+
+/* ----------------------------------------------------------
+   * Gets weekday (minified version)
+   * ---------------------------------------------------------- */
+export function getMinifiedWeekday(day: number, language: string): string {
+  if (language === 'pt-PT') {
+    switch (day) {
+      case 1:
+        return 'Seg';
+      case 2:
+        return 'Ter';
+      case 3:
+        return 'Qua';
+      case 4:
+        return 'Qui';
+      case 5:
+        return 'Sex';
+      case 6:
+        return 'Sáb';
+      case 7:
+        return 'Dom';
+    }
+  } else {
+    switch (day) {
+      case 1:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thu';
+      case 5:
+        return 'Fri';
+      case 6:
+        return 'Sat';
+      case 7:
+        return 'Sun';
+    }
   }
 }

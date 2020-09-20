@@ -1,6 +1,8 @@
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 
+import {formatTime, getMinifiedWeekday} from '../_util/Time';
+
 
 export class Lesson {
     constructor(private _start: Date, private _end: Date, private _room: string, private _campus: string) {}
@@ -48,4 +50,17 @@ export class Lesson {
       );
     }
 
+    print(language: string): string {
+      let s = '';
+      const weekday = this.start.getDay();
+
+      if (language === 'pt-PT') {
+        s += getMinifiedWeekday(weekday, 'pt-PT');
+      } else {
+        s += getMinifiedWeekday(weekday, 'en-GB');
+      }
+
+      s += ', ' + formatTime(this.start) + ' - ' + formatTime(this.end);
+      return s;
+    }
 }
