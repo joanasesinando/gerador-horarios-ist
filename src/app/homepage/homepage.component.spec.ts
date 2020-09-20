@@ -348,9 +348,9 @@ describe('HomepageComponent', () => {
         expect(component.selectedCoursesIDs.has(courseToRemove.id)).toBeFalse();
       });
 
-      it('should NOT remove a course not selected', async () => {
+      it('should NOT remove a course not selected', () => {
         const courseToRemove = courses[0];
-        await expectAsync(component.removeCourse(courseToRemove.id)).toBeResolved();
+        expect(component.removeCourse(courseToRemove.id)).toBe(null);
 
         expect(component.courses).toEqual(courses);
         expect(component.selectedCourses).toEqual([course2, course1]);
