@@ -84,7 +84,7 @@ export class HomepageComponent implements OnInit {
     public firebaseService: FirebaseService,
     private router: Router,
     private alertService: AlertService,
-    private stateService: StateService) {
+    public stateService: StateService) {
 
     this.spinners.loadingPage = true;
 
@@ -112,7 +112,6 @@ export class HomepageComponent implements OnInit {
     // Reset state if coming back
     if (this.stateService.hasStateSaved()) {
       this.resetState();
-      this.logger.log('selected courses', this.selectedCourses);
       this.spinners.loadingPage = false;
       return;
     }
@@ -157,42 +156,41 @@ export class HomepageComponent implements OnInit {
     const academicTerm = this.stateService.academicTermSelected;
     const degreeID = this.stateService.degreeIDSelected;
 
+    // Reset academic terms state
     this.academicTerms = this.stateService.academicTermsRepository;
-    this.academicTermFormControl.patchValue(this.stateService.academicTermSelected);
+    this.academicTermFormControl.patchValue(academicTerm);
     this.academicTermFormControl.enable();
     this.spinners.academicTerm = false;
+    this.logger.log('has academic terms state saved', this.academicTerms);
 
-    this.degrees = this.stateService.degreesRepository.get(academicTerm);
+    // Reset degrees state
+    this.loadDegrees(academicTerm);
     this.degreeFormControl.patchValue(degreeID);
-    this.degreeFormControl.enable();
-    this.spinners.degree = false;
 
-    this.courses = this.stateService.coursesRepository.get(academicTerm).get(degreeID);
-    this.courseFormControl.enable();
-    this.spinners.course = false;
+    // Reset courses state
+    this.loadCoursesBasicInfo(academicTerm, degreeID);
 
-    this.selectedCourses = this.stateService.selectedCoursesFullInfo;
-    this.campusPicked.clear();
-    for (const course of this.selectedCourses) {
-      this.selectedCoursesIDs.set(course.id, true);
+    // Reset selected courses state
+    for (const course of this.stateService.selectedCourses) {
+      this.addCourse(course.id);
     }
   }
 
   saveAcademicTermsState(academicTerms: string[]): void {
     this.stateService.academicTermsRepository = _.cloneDeep(academicTerms);
-    this.logger.log('saved academic terms state', this.stateService.academicTermsRepository);
+    this.logger.log('saved academic terms state');
   }
 
   saveDegreesState(academicTerm: string, degrees: Degree[]): void {
     this.stateService.degreesRepository.set(academicTerm, _.cloneDeep(degrees));
-    this.logger.log('saved degrees state', this.stateService.degreesRepository);
+    this.logger.log('saved degrees state');
   }
 
   saveCoursesState(academicTerm: string, degreeID: number, courses: Course[]): void {
     this.stateService.coursesRepository.has(academicTerm) ?
       this.stateService.coursesRepository.get(academicTerm).set(degreeID, _.cloneDeep(courses)) :
       this.stateService.coursesRepository.set(academicTerm, new Map<number, Course[]>().set(degreeID, _.cloneDeep(courses)));
-    this.logger.log('saved courses state', this.stateService.coursesRepository);
+    this.logger.log('saved courses state');
   }
 
   updateCourseState(academicTerm: string, degreeID: number, course: Course): void {
@@ -200,7 +198,7 @@ export class HomepageComponent implements OnInit {
     const index = this.findCourseIndex(course.id, courses);
     courses[index] = course;
     this.stateService.coursesRepository.get(academicTerm).set(degreeID, _.cloneDeep(courses));
-    this.logger.log('updated course state', this.stateService.coursesRepository);
+    this.logger.log('updated course state');
   }
 
   // TODO: same academic term; reset when picking different
@@ -209,7 +207,7 @@ export class HomepageComponent implements OnInit {
 
     // If state saved, don't call APIs
     if (this.stateService.degreesRepository.has(academicTerm)) {
-      this.logger.log('has degrees saved');
+      this.logger.log('has degrees state saved');
       this.degrees = this.stateService.degreesRepository.get(academicTerm)
         .sort((a, b) => a.acronym.localeCompare(b.acronym));
       this.degreeFormControl.enable();
@@ -239,30 +237,35 @@ export class HomepageComponent implements OnInit {
           this.spinners.degree = false;
           this.logger.log('degrees', this.degrees);
 
-          // Save state
-          this.saveDegreesState(academicTerm, this.degrees);
-
           // Load to database
           const error = {found: false, type: null};
           for (const degree of this.degrees) {
             this.firebaseService.loadDegree(academicTerm, degree)
               .catch((err) => { error.found = true; error.type = err; });
           }
-          error.found ? this.logger.log('error saving degrees:', error.type) : this.logger.log('degrees successfully saved');
+          if (error.found) {
+            this.logger.log('error saving degrees to database:', error.type);
+
+          } else {
+            this.logger.log('degrees successfully saved to database');
+
+            // Save state
+            this.saveDegreesState(academicTerm, this.degrees);
+          }
         });
       }
     });
 
   }
 
-  loadCoursesBasicInfo(academicTerm: string, degreeID: number): Promise<void | Course[]> {
+  loadCoursesBasicInfo(academicTerm: string, degreeID: number): Promise<void | Course[]> | void {
     this.spinners.course = true;
 
     // If state saved, don't call APIs
     if (this.stateService.coursesRepository.has(academicTerm)
       && this.stateService.coursesRepository.get(academicTerm).has(degreeID)) {
 
-      this.logger.log('has courses saved');
+      this.logger.log('has courses state saved');
       this.courses = this.stateService.coursesRepository.get(academicTerm).get(degreeID)
         .sort((a, b) => a.acronym.localeCompare(b.acronym))
         .filter((course) => !this.selectedCoursesIDs.has(course.id));
@@ -301,9 +304,9 @@ export class HomepageComponent implements OnInit {
               .catch((err) => { error.found = true; error.type = err; });
           }
           if (error.found) {
-            this.logger.log('error saving courses:', error.type);
+            this.logger.log('error saving courses to database:', error.type);
           } else {
-            this.logger.log('courses successfully saved');
+            this.logger.log('courses successfully saved to database');
 
             // Save state
             this.saveCoursesState(academicTerm, degreeID, this.courses);
@@ -343,11 +346,11 @@ export class HomepageComponent implements OnInit {
             this.firebaseService.updateCourse(academicTerm, degreeID, courseToAdd)
               .catch((err) => { error.found = true; error.type = err; });
             if (error.found) {
-              this.logger.log('error saving courses:', error.type);
+              this.logger.log('error updating course in database:', error.type);
             } else {
-              this.logger.log('course successfully updated');
+              this.logger.log('course successfully updated in database');
 
-              // Save state
+              // Update state
               this.updateCourseState(academicTerm, degreeID, courseToAdd);
             }
           }
@@ -382,13 +385,6 @@ export class HomepageComponent implements OnInit {
 
     // Course to remove is not selected
     if (courseIndex == null) { return null; }
-
-    // If coming back from generation empty
-    // TODO: review
-    if (!academicTerm || !degreeID) {
-      remove(this.selectedCourses, this.selectedCoursesIDs, this.campusPicked, this.typesOfClassesPicked, this.logger);
-      return;
-    }
 
     // Add back to select if same degree
     if (this.stateService.hasCourseInDegree(academicTerm, degreeID, courseID)) {
@@ -428,12 +424,11 @@ export class HomepageComponent implements OnInit {
   generateSchedules(): void {
     if (this.selectedCourses.length > 0) {
       // Save state
-      this.stateService.selectedCourses = this.selectedCourses;
-      this.stateService.selectedCoursesFullInfo = _.cloneDeep(this.selectedCourses);
       this.stateService.academicTermSelected = this.academicTermFormControl.value;
       this.stateService.degreeIDSelected = this.degreeFormControl.value;
+      this.stateService.selectedCourses = _.cloneDeep(this.selectedCourses);
 
-      // Alter selected courses based on user choices & send
+      // Alter selected courses based on user choices
       this.prepareCoursesToGenerate();
       this.router.navigate(['/generate-schedules']);
     }
@@ -444,7 +439,7 @@ export class HomepageComponent implements OnInit {
     this.updateCampus();
     this.updateTypesOfClasses();
 
-    for (const course of this.selectedCourses) {
+    for (const course of this.stateService.selectedCourses) {
       this.removeShiftsBasedOnCampus(course);
       this.removeShiftsBasedOnTypesOfClasses(course);
     }
@@ -455,7 +450,7 @@ export class HomepageComponent implements OnInit {
    * Updates courses so that A and B merges into one shift.
    * ----------------------------------------------------------- */
   removeABDifferencesInShifts(): void {
-    for (const course of this.selectedCourses) {
+    for (const course of this.stateService.selectedCourses) {
       for (let i = course.shifts.length - 1; i >= 0; i--) {
         const shift = course.shifts[i];
 
@@ -475,8 +470,8 @@ export class HomepageComponent implements OnInit {
    * ----------------------------------------------------------- */
   updateCampus(): void {
     for (const key of this.campusPicked.keys()) {
-      const index = this.findCourseIndex(key, this.selectedCourses);
-      this.selectedCourses[index].campus = this.campusPicked.get(key);
+      const index = this.findCourseIndex(key, this.stateService.selectedCourses);
+      this.stateService.selectedCourses[index].campus = this.campusPicked.get(key);
     }
   }
 
@@ -485,8 +480,8 @@ export class HomepageComponent implements OnInit {
    * ----------------------------------------------------------- */
   updateTypesOfClasses(): void {
     for (const key of this.typesOfClassesPicked.keys()) {
-      const index = this.findCourseIndex(key, this.selectedCourses);
-      this.selectedCourses[index].types = this.typesOfClassesPicked.get(key);
+      const index = this.findCourseIndex(key, this.stateService.selectedCourses);
+      this.stateService.selectedCourses[index].types = this.typesOfClassesPicked.get(key);
     }
   }
 

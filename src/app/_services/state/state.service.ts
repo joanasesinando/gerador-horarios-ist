@@ -8,7 +8,7 @@ import {Degree} from '../../_domain/Degree';
 })
 export class StateService {
 
-  private _academicTermsRepository: string[];
+  private _academicTermsRepository: string[] = null;
   private _degreesRepository: Map<string, Degree[]>
     = new Map<string, Degree[]>(); // academicTerm -> Degree[]
   private _coursesRepository: Map<string, Map<number, Course[]>>
@@ -17,7 +17,6 @@ export class StateService {
   private _academicTermSelected: string = null;
   private _degreeIDSelected: number = null;
   private _selectedCourses: Course[] = null;
-  private _selectedCoursesFullInfo: Course[] = null;
 
   constructor() { }
 
@@ -33,9 +32,6 @@ export class StateService {
   get selectedCourses(): Course[] { return this._selectedCourses; }
   set selectedCourses(value: Course[]) { this._selectedCourses = value; }
 
-  get selectedCoursesFullInfo(): Course[] { return this._selectedCoursesFullInfo; }
-  set selectedCoursesFullInfo(value: Course[]) { this._selectedCoursesFullInfo = value; }
-
   get academicTermSelected(): string { return this._academicTermSelected; }
   set academicTermSelected(value: string) { this._academicTermSelected = value; }
 
@@ -43,7 +39,11 @@ export class StateService {
   set degreeIDSelected(value: number) { this._degreeIDSelected = value; }
 
   hasStateSaved(): boolean {
-    return this._selectedCoursesFullInfo !== null && this._academicTermSelected !== null && this._degreeIDSelected !== null;
+    return this._academicTermsRepository !== null &&
+           this._degreesRepository.size !== 0 &&
+           this._coursesRepository.size !== 0 &&
+           this._academicTermSelected !== null &&
+           this._degreeIDSelected !== null;
   }
 
   hasCourseInDegree(academicTerm: string, degreeID: number, courseID: number): boolean {
