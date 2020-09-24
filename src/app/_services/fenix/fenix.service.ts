@@ -15,21 +15,11 @@ import {ClassType} from '../../_domain/ClassType';
 export class FenixService {
 
   url = 'https://cors-anywhere.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/';
+
   totalHoursPerWeekDoNotMatchLessonsTime = false;
+  currentAcademicTerm: string;
 
   constructor(public translateService: TranslateService, public errorService: ErrorService) { }
-
-  /* ----------------------------------------------------------------------------
-   * Returns true if academicTerm is bigger or equal to 2003/2004.
-   * Otherwise, return false.
-   * ----------------------------------------------------------------------------
-   * [Reason]
-   * There's not enough info on degrees and courses on academic terms smaller than
-   * 2003/2004 to generate schedules.
-   * ---------------------------------------------------------------------------- */
-  private static validAcademicTerm(academicTerm: string): boolean {
-    return academicTerm >= '2003/2004';
-  }
 
   private static parseDegree(degreeJson): Degree {
     if (!degreeJson.id) { throw new Error('No ID found for degree'); }
@@ -139,6 +129,14 @@ export class FenixService {
     return courseLoads;
   }
 
+  /* ------------------------------------------------------------------------------
+   * Returns true if academicTerm is either the current or the next academic term.
+   * Otherwise, return false.
+   * ------------------------------------------------------------------------------ */
+  private validAcademicTerm(academicTerm: string): boolean {
+    return academicTerm >= this.currentAcademicTerm;
+  }
+
   /* --------------------------------------------------------------------------------
    * Returns lessons for a given shift.
    * --------------------------------------------------------------------------------
@@ -235,11 +233,20 @@ export class FenixService {
     });
   }
 
-  getAcademicTerms(): Promise<string[]> {
+  getCurrentAcademicTerm(): Promise<string> {
+    return this.httpGet('about')
+      .then(r => r.json())
+      .then(json => {
+        return json.currentAcademicTerm.split(' ')[2];
+      });
+  }
+
+  async getAcademicTerms(): Promise<string[]> {
+    this.currentAcademicTerm = await this.getCurrentAcademicTerm();
     return this.httpGet('academicterms?lang=' + this.getLanguage())
       .then(r => r.json())
       .then(json => {
-        return Object.keys(json).sort().reverse().filter((value) => FenixService.validAcademicTerm(value));
+        return Object.keys(json).sort().reverse().filter(academicTerm => this.validAcademicTerm(academicTerm));
       });
   }
 

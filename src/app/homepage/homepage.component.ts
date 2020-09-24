@@ -125,7 +125,6 @@ export class HomepageComponent implements OnInit {
     }, 10000);
 
     // Get academic terms
-    // TODO: only show current and next (API about)
     this.fenixService.getAcademicTerms().then(academicTerms => {
       this.academicTerms = academicTerms;
       this.academicTermFormControl.enable();
