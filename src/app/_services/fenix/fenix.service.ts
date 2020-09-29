@@ -21,6 +21,12 @@ export class FenixService {
 
   constructor(public translateService: TranslateService, public errorService: ErrorService) { }
 
+  private static getNextAcademicTerm(academicTerm: string): string {
+    const first = parseInt(academicTerm.split('/')[0], 10);
+    const second = parseInt(academicTerm.split('/')[1], 10);
+    return (first + 1) + '/' + (second + 1);
+  }
+
   private static parseDegree(degreeJson): Degree {
     if (!degreeJson.id) { throw new Error('No ID found for degree'); }
     if (!degreeJson.name) { throw new Error('No name found for degree ' + degreeJson.id); }
@@ -129,14 +135,6 @@ export class FenixService {
     return courseLoads;
   }
 
-  /* ------------------------------------------------------------------------------
-   * Returns true if academicTerm is either the current or the next academic term.
-   * Otherwise, return false.
-   * ------------------------------------------------------------------------------ */
-  private validAcademicTerm(academicTerm: string): boolean {
-    return academicTerm >= this.currentAcademicTerm;
-  }
-
   /* --------------------------------------------------------------------------------
    * Returns lessons for a given shift.
    * --------------------------------------------------------------------------------
@@ -243,11 +241,7 @@ export class FenixService {
 
   async getAcademicTerms(): Promise<string[]> {
     this.currentAcademicTerm = await this.getCurrentAcademicTerm();
-    return this.httpGet('academicterms?lang=' + this.getLanguage())
-      .then(r => r.json())
-      .then(json => {
-        return Object.keys(json).sort().reverse().filter(academicTerm => this.validAcademicTerm(academicTerm));
-      });
+    return [this.currentAcademicTerm, FenixService.getNextAcademicTerm(this.currentAcademicTerm)];
   }
 
   getDegrees(academicTerm: string): Promise<Degree[]> { // TODO: testing
