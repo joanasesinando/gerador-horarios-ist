@@ -9,7 +9,6 @@ import {Shift} from '../../_domain/Shift';
 import {ClassType} from '../../_domain/ClassType';
 
 const NO_ROOM_FOUND = 'NO ROOM FOUND';
-const NO_CAMPUS_FOUND = 'NO CAMPUS FOUND';
 
 @Injectable({
   providedIn: 'root'
@@ -163,10 +162,10 @@ export class FenixService {
         new Date(lessons[weekIndex].start),
         new Date(lessons[weekIndex].end),
         lessons[weekIndex].room ? lessons[weekIndex].room.name : NO_ROOM_FOUND,
-        lessons[weekIndex].room ? lessons[weekIndex].room.topLevelSpace.name : NO_CAMPUS_FOUND
+        lessons[weekIndex].room ? lessons[weekIndex].room.topLevelSpace.name : null
       );
       shiftLessons.push(baseLesson);
-      if (baseLesson.campus === NO_CAMPUS_FOUND) { this.campusNotFound = true; }
+      if (!baseLesson.campus) { this.campusNotFound = true; }
 
       // Find others on same week
       for (const shiftLesson of lessons) {
@@ -174,10 +173,10 @@ export class FenixService {
           const lesson = new Lesson(new Date(shiftLesson.start),
             new Date(shiftLesson.end),
             shiftLesson.room ? shiftLesson.room.name : NO_ROOM_FOUND,
-            shiftLesson.room ? shiftLesson.room.topLevelSpace.name : NO_CAMPUS_FOUND
+            shiftLesson.room ? shiftLesson.room.topLevelSpace.name : null
           );
           shiftLessons.push(lesson);
-          if (baseLesson.campus === NO_CAMPUS_FOUND) { this.campusNotFound = true; }
+          if (!baseLesson.campus) { this.campusNotFound = true; }
         }
       }
 
@@ -311,16 +310,13 @@ export class FenixService {
           }
 
           // Set shifts' & lessons' campus if none found, but found on course
-          if (campus.length === 1) {
-            const campusForAll = campus[0];
-            shifts.forEach(shift => {
-              if (shift.campus === NO_CAMPUS_FOUND) { shift.campus = campusForAll; }
+          shifts.forEach(shift => {
+            if (!shift.campus && campus.length === 1) { shift.campus = campus[0]; }
 
-              shift.lessons.forEach(lesson => {
-                if (lesson.campus === NO_CAMPUS_FOUND) { lesson.campus = campusForAll; }
-              });
+            shift.lessons.forEach(lesson => {
+              if (!lesson.campus && shift.campus) { lesson.campus = shift.campus; }
             });
-          }
+          });
 
           return FenixService.fillMissingInfo(new Course(course.id, course.name, course.acronym, types, campus, shifts, courseLoads));
 
