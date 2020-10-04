@@ -90,8 +90,8 @@ export class FirebaseService {
       });
   }
 
-  updateLastTimeUpdatedTimestamp(): Promise<void> {
-    return this.db.collection('timestamp').doc('timestamp')
+  updateLastTimeUpdatedTimestamp(): void {
+    this.db.collection('timestamp').doc('timestamp')
       .update({updated: Date.now()});
   }
 

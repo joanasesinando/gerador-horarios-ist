@@ -163,6 +163,7 @@ export class HomepageComponent implements OnInit {
         this.logger.log('Data is too old');
         this.firebaseService.cleanDatabase(this.academicTerms);
         this.firebaseService.updateLastTimeUpdatedTimestamp();
+        this.logger.log('Database successfully cleaned');
       }
     });
   }
