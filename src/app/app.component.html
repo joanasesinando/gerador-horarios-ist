@@ -1,51 +1,61 @@
 <router-outlet></router-outlet>
 
+<!--<div class="test">-->
+<!--  <div class="item" style="background-color: #0c9afe">-->
+<!--  </div>-->
+
+<!--  <div class="item" style="background-color: #967da0">-->
+<!--  </div>-->
+<!--</div>-->
+
 <!-- Alerts
 ================================================== -->
-<div id="dangerAlert" class="alert alert-danger collapse" role="alert" onclick="$('#dangerAlert').hide();">
-  <div class="d-flex align-items-center">
-    <div class="alert-icon-container">
-      <fa-icon [icon]="faBolt" class="fa-md"></fa-icon>
-    </div>
-    <div class="alert-content">
-      <p class="alert-title"></p>
-      <p class="alert-text"></p>
-    </div>
-  </div>
-</div>
-
-<div id="successAlert" class="alert alert-success collapse" role="alert" onclick="$('#successAlert').hide();">
-  <div class="d-flex align-items-center">
-    <div class="alert-icon-container">
-      <fa-icon [icon]="faCheck" class="fa-md"></fa-icon>
-    </div>
-    <div class="alert-content">
-      <p class="alert-title"></p>
-      <p class="alert-text"></p>
+<div class="alerts">
+  <div id="infoAlert" class="alert alert-info collapse" role="alert" onclick="$('#infoAlert').hide();">
+    <div class="d-flex align-items-center">
+      <div class="alert-icon-container">
+        <fa-icon [icon]="faQuestion" class="fa-md"></fa-icon>
+      </div>
+      <div class="alert-content">
+        <p class="alert-title"></p>
+        <p class="alert-text"></p>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="warningAlert" class="alert alert-warning collapse" role="alert" onclick="$('#warningAlert').hide();">
-  <div class="d-flex align-items-center">
-    <div class="alert-icon-container">
-      <fa-icon [icon]="faExclamation" class="fa-md"></fa-icon>
-    </div>
-    <div class="alert-content">
-      <p class="alert-title"></p>
-      <p class="alert-text"></p>
+  <div id="warningAlert" class="alert alert-warning collapse" role="alert" onclick="$('#warningAlert').hide();">
+    <div class="d-flex align-items-center">
+      <div class="alert-icon-container">
+        <fa-icon [icon]="faExclamation" class="fa-md"></fa-icon>
+      </div>
+      <div class="alert-content">
+        <p class="alert-title"></p>
+        <p class="alert-text"></p>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="infoAlert" class="alert alert-info collapse" role="alert" onclick="$('#infoAlert').hide();">
-  <div class="d-flex align-items-center">
-    <div class="alert-icon-container">
-      <fa-icon [icon]="faQuestion" class="fa-md"></fa-icon>
+  <div id="dangerAlert" class="alert alert-danger collapse" role="alert" onclick="$('#dangerAlert').hide();">
+    <div class="d-flex align-items-center">
+      <div class="alert-icon-container">
+        <fa-icon [icon]="faBolt" class="fa-md"></fa-icon>
+      </div>
+      <div class="alert-content">
+        <p class="alert-title"></p>
+        <p class="alert-text"></p>
+      </div>
     </div>
-    <div class="alert-content">
-      <p class="alert-title"></p>
-      <p class="alert-text"></p>
+  </div>
+
+  <div id="successAlert" class="alert alert-success collapse" role="alert" onclick="$('#successAlert').hide();">
+    <div class="d-flex align-items-center">
+      <div class="alert-icon-container">
+        <fa-icon [icon]="faCheck" class="fa-md"></fa-icon>
+      </div>
+      <div class="alert-content">
+        <p class="alert-title"></p>
+        <p class="alert-text"></p>
+      </div>
     </div>
   </div>
 </div>

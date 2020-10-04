@@ -16,6 +16,6 @@ export class ErrorService {
         '📢 Ajuda-nos a melhorar',
         'Reporta este erro através do formulário de feedback para que possamos corrigi-lo.',
         'info');
-    }, 8500);
+    }, 2000);
   }
 }

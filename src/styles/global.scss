@@ -101,18 +101,21 @@ a { color: $gh-blue; }
  *  5. Alerts
  *
  * ------------------------------------------------------------------- */
-
-.alert {
+.alerts {
   position: fixed;
   top: .5rem;
   right: .5rem;
+  height: auto;
+  width: 25rem;
+  z-index: 1060;
+}
+.alert {
   border-width: 1px;
   border-radius: .25rem;
   padding: 1rem;
   width: 25rem;
   box-shadow: 0 .5rem 1rem 0 rgba(44, 51, 73, 0.1);
-  margin-bottom: 0;
-  z-index: 1060;
+  margin-bottom: .5rem;
 }
 @media (max-width: 575.98px) {
   .alert { width: 95%; }
@@ -271,4 +274,22 @@ $scrollbarWidth: 10px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.test {
+  position: fixed;
+  top: .5rem;
+  right: .5rem;
+  height: auto;
+  width: 25rem;
+  z-index: 1060;
+
+  .item {
+    height: 5rem;
+    border-width: 1px;
+    border-radius: .25rem;
+    padding: 1rem;
+    box-shadow: 0 .5rem 1rem 0 rgba(44, 51, 73, 0.1);
+    margin-bottom: .5rem;
+  }
 }
