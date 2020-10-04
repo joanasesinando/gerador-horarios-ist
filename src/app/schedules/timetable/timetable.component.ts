@@ -1,4 +1,5 @@
-import {Component, EventEmitter, HostListener, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Observable, Subscription} from 'rxjs';
 
 import {LoggerService} from '../../_util/logger.service';
 import {TranslateService} from '@ngx-translate/core';
@@ -15,7 +16,7 @@ import {formatTime, getTimestamp, getWeekday} from '../../_util/Time';
   templateUrl: './timetable.component.html',
   styleUrls: ['./timetable.component.scss']
 })
-export class TimetableComponent implements OnInit {
+export class TimetableComponent implements OnInit, OnDestroy {
 
   SLOT_HEIGHT_DESKTOP = 27;
   SLOT_HEIGHT_MOBILE = 25;
@@ -24,6 +25,7 @@ export class TimetableComponent implements OnInit {
   TIMELINE_UNIT_DURATION = 30;
 
   @Input() schedules: Schedule[];
+  @Input() keydownEvents: Observable<string>;
   @Output() scheduleSelected = new EventEmitter<number>();
 
   currentSchedule = 0;
@@ -31,6 +33,8 @@ export class TimetableComponent implements OnInit {
   eventsPerWeekday: Map<string, Event[]> = new Map();
 
   mobileView = false;
+
+  keydownEventsSubscription: Subscription;
 
   faCaretRight = faCaretRight;
   faCaretLeft = faCaretLeft;
@@ -43,6 +47,21 @@ export class TimetableComponent implements OnInit {
       this.organizeEventsPerWeekday(0);
     }
     this.onWindowResize();
+    this.keydownEventsSubscription = this.keydownEvents.subscribe(direction => {
+      switch (direction) {
+        case 'right':
+          this.next();
+          break;
+
+        case 'left':
+          this.prev();
+          break;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.keydownEventsSubscription.unsubscribe();
   }
 
   getTimelineHours(start, end): string[] {

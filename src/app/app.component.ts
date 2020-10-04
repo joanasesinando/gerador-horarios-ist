@@ -13,5 +13,5 @@ export class AppComponent {
   faBolt = faBolt;
   faCheck = faCheck;
   faExclamation = faExclamation;
-  faQuestion = faQuestion
+  faQuestion = faQuestion;
 }

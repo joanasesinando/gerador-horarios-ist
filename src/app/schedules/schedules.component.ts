@@ -1,5 +1,6 @@
 import {AfterViewInit, Component, HostListener, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
+import {Subject} from 'rxjs';
 
 import {LoggerService} from '../_util/logger.service';
 import {AlertService} from '../_util/alert.service';
@@ -26,6 +27,7 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
   generationTime: number = null;
 
   mobileView = false;
+  keyDownSubject: Subject<string> = new Subject<string>();
 
   constructor(
     private logger: LoggerService,
@@ -114,6 +116,14 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
 
   goBack(): void {
     this.router.navigate(['/']);
+  }
+
+  onKeyDownArrowRight(): void {
+    this.keyDownSubject.next('right');
+  }
+
+  onKeyDownArrowLeft(): void {
+    this.keyDownSubject.next('left');
   }
 
   @HostListener('window:resize', [])

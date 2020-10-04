@@ -1,4 +1,5 @@
-<div class="container-fluid">
+<div class="container-fluid" tabindex="0" autofocus
+     (keydown.arrowRight)="onKeyDownArrowRight()" (keydown.arrowLeft)="onKeyDownArrowLeft()">
 
   <div *ngIf="spinner" class="loading-page text-center">
     <div class="spinner-border text-primary mb-4" role="status"></div>
@@ -53,7 +54,8 @@
 
               <!-- Timetable -->
               <app-timetable *ngIf="generatedSchedules.length !== 0"
-                             [schedules]="generatedSchedules" (scheduleSelected)="scheduleInView = $event"></app-timetable>
+                             [schedules]="generatedSchedules" (scheduleSelected)="scheduleInView = $event"
+                             [keydownEvents]="keyDownSubject.asObservable()"></app-timetable>
 
               <!-- Add btn -->
               <div class="btn-add d-flex flex-column align-items-center">
