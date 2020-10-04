@@ -1,4 +1,4 @@
-/* ----------------------------------------------------------
+/* ------------------------------------------------------------
    * Converts date to time in HH:mm format.
    * date -> HH:mm
    * ---------------------------------------------------------- */
@@ -11,7 +11,7 @@ export function formatTime(date: Date): string {
   return hours + ':' + min;
 }
 
-/* ----------------------------------------------------------
+/* ------------------------------------------------------------
    * Converts time to timestamp. Accepts HH:mm format.
    * HH:mm -> timestamp
    * ---------------------------------------------------------- */
@@ -23,7 +23,16 @@ export function getTimestamp(time: string): number {
   return parseInt(hours, 10) * 60 + parseInt(min, 10);
 }
 
-/* ----------------------------------------------------------
+/* ------------------------------------------------------------
+   * Checks if two timestamps (in milliseconds) are more than
+   * X days apart
+   * ---------------------------------------------------------- */
+export function isOlderThan(timestamp1: number, timestamp2: number, days: number): boolean {
+  const MILLISECONDS_IN_A_DAY = 24 * 60 * 60 * 1000;
+  return Math.abs(timestamp1 - timestamp2) > days * MILLISECONDS_IN_A_DAY;
+}
+
+/* ------------------------------------------------------------
    * Gets weekday (full english version)
    * ---------------------------------------------------------- */
 export function getWeekday(day: number): string {
@@ -45,7 +54,7 @@ export function getWeekday(day: number): string {
   }
 }
 
-/* ----------------------------------------------------------
+/* ------------------------------------------------------------
    * Gets weekday (minified version)
    * ---------------------------------------------------------- */
 export function getMinifiedWeekday(day: number, language: string): string {

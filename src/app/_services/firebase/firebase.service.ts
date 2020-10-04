@@ -90,6 +90,11 @@ export class FirebaseService {
       });
   }
 
+  updateLastTimeUpdatedTimestamp(): Promise<void> {
+    return this.db.collection('timestamp').doc('timestamp')
+      .update({updated: Date.now()});
+  }
+
   getCollection(collection: string, converter: any, document?: number, subCollection?: string): Promise<any> {
     let ref;
     if (document && subCollection) {
@@ -113,11 +118,73 @@ export class FirebaseService {
       }).catch(err => this.logger.log('Error getting collection:', err));
   }
 
+  getLastTimeUpdatedTimestamp(): Promise<number> {
+    const ref = this.db.collection('timestamp');
+    return ref.get().then(querySnapshot => {
+      if (!querySnapshot.empty) {
+        const data: {updated: string}[] = [];
+        querySnapshot.forEach(doc => {
+          data.push(doc.data());
+        });
+        return data[0].updated;
+
+      } else {
+        this.logger.log('Collection is empty:', 'timestamp');
+      }
+    }).catch(err => this.logger.log('Error getting collection:', err));
+  }
+
   getDegrees(academicTerm: string): Promise<any> {
     return this.getCollection(academicTerm.replace('/', '-'), degreeConverter);
   }
 
   getCourses(academicTerm: string, degreeID: number): Promise<any> {
     return this.getCollection(academicTerm.replace('/', '-'), courseConverter, degreeID, 'courses');
+  }
+
+  deleteDocument(collection: string, document: string, subCollection?: string, subDocument?: string): void {
+    if (subCollection && subDocument) {
+      this.db.collection(collection).doc(document).collection(subCollection).doc(subDocument)
+        .delete()
+        .catch(err => this.logger.log('Error deleting document:', err));
+    } else {
+      this.db.collection(collection).doc(document)
+        .delete()
+        .catch(err => this.logger.log('Error deleting document:', err));
+    }
+  }
+
+  cleanDatabase(academicTerms: string[]): void {
+    academicTerms.forEach(academicTerm => {
+      this.hasDegrees(academicTerm).then(hasDegrees => {
+        if (hasDegrees) {
+
+          this.getDegrees(academicTerm).then(degrees => {
+            if (degrees) {
+              degrees.forEach(degree => {
+
+                this.hasCourses(academicTerm, degree.id).then(hasCourses => {
+                  if (hasCourses) {
+
+                    this.getCourses(academicTerm, degree.id).then(courses => {
+                      if (courses) {
+                        courses.forEach(course => {
+                          this.deleteDocument(academicTerm.replace('/', '-'), degree.id, 'courses', course.id);
+                        });
+                      }
+                      this.deleteDocument(academicTerm.replace('/', '-'), degree.id);
+                    });
+
+                  } else {
+                    this.deleteDocument(academicTerm.replace('/', '-'), degree.id);
+                  }
+                });
+              });
+            }
+          });
+
+        }
+      });
+    });
   }
 }

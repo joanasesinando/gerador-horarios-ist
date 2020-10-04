@@ -7,6 +7,8 @@ import _ from 'lodash';
 import {LoggerService} from '../_util/logger.service';
 import {Course} from '../_domain/Course';
 import {Degree} from '../_domain/Degree';
+import {ClassType} from '../_domain/ClassType';
+import {isOlderThan} from '../_util/Time';
 
 import {FenixService} from '../_services/fenix/fenix.service';
 import {FirebaseService} from '../_services/firebase/firebase.service';
@@ -24,7 +26,6 @@ import {
   faGlobeEurope,
   faBolt
 } from '@fortawesome/free-solid-svg-icons';
-import {ClassType} from '../_domain/ClassType';
 
 declare let $;
 
@@ -127,13 +128,17 @@ export class HomepageComponent implements OnInit {
     // Get academic terms
     this.fenixService.getAcademicTerms().then(academicTerms => {
       this.academicTerms = academicTerms;
-      this.academicTermFormControl.enable();
-      this.spinners.academicTerm = false;
       this.logger.log('academic terms', this.academicTerms);
       tookToLong = false;
 
+      // Reset database if data is too old
+      this.checkIfDatabaseIsOld();
+
       // Save state
       this.saveAcademicTermsState(this.academicTerms);
+
+      this.academicTermFormControl.enable();
+      this.spinners.academicTerm = false;
     });
     this.spinners.loadingPage = false;
   }
@@ -149,6 +154,17 @@ export class HomepageComponent implements OnInit {
 
   showScrollDown(): boolean {
     return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
+  }
+
+  checkIfDatabaseIsOld(): void {
+    this.firebaseService.getLastTimeUpdatedTimestamp().then(timestamp => {
+      const now = Date.now();
+      if (isOlderThan(timestamp, now, 30)) {
+        this.logger.log('Data is too old');
+        this.firebaseService.cleanDatabase(this.academicTerms);
+        this.firebaseService.updateLastTimeUpdatedTimestamp();
+      }
+    });
   }
 
   resetState(): void {
