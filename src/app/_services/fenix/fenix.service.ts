@@ -8,6 +8,8 @@ import {Lesson} from '../../_domain/Lesson';
 import {Shift} from '../../_domain/Shift';
 import {ClassType} from '../../_domain/ClassType';
 
+const NO_ROOM_FOUND = 'NO ROOM FOUND';
+const NO_CAMPUS_FOUND = 'NO CAMPUS FOUND';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +19,7 @@ export class FenixService {
   url = 'https://cors-anywhere.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/';
 
   totalHoursPerWeekDoNotMatchLessonsTime = false;
+  campusNotFound = false;
   currentAcademicTerm: string;
 
   constructor(public translateService: TranslateService, public errorService: ErrorService) { }
@@ -53,15 +56,13 @@ export class FenixService {
     if (!scheduleJson.shifts) { throw new Error('No shifts found'); }
     scheduleJson.shifts.forEach(shift => {
       if (!shift.name) { throw new Error('No name found for shift'); }
-      if (!shift.types) { throw new Error('No types found for shift ' + shift.name); }
+      if (!shift.types) { throw new Error('No type found for shift ' + shift.name); }
       if (!shift.lessons) { throw new Error('No lessons found for shift ' + shift.name); }
 
       shift.lessons.forEach(lesson => {
         if (!lesson.start) { throw new Error('No start found for lesson'); }
         if (!lesson.end) { throw new Error('No end found for lesson'); }
-        if (!lesson.room) { throw new Error('No room found for lesson'); }
       });
-      if (!shift.rooms) { throw new Error('No rooms found for shift ' + shift.name); }
     });
   }
 
@@ -69,7 +70,7 @@ export class FenixService {
    * Fill-in missing info that's not crucial for generating schedules.
    * ---------------------------------------------------------------------------- */
   private static fillMissingInfo(course: Course): Course {
-    if (course.campus.length === 0) { course.campus = ['NONE FOUND']; }
+    if (course.campus.length === 0) { course.campus = ['NO CAMPUS FOUND']; }
     if (course.types.length === 0) { course.types = [ClassType.NONE]; }
     if (course.shifts.length === 0) {
       throw new Error('No shifts found. Impossible to generate schedules for course: ' + course.name);
@@ -149,6 +150,7 @@ export class FenixService {
     let weekIndex = 0;
 
     while (shiftLessons.length === 0 || !FenixService.hasTotalHoursPerWeek(hoursPerWeek, shiftLessons, shiftType)) {
+      // Total hours per week are incorrect
       if (weekIndex === lessons.length) {
         this.totalHoursPerWeekDoNotMatchLessonsTime = true;
         break;
@@ -160,20 +162,22 @@ export class FenixService {
       const baseLesson = new Lesson(
         new Date(lessons[weekIndex].start),
         new Date(lessons[weekIndex].end),
-        lessons[weekIndex].room ? lessons[weekIndex].room.name : null,
-        lessons[weekIndex].room ? lessons[weekIndex].room.topLevelSpace.name : null
+        lessons[weekIndex].room ? lessons[weekIndex].room.name : NO_ROOM_FOUND,
+        lessons[weekIndex].room ? lessons[weekIndex].room.topLevelSpace.name : NO_CAMPUS_FOUND
       );
       shiftLessons.push(baseLesson);
+      if (baseLesson.campus === NO_CAMPUS_FOUND) { this.campusNotFound = true; }
 
       // Find others on same week
       for (const shiftLesson of lessons) {
         if (!FenixService.isSameLesson(baseLesson, shiftLesson) && FenixService.isSameWeek(baseLesson.start, new Date(shiftLesson.start))) {
           const lesson = new Lesson(new Date(shiftLesson.start),
             new Date(shiftLesson.end),
-            shiftLesson.room ? shiftLesson.room.name : null,
-            shiftLesson.room ? shiftLesson.room.topLevelSpace.name : null);
-
+            shiftLesson.room ? shiftLesson.room.name : NO_ROOM_FOUND,
+            shiftLesson.room ? shiftLesson.room.topLevelSpace.name : NO_CAMPUS_FOUND
+          );
           shiftLessons.push(lesson);
+          if (baseLesson.campus === NO_CAMPUS_FOUND) { this.campusNotFound = true; }
         }
       }
 
@@ -294,28 +298,28 @@ export class FenixService {
           let courseLoads = FenixService.getCourseLoads(scheduleJson.courseLoads);
 
           // Get shifts
-          const shifts: Shift[] = [];
-          for (const shift of scheduleJson.shifts) {
-
-            // Get shift types
-            const shiftType = this.formatType(shift.types[0]);
-
-            // Get shift lessons
-            const shiftLessons = this.getShiftLessons(courseLoads, shift.lessons, shiftType);
-
-            // Get shift campus
-            const shiftCampus = shiftLessons[0].campus;
-
-            shifts.push(new Shift(shift.name, shiftType, shiftLessons, shiftCampus));
-          }
+          let shifts = this.getShifts(scheduleJson.shifts, courseLoads);
 
           // Get campus
           const campus: string[] = FenixService.getCourseCampus(shifts).reverse();
 
-          // Update courseLoads if inconsistencies found
+          // Update courseLoads & shifts if inconsistencies found
           if (this.totalHoursPerWeekDoNotMatchLessonsTime) {
             courseLoads = FenixService.calculateCourseLoads(shifts);
+            shifts = this.getShifts(scheduleJson.shifts, courseLoads);
             this.totalHoursPerWeekDoNotMatchLessonsTime = false;
+          }
+
+          // Set shifts' & lessons' campus if none found, but found on course
+          if (campus.length === 1) {
+            const campusForAll = campus[0];
+            shifts.forEach(shift => {
+              if (shift.campus === NO_CAMPUS_FOUND) { shift.campus = campusForAll; }
+
+              shift.lessons.forEach(lesson => {
+                if (lesson.campus === NO_CAMPUS_FOUND) { lesson.campus = campusForAll; }
+              });
+            });
           }
 
           return FenixService.fillMissingInfo(new Course(course.id, course.name, course.acronym, types, campus, shifts, courseLoads));
@@ -331,5 +335,23 @@ export class FenixService {
       types.push(type);
     }
     return types.reverse();
+  }
+
+  private getShifts(shiftsJson, courseLoads): Shift[] {
+    const shifts: Shift[] = [];
+    for (const shift of shiftsJson) {
+
+      // Get shift type
+      const shiftType = this.formatType(shift.types[0]);
+
+      // Get shift lessons
+      const shiftLessons = this.getShiftLessons(courseLoads, shift.lessons, shiftType);
+
+      // Get shift campus
+      const shiftCampus = shiftLessons[0].campus;
+
+      shifts.push(new Shift(shift.name, shiftType, shiftLessons, shiftCampus));
+    }
+    return shifts;
   }
 }

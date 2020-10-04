@@ -68,7 +68,7 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
       if (this.generatedSchedules.length === 0) {
         this.alertService.showAlert(
           'Sem horários',
-          'Não existe nenhum horário possível com todas estas cadeiras. Remove alguma e tenta de novo.',
+          'Não existe nenhum horário possível com estas cadeiras. Remove alguma e tenta de novo.',
           'warning');
         this.goBack();
         return;

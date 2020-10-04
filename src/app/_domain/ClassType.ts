@@ -17,7 +17,7 @@ export enum ClassType {
   TRAINING_PERIOD_EN = 'Training Period',
   FIELD_WORK_EN = 'Field Work',
 
-  NONE = 'No class type found'
+  NONE = 'NO CLASS TYPE FOUND'
 }
 
 export function minifyClassType(type: ClassType): string {
