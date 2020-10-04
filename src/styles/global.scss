@@ -156,8 +156,8 @@ a { color: $gh-blue; }
 }
 
 .alert-success:hover {
-  background-color: #00e498;
-  border-color: #00e498;
+  background-color: lighten(#00d68f, 10%);
+  border-color: lighten(#00d68f, 10%);
   cursor: pointer;
 }
 
@@ -171,8 +171,8 @@ a { color: $gh-blue; }
 }
 
 .alert-danger:hover {
-  background-color: #ff4678;
-  border-color: #ff4678;
+  background-color: lighten(#ff3d71, 10%);
+  border-color: lighten(#ff3d71, 10%);
   cursor: pointer;
 }
 
@@ -186,8 +186,8 @@ a { color: $gh-blue; }
 }
 
 .alert-warning:hover {
-  background-color: #feae0c;
-  border-color: #feae0c;
+  background-color: lighten(#ffaa00, 10%);
+  border-color: lighten(#ffaa00, 10%);
   cursor: pointer;
 }
 
@@ -201,8 +201,8 @@ a { color: $gh-blue; }
 }
 
 .alert-info:hover {
-  background-color: #0c9afe;
-  border-color: #0c9afe;
+  background-color: lighten(#0095ff, 10%);
+  border-color: lighten(#0095ff, 10%);
   cursor: pointer;
 }
 
