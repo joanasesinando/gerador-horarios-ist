@@ -36,7 +36,7 @@ describe('HomepageComponent', () => {
   let courses: Course[];
 
   beforeEach(async(() => {
-    academicTerms = ['2021/2022', '2020/2021'];
+    academicTerms = ['2020/2021', '2021/2022'];
     degrees = [
       new Degree(1, 'Degree #1', 'D1'),
       new Degree(2, 'Degree #2', 'D2'),
@@ -77,6 +77,7 @@ describe('HomepageComponent', () => {
     };
 
     firebaseServiceStub = {
+      getLastTimeUpdatedTimestamp: () => of(Date.now()).toPromise(),
       hasDegrees: () => of(true).toPromise(),
       getDegrees: () => of(degrees).toPromise(),
       hasCourses: () => of(true).toPromise(),

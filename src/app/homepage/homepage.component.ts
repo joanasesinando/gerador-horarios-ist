@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {AfterViewInit, Component, HostListener, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
@@ -35,7 +35,7 @@ declare let $;
   templateUrl: './homepage.component.html',
   styleUrls: ['./homepage.component.scss']
 })
-export class HomepageComponent implements OnInit {
+export class HomepageComponent implements OnInit, AfterViewInit {
 
   mobileView = false;
   featuresHorizontal = false;
@@ -145,6 +145,9 @@ export class HomepageComponent implements OnInit {
 
   ngOnInit(): void {
     this.onWindowResize();
+  }
+
+  ngAfterViewInit(): void {
     $('[data-toggle="tooltip"]').tooltip();
   }
 
