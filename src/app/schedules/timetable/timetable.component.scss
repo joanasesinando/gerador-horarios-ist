@@ -1,4 +1,5 @@
 @import "src/styles/colors";
+@import "src/styles/shadows";
 
 @import "~bootstrap/scss/functions";
 @import "~bootstrap/scss/variables";
@@ -289,7 +290,21 @@ $columns: 5;
       @include media-breakpoint-down(sm) {
         padding: .5em;
       }
+    }
+
+    .pin {
+      display: none;
+      position: absolute;
+      top: .3rem;
+      right: .3rem;
+      font-size: .8rem;
+      color: white;
+    }
+
+    &:hover, &:focus {
       cursor: pointer;
+      box-shadow: $selected-shadow;
+      .pin { display: block; }
     }
   }
 }
@@ -336,11 +351,6 @@ $columns: 5;
 /* --------------------------
    event colors
    -------------------------- */
-.schedule .single-event {
-  background: $gh-darkBlue;
-  &:hover { background: lighten($gh-darkBlue, 5%); }
-}
-
 .schedule .single-event.event-1 {
   background: #577F92;
   &:hover { background: #618da1; }
@@ -367,11 +377,33 @@ $columns: 5;
 }
 
 .schedule .single-event.event-6 {
+  background: $gh-darkBlue;
+  &:hover { background: lighten($gh-darkBlue, 5%); }
+}
+
+.schedule .single-event.event-7 {
   background: #967da0;
   &:hover { background: #ad91b9; }
 }
 
-.schedule .single-event.event-7 {
+.schedule .single-event.event-8 {
   background: #61816e;
   &:hover { background: #6d917c; }
+}
+
+/* --------------------------
+   pinned event
+   -------------------------- */
+.schedule .events .single-event.pinned {
+  border: 2px solid rgba(235, 87, 87, 0.8);
+  box-shadow: $pinned-shadow;
+  z-index: 10;
+
+  .pin {
+    display: block;
+    top: .2rem;
+    right: .2rem;
+    font-size: .7rem;
+    color: #EB5757;
+  }
 }

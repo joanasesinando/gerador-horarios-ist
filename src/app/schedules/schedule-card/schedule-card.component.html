@@ -1,38 +1,40 @@
-<button *ngIf="mobileView" class="btn btn-block btn-danger btn-remove-mobile" (click)="removeBtnClicked()">
-  <fa-icon [icon]="faTimes"></fa-icon>
-</button>
-
-<div class="wrapper rounded text-center pt-3 px-3 px-xl-4 mb-3" data-toggle="collapse"
-     [attr.data-target]="'#schedulesClasses-' + schedule.id"
-     aria-expanded="true" aria-controls="schedulesClasses" (click)="toggle()">
-
-  <button *ngIf="!mobileView" class="btn btn-sm btn-danger btn-remove" (click)="removeBtnClicked()">
+<div class="schedule-card mx-sm-1 mx-lg-0">
+  <button *ngIf="mobileView" class="btn btn-block btn-danger btn-remove-mobile" (click)="removeBtnClicked()">
     <fa-icon [icon]="faTimes"></fa-icon>
   </button>
 
-  <h6 class="text-primary font-weight-bold mb-1 mt-lg-1">Horário #{{schedule.id + 1}}</h6>
+  <div class="wrapper rounded text-center pt-3 px-3 px-xl-4 mb-3" data-toggle="collapse"
+       [attr.data-target]="'#schedulesClasses-' + schedule.id"
+       aria-expanded="true" aria-controls="schedulesClasses" (click)="toggle()">
 
-  <div class="collapse show" id="schedulesClasses-{{schedule.id}}">
-    <div *ngFor="let cl of schedule.classes" class="schedule-class text-left mt-3">
-      <p class="class-name font-weight-bold mb-2">{{cl.course.name}}</p>
+    <button *ngIf="!mobileView" class="btn btn-sm btn-danger btn-remove" (click)="removeBtnClicked()">
+      <fa-icon [icon]="faTimes"></fa-icon>
+    </button>
 
-      <div *ngFor="let shift of cl.shifts">
+    <h6 class="text-primary font-weight-bold mb-1 mt-lg-1">Horário #{{schedule.id + 1}}</h6>
 
-        <div *ngFor="let lesson of shift.lessons" class="d-flex flex-wrap ml-2">
-          <span class="lesson-type font-weight-bold mr-2 mb-1">({{minifyClassType(shift.type)}})</span>
-          <span class="lesson-time mr-3 mb-1">{{lesson.print(translateService.currentLang)}}</span>
-          <span class="lesson-room">{{lesson.room}}</span>
+    <div class="collapse show" id="schedulesClasses-{{schedule.id}}">
+      <div *ngFor="let cl of schedule.classes" class="schedule-class text-left mt-3">
+        <p class="class-name font-weight-bold mb-2">{{cl.course.name}}</p>
+
+        <div *ngFor="let shift of cl.shifts">
+
+          <div *ngFor="let lesson of shift.lessons" class="d-flex flex-wrap ml-2">
+            <span class="lesson-type font-weight-bold mr-2 mb-1">({{minifyClassType(shift.type)}})</span>
+            <span class="lesson-time mr-3 mb-1">{{lesson.print(translateService.currentLang)}}</span>
+            <span class="lesson-room">{{lesson.room}}</span>
+          </div>
+
         </div>
-
       </div>
     </div>
+
+    <fa-icon *ngIf="!expanded" [icon]="faCaretDown" class="arrow"
+             data-toggle="collapse" [attr.data-target]="'#schedulesClasses-' + schedule.id"
+             aria-expanded="true" aria-controls="schedulesClasses" (click)="toggle()"></fa-icon>
+
+    <fa-icon *ngIf="expanded" [icon]="faCaretUp" class="arrow"
+             data-toggle="collapse" [attr.data-target]="'#schedulesClasses-' + schedule.id"
+             aria-expanded="true" aria-controls="schedulesClasses" (click)="toggle()"></fa-icon>
   </div>
-
-  <fa-icon *ngIf="!expanded" [icon]="faCaretDown" class="arrow"
-           data-toggle="collapse" [attr.data-target]="'#schedulesClasses-' + schedule.id"
-           aria-expanded="true" aria-controls="schedulesClasses" (click)="toggle()"></fa-icon>
-
-  <fa-icon *ngIf="expanded" [icon]="faCaretUp" class="arrow"
-           data-toggle="collapse" [attr.data-target]="'#schedulesClasses-' + schedule.id"
-           aria-expanded="true" aria-controls="schedulesClasses" (click)="toggle()"></fa-icon>
 </div>

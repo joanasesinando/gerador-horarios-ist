@@ -9,4 +9,8 @@ export class Schedule {
 
   get classes(): Class[] { return this._classes; }
   set classes(value: Class[]) { this._classes = value; }
+
+  equal(other: Schedule): boolean {
+    return this.id === other.id;
+  }
 }

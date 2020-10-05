@@ -44,4 +44,16 @@ export class Shift {
     return false;
   }
 
+  equal(other: Shift): boolean {
+    this.lessons.forEach(lesson => {
+      let found = false;
+      other.lessons.forEach(otherLesson => {
+        if (lesson.equal(otherLesson)) { found = true; }
+      });
+      if (!found) { return false; }
+    });
+    return this.name === other.name &&
+      this.type === other.type &&
+      this.campus === other.campus;
+  }
 }

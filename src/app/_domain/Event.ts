@@ -1,12 +1,17 @@
 export class Event {
   constructor(
+    private _shiftName: string,
     private _tag: number,
     private _weekday: string,
     private _start: string,
     private _end: string,
     private _name: string,
-    private _place: string
+    private _place: string,
+    private _pinned: boolean
   ) { }
+
+  get shiftName(): string { return this._shiftName; }
+  set shiftName(value: string) { this._shiftName = value; }
 
   get tag(): number { return this._tag; }
   set tag(value: number) { this._tag = value; }
@@ -25,4 +30,7 @@ export class Event {
 
   get place(): string { return this._place; }
   set place(value: string) { this._place = value; }
+
+  get pinned(): boolean { return this._pinned; }
+  set pinned(value: boolean) { this._pinned = value; }
 }

@@ -84,9 +84,11 @@
       </div>
 
       <div class="schedules-deck">
-        <app-schedule-card *ngFor="let schedule of schedulesPicked"
-                           [schedule]="schedule"
-                           (removeBtn)="removeSchedule($event)"></app-schedule-card>
+        <div class="d-sm-flex flex-wrap justify-content-start d-lg-block mr-lg-1">
+          <app-schedule-card *ngFor="let schedule of schedulesPicked"
+                             [schedule]="schedule"
+                             (removeBtn)="removeSchedule($event)"></app-schedule-card>
+        </div>
       </div>
 
       <!-- Finish btn -->

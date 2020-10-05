@@ -63,4 +63,13 @@ export class Lesson {
       s += ', ' + formatTime(this.start) + ' - ' + formatTime(this.end);
       return s;
     }
+
+    equal(other: Lesson): boolean {
+      return this.start.getDay() === other.start.getDay() &&
+        formatTime(this.start) === formatTime(other.start) &&
+        this.end.getDay() === other.end.getDay() &&
+        formatTime(this.end) === formatTime(other.end) &&
+        this.room === other.room &&
+        this.campus === other.campus;
+    }
 }

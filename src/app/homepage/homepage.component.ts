@@ -121,9 +121,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     let tookToLong = true;
     setTimeout(() => {
       if (tookToLong) {
-        alertService.showAlert('Serviço indisponível', 'O gerador encontra-se em baixo. Por favor, tenta de novo daqui a 10min.', 'danger');
+        alertService.showAlert('Serviço indisponível', 'O gerador encontra-se em baixo. Por favor, tenta de novo daqui a uns minutos.', 'danger');
       }
-    }, 10000);
+    }, 15000);
 
     // Get academic terms
     this.fenixService.getAcademicTerms().then(academicTerms => {
@@ -455,6 +455,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   prepareCoursesToGenerate(): void {
     this.removeABDifferencesInShifts();
+    this.renameShiftsWhenSameName();
     this.updateCampus();
     this.updateTypesOfClasses();
 
@@ -480,6 +481,23 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         } else if (shift.name.startsWith('b_')) {
           course.shifts.splice(i, 1);
         }
+      }
+    }
+  }
+
+  /* -----------------------------------------------------------
+   * Rename shifts when some have the same name
+   * ----------------------------------------------------------- */
+  renameShiftsWhenSameName(): void {
+    const tempMap: Map<string, number> = new Map(); // shift.name --> index
+    for (let i = 0; i < this.stateService.selectedCourses.length; i++) {
+      const course = this.stateService.selectedCourses[i];
+
+      for (let j = 0; j < course.shifts.length; j++) {
+        const shift = course.shifts[j];
+
+        if (tempMap.has(shift.name)) { shift.name = shift.name + '-' + i + j; }
+        else { tempMap.set(shift.name, j); }
       }
     }
   }

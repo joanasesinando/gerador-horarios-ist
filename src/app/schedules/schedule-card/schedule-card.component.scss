@@ -4,6 +4,15 @@
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/mixins";
 
+.schedule-card {
+  @include media-breakpoint-only(md) {
+    width: calc((100vw - 5.6rem) / 3);
+  }
+  @include media-breakpoint-only(sm) {
+    width: calc((100vw - 5.1rem) / 2);
+  }
+}
+
 .wrapper {
   position: relative;
   background-color: white;

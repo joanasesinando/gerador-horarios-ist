@@ -1,10 +1,10 @@
-<h5 class="text-center d-block mt-5 mb-3">{{currentSchedule + 1}} / {{schedules.length}}</h5>
+<h5 class="text-center d-block mt-5 mb-3">{{currentScheduleIndex + 1}} / {{schedulesToShow.length}}</h5>
 
 <div class="timetable d-flex justify-content-center align-items-center"
   (swipeleft)="next()" (swiperight)="prev()">
 
   <!-- Previous btn -->
-  <fa-icon [ngClass]="{'invisible': schedules.length < 2 || currentSchedule === 0}"
+  <fa-icon [ngClass]="{'invisible': schedulesToShow.length < 2 || currentScheduleIndex === 0}"
            [icon]="faCaretLeft" class="prev mr-4" (click)="prev()"></fa-icon>
 
   <div class="schedule">
@@ -32,12 +32,15 @@
           <ul>
             <li *ngFor="let ev of eventsPerWeekday.get('monday')"
                 [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end">
-              <div class="single-event-div" (click)="pin()">
+                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
+                [ngClass]="{'pinned': ev.pinned}"
+                [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+              <div class="single-event-div">
                 <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                 <em class="event-name">{{ev.name}}</em>
                 <span *ngIf="isTallEnough(ev.start, ev.end)" class="event-place">{{ev.place}}</span>
               </div>
+              <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
             </li>
           </ul>
         </li>
@@ -51,12 +54,15 @@
           <ul>
             <li *ngFor="let ev of eventsPerWeekday.get('tuesday')"
                 [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end">
-              <div class="single-event-div" (click)="pin()">
+                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
+                [ngClass]="{'pinned': ev.pinned}"
+                [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+              <div class="single-event-div">
                 <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                 <em class="event-name">{{ev.name}}</em>
                 <span *ngIf="isTallEnough(ev.start, ev.end)" class="event-place">{{ev.place}}</span>
               </div>
+              <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
             </li>
           </ul>
         </li>
@@ -70,12 +76,15 @@
           <ul>
             <li *ngFor="let ev of eventsPerWeekday.get('wednesday')"
                 [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end">
-              <div class="single-event-div" (click)="pin()">
+                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
+                [ngClass]="{'pinned': ev.pinned}"
+                [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+              <div class="single-event-div">
                 <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                 <em class="event-name">{{ev.name}}</em>
                 <span *ngIf="isTallEnough(ev.start, ev.end)" class="event-place">{{ev.place}}</span>
               </div>
+              <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
             </li>
           </ul>
         </li>
@@ -89,12 +98,15 @@
           <ul>
             <li *ngFor="let ev of eventsPerWeekday.get('thursday')"
                 [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end">
-              <div class="single-event-div" (click)="pin()">
+                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
+                [ngClass]="{'pinned': ev.pinned}"
+                [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+              <div class="single-event-div">
                 <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                 <em class="event-name">{{ev.name}}</em>
                 <span *ngIf="isTallEnough(ev.start, ev.end)" class="event-place">{{ev.place}}</span>
               </div>
+              <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
             </li>
           </ul>
         </li>
@@ -108,12 +120,15 @@
           <ul>
             <li *ngFor="let ev of eventsPerWeekday.get('friday')"
                 [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end">
-              <div class="single-event-div" (click)="pin()">
+                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
+                [ngClass]="{'pinned': ev.pinned}"
+                [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+              <div class="single-event-div">
                 <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                 <em class="event-name">{{ev.name}}</em>
                 <span *ngIf="isTallEnough(ev.start, ev.end)" class="event-place">{{ev.place}}</span>
               </div>
+              <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
             </li>
           </ul>
         </li>
@@ -124,6 +139,6 @@
   </div> <!-- .schedule -->
 
   <!-- Next btn -->
-  <fa-icon [ngClass]="{'invisible': schedules.length < 2 || currentSchedule >= schedules.length - 1}"
+  <fa-icon [ngClass]="{'invisible': schedulesToShow.length < 2 || currentScheduleIndex >= schedulesToShow.length - 1}"
            [icon]="faCaretRight" class="next ml-4" (click)="next()"></fa-icon>
 </div>

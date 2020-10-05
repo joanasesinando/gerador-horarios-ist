@@ -5,9 +5,9 @@
 @import "~bootstrap/scss/mixins";
 
 
-.content,
-.sidebar {
-  min-height: 100vh;
+.content { min-height: 100vh; }
+@include media-breakpoint-up(lg) {
+  .sidebar { min-height: 100vh; }
 }
 
 .main-content {

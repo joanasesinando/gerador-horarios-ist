@@ -12,7 +12,7 @@ import {Shift} from '../../_domain/Shift';
 })
 export class SchedulesGenerationService {
 
-  constructor(private logger: LoggerService) { }
+  constructor(public logger: LoggerService) { }
 
   /* --------------------------------------------------------------------------------
    * Returns generated schedules based on user selected courses.
@@ -22,7 +22,7 @@ export class SchedulesGenerationService {
    *    per week of each type of class selected); check for overlaps and discard
    *  - combine each to create different schedules; check for overlaps and discard
    * -------------------------------------------------------------------------------- */
-  generateSchedules(courses: Course[]): Schedule[] {
+   generateSchedules(courses: Course[]): Schedule[] {
     this.logger.log('generating...');
 
     // Combine shifts
