@@ -4,7 +4,7 @@
 
 <div class="wrapper rounded text-center pt-3 px-3 px-xl-4 mb-3" data-toggle="collapse"
      [attr.data-target]="'#schedulesClasses-' + schedule.id"
-     aria-expanded="false" aria-controls="schedulesClasses" (click)="toggle()">
+     aria-expanded="true" aria-controls="schedulesClasses" (click)="toggle()">
 
   <button *ngIf="!mobileView" class="btn btn-sm btn-danger btn-remove" (click)="removeBtnClicked()">
     <fa-icon [icon]="faTimes"></fa-icon>
@@ -12,7 +12,7 @@
 
   <h6 class="text-primary font-weight-bold mb-1 mt-lg-1">Horário #{{schedule.id + 1}}</h6>
 
-  <div class="collapse" id="schedulesClasses-{{schedule.id}}">
+  <div class="collapse show" id="schedulesClasses-{{schedule.id}}">
     <div *ngFor="let cl of schedule.classes" class="schedule-class text-left mt-3">
       <p class="class-name font-weight-bold mb-2">{{cl.course.name}}</p>
 
@@ -28,6 +28,11 @@
     </div>
   </div>
 
-  <fa-icon *ngIf="!expanded" [icon]="faCaretDown" class="arrow"></fa-icon>
-  <fa-icon *ngIf="expanded" [icon]="faCaretUp" class="arrow"></fa-icon>
+  <fa-icon *ngIf="!expanded" [icon]="faCaretDown" class="arrow"
+           data-toggle="collapse" [attr.data-target]="'#schedulesClasses-' + schedule.id"
+           aria-expanded="true" aria-controls="schedulesClasses" (click)="toggle()"></fa-icon>
+
+  <fa-icon *ngIf="expanded" [icon]="faCaretUp" class="arrow"
+           data-toggle="collapse" [attr.data-target]="'#schedulesClasses-' + schedule.id"
+           aria-expanded="true" aria-controls="schedulesClasses" (click)="toggle()"></fa-icon>
 </div>

@@ -23,7 +23,7 @@ export class ScheduleCardComponent implements OnInit {
   faCaretUp = faCaretUp;
   faTimes = faTimes;
 
-  expanded = false;
+  expanded = true;
   mobileView = false;
 
   constructor(public translateService: TranslateService) { }

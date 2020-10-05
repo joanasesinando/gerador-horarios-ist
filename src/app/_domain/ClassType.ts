@@ -3,7 +3,7 @@ export enum ClassType {
   THEORY_PT = 'Teórico',
   LAB_PT = 'Laboratório',
   PROBLEMS_PT = 'Problemas',
-  SEMINARY_PT = 'Seminários',
+  SEMINARY_PT = 'Seminário',
   TUTORIAL_ORIENTATION_PT = 'Orientação Tutorial',
   TRAINING_PERIOD_PT = 'Estágio',
   FIELD_WORK_PT = 'Trabalho de Campo',
