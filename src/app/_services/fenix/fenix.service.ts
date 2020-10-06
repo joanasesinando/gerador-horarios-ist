@@ -92,7 +92,7 @@ export class FenixService {
         if (!campus.includes(lesson.campus) && lesson.campus) { campus.push(lesson.campus); }
       }
     }
-    return campus;
+    return campus.sort();
   }
 
   private static hasTotalHoursPerWeek(hoursPerWeek: {}, lessons: Lesson[], shiftType: string): boolean {
@@ -300,7 +300,7 @@ export class FenixService {
           let shifts = this.getShifts(scheduleJson.shifts, courseLoads);
 
           // Get campus
-          const campus: string[] = FenixService.getCourseCampus(shifts).reverse();
+          const campus: string[] = FenixService.getCourseCampus(shifts);
 
           // Update courseLoads & shifts if inconsistencies found
           if (this.totalHoursPerWeekDoNotMatchLessonsTime) {
