@@ -318,7 +318,12 @@ export class FenixService {
             });
           });
 
-          return FenixService.fillMissingInfo(new Course(course.id, course.name, course.acronym, types, campus, shifts, courseLoads));
+          course.types = types;
+          course.campus = campus;
+          course.shifts = shifts;
+          course.courseLoads = courseLoads;
+
+          return FenixService.fillMissingInfo(course);
 
         } catch (error) { this.errorService.showError(error); }
       });

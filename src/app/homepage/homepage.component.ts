@@ -338,11 +338,14 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   addCourse(courseID: number): void {
     this.noShiftsFound = false;
     const courseIndex = this.findCourseIndex(courseID, this.courses);
+    const degreeIndex = this.findDegreeIndex(this.degreeFormControl.value, this.degrees);
 
     if (courseID && courseID !== -1 && courseIndex != null) {
       const addBtn = $('#addBtn');
       addBtn.attr('disabled', true);
+
       let courseToAdd = this.courses[courseIndex];
+      courseToAdd.degree = this.degrees[degreeIndex];
 
       if (courseToAdd.hasFullInfo()) {
         this.addCourseHelper(courseToAdd, courseIndex, addBtn);
@@ -427,6 +430,15 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     let index = 0;
     for (const course of courses) {
       if (course.id === courseID) { return index; }
+      index++;
+    }
+    return null;
+  }
+
+  findDegreeIndex(degreeID: number, degrees: Degree[]): number {
+    let index = 0;
+    for (const degree of degrees) {
+      if (degree.id === degreeID) { return index; }
       index++;
     }
     return null;

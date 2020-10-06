@@ -3,6 +3,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import {Course} from '../../_domain/Course';
 import {ClassType} from '../../_domain/ClassType';
+import {Degree} from '../../_domain/Degree';
 
 declare let $;
 
@@ -29,8 +30,32 @@ export class CourseCardComponent implements AfterViewInit {
   }
 
   formatName(name: string): string {
-    // @ts-ignore
-    return name.replaceAll(/[ ,]/g, '');
+    return name.replace(/[ ,]/g, '');
+  }
+
+  hasDefaultCampus(degree: Degree): boolean {
+    switch (degree.acronym) {
+      case 'LEIC-A':
+      case 'LEIC-T':
+      case 'MEIC-A':
+      case 'MEIC-T':
+        return true;
+
+      default:
+        return false;
+    }
+  }
+
+  setCampusBasedOnDefault(degree: Degree, campus: string): boolean {
+    switch (degree.acronym) {
+      case 'LEIC-A':
+      case 'MEIC-A':
+        return campus === 'Alameda';
+
+      case 'LEIC-T':
+      case 'MEIC-T':
+        return campus === 'Taguspark';
+    }
   }
 
   campusPicked(course): void {

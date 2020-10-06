@@ -1,6 +1,7 @@
 import {ClassType} from './ClassType';
 import {Shift} from './Shift';
 import {Lesson} from './Lesson';
+import {Degree} from './Degree';
 
 
 export class Course {
@@ -11,7 +12,8 @@ export class Course {
     private _types?: ClassType[],
     private _campus?: string[],
     private _shifts?: Shift[],
-    private _courseLoads?: {}
+    private _courseLoads?: {},
+    private _degree?: Degree // degree this course was selected from
   ) {}
 
   get id(): number { return this._id; }
@@ -34,6 +36,9 @@ export class Course {
 
   get courseLoads(): {}  { return this._courseLoads; }
   set courseLoads(value: {}) { this._courseLoads = value; }
+
+  get degree(): Degree  { return this._degree; }
+  set degree(value: Degree) { this._degree = value; }
 
   hasFullInfo(): boolean {
     return this.types !== undefined || this.campus !== undefined || this.shifts !== undefined;
