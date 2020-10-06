@@ -69,7 +69,7 @@ export class FenixService {
    * Fill-in missing info that's not crucial for generating schedules.
    * ---------------------------------------------------------------------------- */
   private static fillMissingInfo(course: Course): Course {
-    if (course.campus.length === 0) { course.campus = ['NO CAMPUS FOUND']; }
+    if (course.campus.length === 0) { course.campus = null; }
     if (course.types.length === 0) { course.types = [ClassType.NONE]; }
     if (course.shifts.length === 0) {
       throw new Error('No shifts found. Impossible to generate schedules for course: ' + course.name);
@@ -311,7 +311,7 @@ export class FenixService {
 
           // Set shifts' & lessons' campus if none found, but found on course
           shifts.forEach(shift => {
-            if (!shift.campus && campus.length === 1) { shift.campus = campus[0]; }
+            if (!shift.campus && campus && campus.length === 1) { shift.campus = campus[0]; }
 
             shift.lessons.forEach(lesson => {
               if (!lesson.campus && shift.campus) { lesson.campus = shift.campus; }

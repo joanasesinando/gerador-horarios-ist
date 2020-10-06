@@ -155,7 +155,8 @@
                 <div class="position-relative">
                   <label for="inputCourse">{{'main-content.labels.course' | translate}}</label>
                   <div class="input-group w-100">
-                    <select class="custom-select" id="inputCourse" formControlName="course">
+                    <select class="custom-select" id="inputCourse" formControlName="course"
+                            (change)="noShiftsFound = false">
                       <option disabled selected value="{{-1}}">{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.course' | translate).toLowerCase()}}...</option>
                       <option *ngFor="let course of courses" id="{{course.id}}" value="{{course.id}}">[{{course.acronym}}] {{course.name}}</option>
                     </select>

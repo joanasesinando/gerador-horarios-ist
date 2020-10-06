@@ -41,7 +41,10 @@ export class Course {
   set degree(value: Degree) { this._degree = value; }
 
   hasFullInfo(): boolean {
-    return this.types !== undefined || this.campus !== undefined || this.shifts !== undefined;
+    return this.types !== undefined &&
+      this.campus !== undefined &&
+      this.shifts !== undefined &&
+      this.courseLoads !== undefined;
   }
 
   convertShifts(): {}[] { // TODO: complete types

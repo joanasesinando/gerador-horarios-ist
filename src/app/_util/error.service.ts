@@ -10,7 +10,7 @@ export class ErrorService {
 
   public showError(error: string): void {
     console.error(error);
-    this.alertService.showAlert('Error', error, 'danger');
+    this.alertService.showAlert('⚡ Error', error, 'danger');
     setTimeout(() => {
       this.alertService.showAlert(
         '📢 Ajuda-nos a melhorar',

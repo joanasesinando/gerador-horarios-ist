@@ -13,6 +13,7 @@ import {isOlderThan} from '../_util/Time';
 import {FenixService} from '../_services/fenix/fenix.service';
 import {FirebaseService} from '../_services/firebase/firebase.service';
 import {AlertService} from '../_util/alert.service';
+import {ErrorService} from '../_util/error.service';
 import {StateService} from '../_services/state/state.service';
 
 import {faGithub} from '@fortawesome/free-brands-svg-icons';
@@ -85,6 +86,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     public firebaseService: FirebaseService,
     private router: Router,
     private alertService: AlertService,
+    private errorService: ErrorService,
     public stateService: StateService) {
 
     this.spinners.loadingPage = true;
@@ -336,7 +338,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   addCourse(courseID: number): void {
-    this.noShiftsFound = false;
     const courseIndex = this.findCourseIndex(courseID, this.courses);
     const degreeIndex = this.findDegreeIndex(this.degreeFormControl.value, this.degrees);
 
@@ -381,8 +382,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     }
   }
 
-  addCourseHelper(course, index, addBtn): void {
-    if (course) {
+  addCourseHelper(course: Course, index: number, addBtn): void {
+    if (course && course.shifts && course.shifts.length > 0) {
       // Update arrays
       this.selectedCourses.unshift(course);
       this.selectedCoursesIDs.set(course.id, true);
@@ -394,7 +395,10 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       // Reset select
       this.courseFormControl.patchValue(-1);
 
-    } else { this.noShiftsFound = true; }
+    } else {
+      this.noShiftsFound = true;
+      this.errorService.showError('No shifts found. Impossible to generate schedules for this course');
+    }
 
     addBtn.attr('disabled', false);
     this.logger.log('selected courses', this.selectedCourses);

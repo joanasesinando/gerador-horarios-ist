@@ -109,6 +109,14 @@ a { color: $gh-blue; }
   height: auto;
   width: 25rem;
   z-index: 1060;
+
+  @include media-breakpoint-down(xs) {
+    right: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 }
 .alert {
   border-width: 1px;
