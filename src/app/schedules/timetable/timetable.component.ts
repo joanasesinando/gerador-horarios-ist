@@ -3,6 +3,7 @@ import {Observable, Subscription} from 'rxjs';
 
 import {LoggerService} from '../../_util/logger.service';
 import {ErrorService} from '../../_util/error.service';
+import {AlertService} from '../../_util/alert.service';
 import {TranslateService} from '@ngx-translate/core';
 import _ from 'lodash';
 
@@ -40,6 +41,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
   pinnedShifts: string[] = [];
 
   mobileView = false;
+  pinActivated = false;
 
   keydownEventsSubscription: Subscription;
 
@@ -50,6 +52,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
   constructor(
     private logger: LoggerService,
     private errorService: ErrorService,
+    private alertService: AlertService,
     public translateService: TranslateService
   ) { }
 
@@ -59,11 +62,22 @@ export class TimetableComponent implements OnInit, OnDestroy {
       this.createEvents(this.schedulesToShow);
       this.organizeEventsPerWeekday(0);
     }
+
     this.onWindowResize();
+
     this.keydownEventsSubscription = this.keydownEvents.subscribe(direction => {
       if (direction === 'right') { this.next(); }
       if (direction === 'left') { this.prev(); }
     });
+
+    setTimeout(() => {
+      if (!this.pinActivated) {
+        this.alertService.showAlert(
+          '💬 Dica',
+          'Sabias que podes fixar uma aula clicando nela? Experimenta!',
+          'info');
+      }
+    }, 120000);
   }
 
   ngOnDestroy(): void {
@@ -166,6 +180,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
   }
 
   togglePin(event): void { // TODO: testing
+    this.pinActivated = true;
     const shiftName = event.getAttribute('data-shift');
     this.pinnedShifts.includes(shiftName) ?
       this.pinnedShifts.splice(this.pinnedShifts.indexOf(shiftName), 1) :

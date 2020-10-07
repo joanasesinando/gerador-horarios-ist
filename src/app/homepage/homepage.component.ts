@@ -310,6 +310,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           // Save state
           this.saveCoursesState(academicTerm, degreeID, this.courses);
         });
+
       } else {
         this.logger.log('no courses found');
         this.fenixService.getCoursesBasicInfo(academicTerm, degreeID).then(courses => {
