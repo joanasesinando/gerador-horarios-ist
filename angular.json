@@ -30,7 +30,10 @@
               "@firebase/component",
               "@firebase/util",
               "hammerjs",
-              "lodash"
+              "lodash",
+              "raf",
+              "@babel/runtime",
+              "core-js"
             ],
             "assets": [
               "src/favicon",
