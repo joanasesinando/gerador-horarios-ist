@@ -107,13 +107,9 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     this.logger.log('schedules picked', this.schedulesPicked);
   }
 
-  finish(): void {
-    // TODO
-    this.alertService.showAlert(
-      'Brevemente 😄',
-      'Esta funcionalidade está ainda em desenvolvimento. Se quiseres contribuir passa pelo repositório no Github!',
-      'info');
-    console.log('finish');
+  save(): void {
+    this.pdfService.generateSchedulesPdf(this.schedulesPicked);
+    this.logger.log('PDF generated');
   }
 
   goBack(): void {
