@@ -6,6 +6,7 @@ import {LoggerService} from '../_util/logger.service';
 import {AlertService} from '../_util/alert.service';
 import {SchedulesGenerationService} from '../_services/schedules-generation/schedules-generation.service';
 import {StateService} from '../_services/state/state.service';
+import {PdfGenerationService} from '../_services/pdf-generation/pdf-generation.service';
 
 import {Course} from '../_domain/Course';
 import {Schedule} from '../_domain/Schedule';
@@ -34,7 +35,8 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     private router: Router,
     private alertService: AlertService,
     private schedulesGenerationService: SchedulesGenerationService,
-    private stateService: StateService
+    private stateService: StateService,
+    private pdfService: PdfGenerationService
   ) { }
 
   ngOnInit(): void {
