@@ -35,19 +35,19 @@
 
                   <div class="custom-control custom-radio custom-control-inline mr-4 mb-2 mt-2 mt-lg-0">
                     <input type="radio" id="show-options-100Compact" name="show-options"
-                           class="custom-control-input" [checked]="true" (change)="pickViewOption($event)">
+                           class="custom-control-input" [checked]="true" (change)="pickViewOption('compact')">
                     <label class="custom-control-label" for="show-options-100Compact">Mais compacto</label>
                   </div>
 
                   <div class="custom-control custom-radio custom-control-inline mr-4 mb-2">
                     <input type="radio" id="show-options-500Compact" name="show-options"
-                           class="custom-control-input" [checked]="false" (change)="pickViewOption($event)">
+                           class="custom-control-input" [checked]="false" (change)="pickViewOption('balanced')">
                     <label class="custom-control-label" for="show-options-500Compact">Mais equilibrado</label>
                   </div>
 
                   <div class="custom-control custom-radio custom-control-inline mr-0 mb-2">
                     <input type="radio" id="show-options-all" name="show-options"
-                           class="custom-control-input" [checked]="false" (change)="pickViewOption($event)">
+                           class="custom-control-input" [checked]="false" (change)="pickViewOption('free-days')">
                     <label class="custom-control-label" for="show-options-all">Mais dias livres</label>
                   </div>
 
@@ -56,13 +56,13 @@
 
               <!-- Timetable -->
               <app-timetable *ngIf="generatedSchedules.length !== 0"
-                             [schedules]="generatedSchedules" (scheduleSelected)="scheduleInView = $event"
+                             [schedules]="generatedSchedules" (scheduleSelected)="scheduleInViewID = $event"
                              [keydownEvents]="keyDownSubject.asObservable()"></app-timetable>
 
               <!-- Add btn -->
               <div class="btn-add d-flex flex-column align-items-center">
                 <button class="btn btn-primary mt-4" [ngClass]="{'btn-block': mobileView}"
-                        type="button" (click)="addSchedule(scheduleInView)">Adicionar Horário</button>
+                        type="button" (click)="addSchedule(scheduleInViewID)">Adicionar Horário</button>
                 <a *ngIf="mobileView" href="#selected-schedules"
                    class="d-block text-center mt-4">Ver horários escolhidos</a>
               </div>

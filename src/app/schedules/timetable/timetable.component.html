@@ -1,13 +1,13 @@
-<h5 class="text-center d-block mt-5 mb-3">{{currentScheduleIndex + 1}} / {{schedulesToShow.length}}</h5>
+<h5 class="text-center d-block mt-5 mb-3">{{scheduleInViewIndex + 1}} / {{schedulesToShow.length}}</h5>
 
 <div class="timetable d-flex justify-content-center align-items-center"
   (swipeleft)="next()" (swiperight)="prev()">
 
-  <p *ngIf="!mobileView" class="schedule-ID">Horário ID: {{currentScheduleID + 1}}</p>
-  <p *ngIf="mobileView" class="schedule-ID">HID: {{currentScheduleID + 1}}</p>
+  <p *ngIf="!mobileView" class="schedule-ID">Horário ID: {{scheduleInViewID + 1}}</p>
+  <p *ngIf="mobileView" class="schedule-ID">HID: {{scheduleInViewID + 1}}</p>
 
   <!-- Previous btn -->
-  <fa-icon [ngClass]="{'invisible': schedulesToShow.length < 2 || currentScheduleIndex === 0}"
+  <fa-icon [ngClass]="{'invisible': schedulesToShow.length < 2 || scheduleInViewIndex === 0}"
            [icon]="faCaretLeft" class="prev mr-4" (click)="prev()"></fa-icon>
 
   <div class="schedule">
@@ -142,6 +142,6 @@
   </div> <!-- .schedule -->
 
   <!-- Next btn -->
-  <fa-icon [ngClass]="{'invisible': schedulesToShow.length < 2 || currentScheduleIndex >= schedulesToShow.length - 1}"
+  <fa-icon [ngClass]="{'invisible': schedulesToShow.length < 2 || scheduleInViewIndex >= schedulesToShow.length - 1}"
            [icon]="faCaretRight" class="next ml-4" (click)="next()"></fa-icon>
 </div>

@@ -374,7 +374,7 @@ describe('SchedulesGenerationService', () => {
 
     });
 
-    describe('Sort schedules by most compact', () => {
+    describe('Calculate schedule info', () => {
       const courses = [
         new Course(
           1, 'Course #1', 'C1', [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
@@ -412,6 +412,11 @@ describe('SchedulesGenerationService', () => {
           new Class(courses[1], courses[1].shifts),
           new Class(courses[2], courses[2].shifts),
         ]);
+      });
+
+      it('should calculate proximity level for a schedule correctly', () => {
+        const proximity = service.calculateProximityLevel(schedule);
+        expect(proximity).toBe(2207);
       });
 
       it('should get classes per weekday for a schedule correctly', () => {
@@ -460,23 +465,36 @@ describe('SchedulesGenerationService', () => {
         expect(weekday[0].start < weekday[1].start && weekday[1].start < weekday[2].start).toBeTrue();
       });
 
-      it('should get schedule info on holes correctly', () => {
+      it('should count holes for a schedule correctly', () => {
         const classesPerWeekday = service.getClassesPerWeekday(schedule);
-        const scheduleHolesInfo = service.getScheduleHolesInfo(classesPerWeekday, 0);
+        const holesInfo = service.countHoles(classesPerWeekday);
 
-        expect(scheduleHolesInfo.index).toBe(0);
+        expect(holesInfo.nr_holes).toBe(2);
+        expect(holesInfo.total_duration).toBe(210);
+      });
+
+      it('should calculate number of free days correctly', () => {
+        const classesPerWeekday = service.getClassesPerWeekday(schedule);
+        const freeDays = service.calculateNumberFreeDays(classesPerWeekday);
+
+        expect(freeDays).toBe(2);
+      });
+
+      it('should calculate schedule info correctly', () => {
+        const classesPerWeekday = service.getClassesPerWeekday(schedule);
+        const scheduleHolesInfo = service.countHoles(classesPerWeekday);
+
         expect(scheduleHolesInfo.nr_holes).toBe(2);
         expect(scheduleHolesInfo.total_duration).toBe(210);
       });
+    });
 
-      it('should sort by most compact: only one schedule', () => {
-        const sortedSchedules = service.sortByMostCompact([schedule]);
-        expect(sortedSchedules).toEqual([schedule]);
-      });
+    describe('Sort by most compact', () => {
+      // TODO
+    });
 
-      it('should sort by most compact', () => {
-
-      });
+    describe('Sort by most free days', () => {
+      // TODO
     });
 
     it('should generate schedules successfully: no overlaps', () => {

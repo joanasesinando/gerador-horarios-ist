@@ -7,12 +7,21 @@ import {Class} from '../../_domain/Class';
 import {Course} from '../../_domain/Course';
 import {Shift} from '../../_domain/Shift';
 import {Lesson} from '../../_domain/Lesson';
+
 import {formatTime, getTimestamp} from '../../_util/Time';
+import _ from 'lodash';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SchedulesGenerationService {
+
+  generatedSchedulesInfo: Map<number, { // scheduleID -> info
+    proximity: number,
+    nr_holes: number,
+    total_duration: number,
+    nr_free_days: number
+  }> = new Map<number, {proximity: number; nr_holes: number; total_duration: number; nr_free_days: number}>();
 
   constructor(public logger: LoggerService) { }
 
@@ -23,6 +32,8 @@ export class SchedulesGenerationService {
    *  - get all combinations of shifts for a given course (taking into account hours
    *    per week of each type of class selected); check for overlaps and discard
    *  - combine each to create different schedules; check for overlaps and discard
+   *  - calculate relevant info for all types of sorting for all schedules
+   *  - sort by most compact (default)
    * -------------------------------------------------------------------------------- */
    generateSchedules(courses: Course[]): Schedule[] {
     this.logger.log('generating...');
@@ -37,11 +48,66 @@ export class SchedulesGenerationService {
     // Combine classes
     let schedules: Schedule[] = this.combineClasses(classesPerCourse);
 
+    // Calculate relevant info
+    this.calculateSchedulesInfo(schedules);
+
     // Sort by most compact
     schedules = this.sortByMostCompact(schedules);
 
     this.logger.log('done');
     return schedules;
+  }
+
+  /* --------------------------------------------------------------------------------
+   * Sorts schedules by most compact
+   * --------------------------------------------------------------------------------
+   * [Heuristic]
+   *  - less #holes
+   *  - smaller sum of total duration + proximity level
+   *  - more free days
+   * // TODO: add balanced
+   * -------------------------------------------------------------------------------- */
+  sortByMostCompact(schedules: Schedule[]): Schedule[] {
+    schedules.sort((a, b) => {
+      const aInfo = this.generatedSchedulesInfo.get(a.id);
+      const bInfo = this.generatedSchedulesInfo.get(b.id);
+      const compactSumA = aInfo.total_duration + aInfo.proximity;
+      const compactSumB = bInfo.total_duration + bInfo.proximity;
+
+      if (aInfo.nr_holes === bInfo.nr_holes)
+        return compactSumA === compactSumB ? bInfo.nr_free_days - aInfo.nr_free_days : compactSumA - compactSumB;
+      return aInfo.nr_holes - bInfo.nr_holes;
+    });
+
+    this.logger.log('Sorted by most compact', schedules);
+    return _.cloneDeep(schedules);
+  }
+
+  /* --------------------------------------------------------------------------------
+   * Sorts schedules by most free days
+   * --------------------------------------------------------------------------------
+   * [Heuristic]
+   *  - more free days
+   *  - more compact
+   * // TODO: add balanced
+   * -------------------------------------------------------------------------------- */
+  sortByMostFreeDays(schedules: Schedule[]): Schedule[] {
+    schedules.sort((a, b) => {
+      const aInfo = this.generatedSchedulesInfo.get(a.id);
+      const bInfo = this.generatedSchedulesInfo.get(b.id);
+      const compactSumA = aInfo.total_duration + aInfo.proximity;
+      const compactSumB = bInfo.total_duration + bInfo.proximity;
+
+      if (bInfo.nr_free_days === aInfo.nr_free_days) {
+        if (aInfo.nr_holes === bInfo.nr_holes)
+          return compactSumA === compactSumB ? bInfo.nr_free_days - aInfo.nr_free_days : compactSumA - compactSumB;
+        return aInfo.nr_holes - bInfo.nr_holes;
+      }
+      return bInfo.nr_free_days - aInfo.nr_free_days;
+    });
+
+    this.logger.log('Sorted by most free days', schedules);
+    return _.cloneDeep(schedules);
   }
 
   combineShifts(course: Course): Class[] {
@@ -151,56 +217,33 @@ export class SchedulesGenerationService {
     return false;
   }
 
-  /* --------------------------------------------------------------------------------
-   * Sorts schedules by most compact, i.e. with less holes between classes
-   * --------------------------------------------------------------------------------
-   * [Algorithm]
-   *  - Get number of holes and total duration of holes per week for each schedule
-   *  - sort by least number of holes; if same number of holes, sort by least
-   *    total duration of holes
-   * -------------------------------------------------------------------------------- */
-  sortByMostCompact(schedules: Schedule[]): Schedule[] {
-    const schedulesInfo: {index: number, proximity: number, nr_holes: number, total_duration: number}[] = [];
-
-    // Get #holes & total_duration of holes
-    for (let i = 0; i < schedules.length; i++) {
-      const schedule = schedules[i];
-      const allLessons = this.getAllLessons(schedule);
-      const proximity = this.calculateProximityLevel(allLessons);
+  calculateSchedulesInfo(schedules: Schedule[]): void {
+    for (const schedule of schedules) {
+      const proximity = this.calculateProximityLevel(schedule);
       const classesPerWeekday: Map<number, {start: number, end: number}[]> = this.getClassesPerWeekday(schedule);
-      const holesInfo = this.getScheduleHolesInfo(classesPerWeekday, i);
-      schedulesInfo.push({index: holesInfo.index, proximity, nr_holes: holesInfo.nr_holes, total_duration: holesInfo.total_duration});
+      const holesInfo = this.countHoles(classesPerWeekday);
+      const freeDays = this.calculateNumberFreeDays(classesPerWeekday);
+
+      this.generatedSchedulesInfo.set(schedule.id, {
+        proximity,
+        nr_holes: holesInfo.nr_holes,
+        total_duration: holesInfo.total_duration,
+        nr_free_days: freeDays
+      });
     }
-
-    // Sort
-    schedulesInfo.sort((a, b) => {
-      if (a.nr_holes === b.nr_holes) {
-        return a.proximity === b.proximity ? a.total_duration - b.total_duration : a.proximity - b.proximity;
-      }
-      return a.nr_holes - b.nr_holes;
-    });
-
-    const sortedSchedules: Schedule[] = [];
-    let id = 0;
-    schedulesInfo.forEach(info => {
-      schedules[info.index].id = id++;
-      sortedSchedules.push(schedules[info.index]);
-    });
-    return sortedSchedules;
   }
 
-  getScheduleHolesInfo(classesPerWeekday: Map<number, {start: number, end: number}[]>, index: number):
-    {index: number, nr_holes: number, total_duration: number} {
-
+  countHoles(classesPerWeekday: Map<number, {start: number, end: number}[]>): {nr_holes: number, total_duration: number} {
     let numberOfHoles = 0;
     let totalDuration = 0;
-    for (let i = 1; i <= 7; i++) {
-      if (classesPerWeekday.has(i) && classesPerWeekday.get(i).length > 1) {
-        const weekday = classesPerWeekday.get(i);
 
-        for (let j = 0; j < weekday.length - 1; j++) {
-          const current = weekday[j];
-          const next = weekday[j + 1];
+    for (let i = 1; i <= 5; i++) {
+      if (classesPerWeekday.has(i) && classesPerWeekday.get(i).length > 1) {
+        const classes = classesPerWeekday.get(i);
+
+        for (let j = 0; j < classes.length - 1; j++) {
+          const current = classes[j];
+          const next = classes[j + 1];
 
           if (next.start > current.end) { // there's a hole
             numberOfHoles++;
@@ -209,38 +252,42 @@ export class SchedulesGenerationService {
         }
       }
     }
-    return {index, nr_holes: numberOfHoles, total_duration: totalDuration};
+    return {nr_holes: numberOfHoles, total_duration: totalDuration};
   }
 
   getClassesPerWeekday(schedule: Schedule): Map<number, {start: number, end: number}[]> {
-    const resMap = new Map<number, {start: number, end: number}[]>();
+    const classesPerWeekday = new Map<number, {start: number, end: number}[]>();
+
     schedule.classes.forEach(cl => {
       cl.shifts.forEach(shift => {
         shift.lessons.forEach(lesson => {
           const key = lesson.start.getDay();
-          const value = {start: getTimestamp(formatTime(lesson.start)), end: getTimestamp(formatTime(lesson.end))};
-          resMap.has(key) ? resMap.get(key).push(value) : resMap.set(key, [value]);
+          const value = { start: getTimestamp(formatTime(lesson.start)), end: getTimestamp(formatTime(lesson.end)) };
+          classesPerWeekday.has(key) ? classesPerWeekday.get(key).push(value) : classesPerWeekday.set(key, [value]);
         });
       });
     });
 
-    for (let i = 1; i <= 7; i++) {
-      if (resMap.has(i) && resMap.get(i).length > 1) {
-        resMap.get(i).sort((a, b) => a.start - b.start);
+    // Sort by start time
+    for (let i = 1; i <= 5; i++) {
+      if (classesPerWeekday.has(i) && classesPerWeekday.get(i).length > 1) {
+        classesPerWeekday.get(i).sort((a, b) => a.start - b.start);
       }
     }
-    return resMap;
+    return classesPerWeekday;
   }
 
-  calculateProximityLevel(lessons: Lesson[]): number {
+  calculateProximityLevel(schedule: Schedule): number {
+    const allLessons: Lesson[] = this.getAllLessons(schedule);
     let proximity = 0;
-    for (let i = 0; i < lessons.length - 1; i++) {
-      const lesson1Start = getTimestamp(formatTime(lessons[i].start));
-      const lesson1Day = lessons[i].start.getDay();
 
-      for (let j = i + 1; j < lessons.length; j++) {
-        const lesson2Start = getTimestamp(formatTime(lessons[j].start));
-        const lesson2Day = lessons[j].start.getDay();
+    for (let i = 0; i < allLessons.length - 1; i++) {
+      const lesson1Start = getTimestamp(formatTime(allLessons[i].start));
+      const lesson1Day = allLessons[i].start.getDay();
+
+      for (let j = i + 1; j < allLessons.length; j++) {
+        const lesson2Start = getTimestamp(formatTime(allLessons[j].start));
+        const lesson2Day = allLessons[j].start.getDay();
         proximity += Math.abs(lesson1Start - lesson2Start) + Math.abs(lesson1Day - lesson2Day);
       }
     }
@@ -257,5 +304,13 @@ export class SchedulesGenerationService {
       });
     });
     return lessons;
+  }
+
+  calculateNumberFreeDays(classesPerWeekday: Map<number, {start: number, end: number}[]>): number {
+    let freeDays = 0;
+    for (let i = 1; i <= 5; i++) {
+      if (!classesPerWeekday.has(i) || classesPerWeekday.get(i).length === 0) freeDays++;
+    }
+    return freeDays;
   }
 }
