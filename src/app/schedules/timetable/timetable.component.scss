@@ -63,6 +63,14 @@ Primary style
 
 .timetable {
   touch-action: pan-y !important; // allow scrolling bc of hammerjs
+  position: relative;
+
+  .schedule-ID {
+    font-size: .8rem;
+    position: absolute;
+    top: -1.5rem;
+    right: 0;
+  }
 }
 
 .single-event-div {

@@ -6,6 +6,8 @@ import {Schedule} from '../../_domain/Schedule';
 import {Class} from '../../_domain/Class';
 import {Course} from '../../_domain/Course';
 import {Shift} from '../../_domain/Shift';
+import {Lesson} from '../../_domain/Lesson';
+import {formatTime, getTimestamp} from '../../_util/Time';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +35,10 @@ export class SchedulesGenerationService {
     }
 
     // Combine classes
-    const schedules: Schedule[] = this.combineClasses(classesPerCourse);
+    let schedules: Schedule[] = this.combineClasses(classesPerCourse);
+
+    // Sort by most compact
+    schedules = this.sortByMostCompact(schedules);
 
     this.logger.log('done');
     return schedules;
@@ -144,5 +149,113 @@ export class SchedulesGenerationService {
       }
     }
     return false;
+  }
+
+  /* --------------------------------------------------------------------------------
+   * Sorts schedules by most compact, i.e. with less holes between classes
+   * --------------------------------------------------------------------------------
+   * [Algorithm]
+   *  - Get number of holes and total duration of holes per week for each schedule
+   *  - sort by least number of holes; if same number of holes, sort by least
+   *    total duration of holes
+   * -------------------------------------------------------------------------------- */
+  sortByMostCompact(schedules: Schedule[]): Schedule[] {
+    const schedulesInfo: {index: number, proximity: number, nr_holes: number, total_duration: number}[] = [];
+
+    // Get #holes & total_duration of holes
+    for (let i = 0; i < schedules.length; i++) {
+      const schedule = schedules[i];
+      const allLessons = this.getAllLessons(schedule);
+      const proximity = this.calculateProximityLevel(allLessons);
+      const classesPerWeekday: Map<number, {start: number, end: number}[]> = this.getClassesPerWeekday(schedule);
+      const holesInfo = this.getScheduleHolesInfo(classesPerWeekday, i);
+      schedulesInfo.push({index: holesInfo.index, proximity, nr_holes: holesInfo.nr_holes, total_duration: holesInfo.total_duration});
+    }
+
+    // Sort
+    schedulesInfo.sort((a, b) => {
+      if (a.nr_holes === b.nr_holes) {
+        return a.proximity === b.proximity ? a.total_duration - b.total_duration : a.proximity - b.proximity;
+      }
+      return a.nr_holes - b.nr_holes;
+    });
+
+    const sortedSchedules: Schedule[] = [];
+    let id = 0;
+    schedulesInfo.forEach(info => {
+      schedules[info.index].id = id++;
+      sortedSchedules.push(schedules[info.index]);
+    });
+    return sortedSchedules;
+  }
+
+  getScheduleHolesInfo(classesPerWeekday: Map<number, {start: number, end: number}[]>, index: number):
+    {index: number, nr_holes: number, total_duration: number} {
+
+    let numberOfHoles = 0;
+    let totalDuration = 0;
+    for (let i = 1; i <= 7; i++) {
+      if (classesPerWeekday.has(i) && classesPerWeekday.get(i).length > 1) {
+        const weekday = classesPerWeekday.get(i);
+
+        for (let j = 0; j < weekday.length - 1; j++) {
+          const current = weekday[j];
+          const next = weekday[j + 1];
+
+          if (next.start > current.end) { // there's a hole
+            numberOfHoles++;
+            totalDuration += next.start - current.end;
+          }
+        }
+      }
+    }
+    return {index, nr_holes: numberOfHoles, total_duration: totalDuration};
+  }
+
+  getClassesPerWeekday(schedule: Schedule): Map<number, {start: number, end: number}[]> {
+    const resMap = new Map<number, {start: number, end: number}[]>();
+    schedule.classes.forEach(cl => {
+      cl.shifts.forEach(shift => {
+        shift.lessons.forEach(lesson => {
+          const key = lesson.start.getDay();
+          const value = {start: getTimestamp(formatTime(lesson.start)), end: getTimestamp(formatTime(lesson.end))};
+          resMap.has(key) ? resMap.get(key).push(value) : resMap.set(key, [value]);
+        });
+      });
+    });
+
+    for (let i = 1; i <= 7; i++) {
+      if (resMap.has(i) && resMap.get(i).length > 1) {
+        resMap.get(i).sort((a, b) => a.start - b.start);
+      }
+    }
+    return resMap;
+  }
+
+  calculateProximityLevel(lessons: Lesson[]): number {
+    let proximity = 0;
+    for (let i = 0; i < lessons.length - 1; i++) {
+      const lesson1Start = getTimestamp(formatTime(lessons[i].start));
+      const lesson1Day = lessons[i].start.getDay();
+
+      for (let j = i + 1; j < lessons.length; j++) {
+        const lesson2Start = getTimestamp(formatTime(lessons[j].start));
+        const lesson2Day = lessons[j].start.getDay();
+        proximity += Math.abs(lesson1Start - lesson2Start) + Math.abs(lesson1Day - lesson2Day);
+      }
+    }
+    return proximity;
+  }
+
+  getAllLessons(schedule: Schedule): Lesson[] {
+    const lessons: Lesson[] = [];
+    schedule.classes.forEach(cl => {
+      cl.shifts.forEach(shift => {
+        shift.lessons.forEach(lesson => {
+          lessons.push(lesson);
+        });
+      });
+    });
+    return lessons;
   }
 }
