@@ -1,12 +1,12 @@
 <div class="container-fluid" tabindex="0" autofocus
      (keydown.arrowRight)="onKeyDownArrowRight()" (keydown.arrowLeft)="onKeyDownArrowLeft()">
 
-  <div *ngIf="spinner" class="loading-page text-center">
+  <div *ngIf="spinners.loadingPage" class="loading-page text-center">
     <div class="spinner-border text-primary mb-4" role="status"></div>
     <h5>Generating . . .</h5>
   </div>
 
-  <div *ngIf="!spinner" class="row no-gutter">
+  <div *ngIf="!spinners.loadingPage" class="row no-gutter">
 
     <!-- Main Content -->
     <div class="main-content col-lg-9">
@@ -29,25 +29,30 @@
 
               <!-- Show options -->
               <div *ngIf="generatedSchedules.length > 1" class="show-options d-lg-flex">
-                <span class="mr-lg-4 mb-2 mb-lg-0"><b>Ordenar por:</b></span>
+                <div class="position-relative">
+                  <div *ngIf="spinners.sorting" class="loading-sort spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                  </div>
+                  <span class="mr-lg-4 mb-2 mb-lg-0"><b>Ordenar por:</b></span>
+                </div>
 
                 <div class="options">
 
                   <div class="custom-control custom-radio custom-control-inline mr-4 mb-2 mt-2 mt-lg-0">
                     <input type="radio" id="show-options-100Compact" name="show-options"
-                           class="custom-control-input" [checked]="true" (change)="pickViewOption('compact')">
+                           class="custom-control-input" [checked]="true" (click)="pickViewOption('compact')">
                     <label class="custom-control-label" for="show-options-100Compact">Mais compacto</label>
                   </div>
 
                   <div class="custom-control custom-radio custom-control-inline mr-4 mb-2">
                     <input type="radio" id="show-options-500Compact" name="show-options"
-                           class="custom-control-input" [checked]="false" (change)="pickViewOption('balanced')">
+                           class="custom-control-input" [checked]="false" (click)="pickViewOption('balanced')">
                     <label class="custom-control-label" for="show-options-500Compact">Mais equilibrado</label>
                   </div>
 
                   <div class="custom-control custom-radio custom-control-inline mr-0 mb-2">
                     <input type="radio" id="show-options-all" name="show-options"
-                           class="custom-control-input" [checked]="false" (change)="pickViewOption('free-days')">
+                           class="custom-control-input" [checked]="false" (click)="pickViewOption('free-days')">
                     <label class="custom-control-label" for="show-options-all">Mais dias livres</label>
                   </div>
 

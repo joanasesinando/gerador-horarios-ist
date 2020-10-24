@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import {LoggerService} from '../../_util/logger.service';
+import {StateService} from '../state/state.service';
 
 import {Schedule} from '../../_domain/Schedule';
 import {Class} from '../../_domain/Class';
@@ -23,7 +24,7 @@ export class SchedulesGenerationService {
     nr_free_days: number
   }> = new Map<number, {proximity: number; nr_holes: number; total_duration: number; nr_free_days: number}>();
 
-  constructor(public logger: LoggerService) { }
+  constructor(public logger: LoggerService, private stateService: StateService) { }
 
   /* --------------------------------------------------------------------------------
    * Returns generated schedules based on user selected courses.
@@ -54,6 +55,9 @@ export class SchedulesGenerationService {
     // Sort by most compact
     schedules = this.sortByMostCompact(schedules);
 
+    // Clean previous states
+    this.stateService.schedulesSortedByMostFreeDays = null;
+
     this.logger.log('done');
     return schedules;
   }
@@ -78,6 +82,9 @@ export class SchedulesGenerationService {
         return compactSumA === compactSumB ? bInfo.nr_free_days - aInfo.nr_free_days : compactSumA - compactSumB;
       return aInfo.nr_holes - bInfo.nr_holes;
     });
+
+    // Save state
+    this.stateService.schedulesSortedByMostCompact = _.cloneDeep(schedules);
 
     this.logger.log('Sorted by most compact', schedules);
     return _.cloneDeep(schedules);
@@ -105,6 +112,9 @@ export class SchedulesGenerationService {
       }
       return bInfo.nr_free_days - aInfo.nr_free_days;
     });
+
+    // Save state
+    this.stateService.schedulesSortedByMostFreeDays = _.cloneDeep(schedules);
 
     this.logger.log('Sorted by most free days', schedules);
     return _.cloneDeep(schedules);

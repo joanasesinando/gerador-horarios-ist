@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import {Course} from '../../_domain/Course';
 import {Degree} from '../../_domain/Degree';
+import {Schedule} from '../../_domain/Schedule';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,9 @@ export class StateService {
   private _academicTermSelected: string = null;
   private _degreeIDSelected: number = null;
   private _selectedCourses: Course[] = null;
+
+  private _schedulesSortedByMostCompact: Schedule[] = null;
+  private _schedulesSortedByMostFreeDays: Schedule[] = null;
 
   constructor() { }
 
@@ -38,6 +42,12 @@ export class StateService {
   get degreeIDSelected(): number { return this._degreeIDSelected; }
   set degreeIDSelected(value: number) { this._degreeIDSelected = value; }
 
+  get schedulesSortedByMostCompact(): Schedule[] { return this._schedulesSortedByMostCompact; }
+  set schedulesSortedByMostCompact(value: Schedule[]) { this._schedulesSortedByMostCompact = value; }
+
+  get schedulesSortedByMostFreeDays(): Schedule[] { return this._schedulesSortedByMostFreeDays; }
+  set schedulesSortedByMostFreeDays(value: Schedule[]) { this._schedulesSortedByMostFreeDays = value; }
+
   hasStateSaved(): boolean {
     return this._academicTermsRepository !== null &&
            this._degreesRepository.size !== 0 &&
@@ -54,5 +64,13 @@ export class StateService {
       }
       return false;
     }
+  }
+
+  hasSchedulesSortedByMostCompact(): boolean {
+    return this._schedulesSortedByMostCompact !== null;
+  }
+
+  hasSchedulesSortedByMostFreeDays(): boolean {
+    return this._schedulesSortedByMostFreeDays !== null;
   }
 }

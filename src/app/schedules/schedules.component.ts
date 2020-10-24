@@ -11,6 +11,8 @@ import {PdfGenerationService} from '../_services/pdf-generation/pdf-generation.s
 import {Course} from '../_domain/Course';
 import {Schedule} from '../_domain/Schedule';
 
+import _ from 'lodash';
+
 
 @Component({
   selector: 'app-schedules',
@@ -25,7 +27,11 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
   scheduleInViewID: number;
   schedulesPicked: Schedule[] = [];
 
-  spinner = true;
+  spinners = {
+    loadingPage: true,
+    sorting: false
+  };
+
   mobileView = false;
   keyDownSubject: Subject<string> = new Subject<string>();
 
@@ -80,25 +86,34 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
 
       // Fake staling for UX
       generationTime != null && generationTime < 1000 ?
-        setTimeout(() => this.spinner = false, 1000) : this.spinner = false;
+        setTimeout(() => this.spinners.loadingPage = false, 1000) : this.spinners.loadingPage = false;
     }, 0);
   }
 
   pickViewOption(option: string): void {
+    this.spinners.sorting = true;
     switch (option) {
       case 'balanced':
         // TODO
         break;
 
       case 'free-days':
-        this.generatedSchedules = this.generationService.sortByMostFreeDays(this.generatedSchedules);
+        this.generatedSchedules = this.stateService.hasSchedulesSortedByMostFreeDays() ?
+          this.stateService.schedulesSortedByMostFreeDays :
+          this.generationService.sortByMostFreeDays(this.generatedSchedules);
+
+        if (this.generationService.generatedSchedulesInfo.get(this.generatedSchedules[0].id).nr_free_days === 0)
+          this.alertService.showAlert('Atenção', 'Não existe nenhum horário com dias livres', 'warning');
         break;
 
       case 'compact':
       default:
-        this.generatedSchedules = this.generationService.sortByMostCompact(this.generatedSchedules);
+        this.generatedSchedules = this.stateService.hasSchedulesSortedByMostCompact() ?
+          this.stateService.schedulesSortedByMostCompact :
+          this.generationService.sortByMostCompact(this.generatedSchedules);
         break;
     }
+    this.spinners.sorting = false;
     this.logger.log('Changed view to ' + option);
   }
 

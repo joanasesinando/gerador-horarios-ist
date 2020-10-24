@@ -98,7 +98,7 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
           temp.push(this.schedules[key]);
         }
       }
-      this.schedules = _.cloneDeep(temp);
+      this.schedules = temp;
 
       this.schedulesToShow = this.filterSchedulesBasedOnPinnedShifts();
       this.scheduleInViewIndex = 0;
@@ -106,7 +106,6 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
 
       // Update timetable
       if (this.schedulesToShow.length > 0) {
-        this.createEvents(this.schedulesToShow);
         this.organizeEventsPerWeekday(this.scheduleInViewID);
       }
     }
@@ -229,7 +228,7 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   filterSchedulesBasedOnPinnedShifts(): Schedule[] { // TODO: testing
-    let filteredSchedules = _.cloneDeep(this.schedules);
+    let filteredSchedules = this.schedules;
 
     this.pinnedShifts.forEach(pinnedShift => {
       const temp: Schedule[] = [];
@@ -242,7 +241,7 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
         });
       });
 
-      filteredSchedules = _.cloneDeep(temp);
+      filteredSchedules = temp;
     });
     return filteredSchedules;
   }
