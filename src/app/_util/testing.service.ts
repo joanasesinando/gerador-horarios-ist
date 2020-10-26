@@ -34,7 +34,7 @@ export class TestingService {
    *  - start: HH:mm
    *  - end: HH:mm
    * -------------------------------------------------------------------------------- */
-  createShiftsOnlyCourse(shifts: Shift[]): Course {
+  createShiftsOnlyCourse(shifts: Shift[]): Course { // FIXME: if not used removed
     return new Course(this.COURSE_ID, this.COURSE_NAME, this.COURSE_ACRONYM, undefined, undefined, shifts);
   }
 
@@ -46,7 +46,7 @@ export class TestingService {
    *  - start: HH:mm
    *  - end: HH:mm
    * -------------------------------------------------------------------------------- */
-  createTimeOnlyShift(times: {weekday: string, start: string, end: string}[]): Shift {
+  createTimeOnlyShift(times: {weekday: string, start: string, end: string}[]): Shift { // FIXME: if not used removed
     const lessons: Lesson[] = [];
     times.forEach(time => {
       lessons.push(this.createTimeOnlyLesson(time.weekday, time.start, time.end));

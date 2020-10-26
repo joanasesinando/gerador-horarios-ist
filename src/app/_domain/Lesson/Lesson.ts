@@ -1,7 +1,7 @@
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 
-import {formatTime, getMinifiedWeekday} from '../../_util/Time';
+import {formatTime, getMinifiedWeekday, getTimestamp} from '../../_util/Time';
 
 
 export class Lesson {
@@ -29,18 +29,13 @@ export class Lesson {
     }
 
     overlap(other: Lesson): boolean {
-      function convertDateToTime(date: Date): number {
-        const min = date.getMinutes() === 0 ? 0 : (date.getMinutes() * 0.5) / 30;
-        return date.getHours() + min;
-      }
-
       const weekDay = this.start.getDay();
-      const startTime = convertDateToTime(this.start);
-      const endTime = convertDateToTime(this.end);
+      const startTime = getTimestamp(formatTime(this.start));
+      const endTime = getTimestamp(formatTime(this.end));
 
       const otherWeekDay = other.start.getDay();
-      const otherStartTime = convertDateToTime(other.start);
-      const otherEndTime = convertDateToTime(other.end);
+      const otherStartTime = getTimestamp(formatTime(other.start));
+      const otherEndTime = getTimestamp(formatTime(other.end));
 
       return weekDay === otherWeekDay && (
              (startTime >= otherStartTime && startTime < otherEndTime) ||
@@ -51,17 +46,9 @@ export class Lesson {
     }
 
     print(language: string): string {
-      let s = '';
       const weekday = this.start.getDay();
-
-      if (language === 'pt-PT') {
-        s += getMinifiedWeekday(weekday, 'pt-PT');
-      } else {
-        s += getMinifiedWeekday(weekday, 'en-GB');
-      }
-
-      s += ', ' + formatTime(this.start) + ' - ' + formatTime(this.end);
-      return s;
+      const minifiedWeekday = language === 'pt-PT' ? getMinifiedWeekday(weekday, 'pt-PT') : getMinifiedWeekday(weekday, 'en-GB');
+      return minifiedWeekday + ', ' + formatTime(this.start) + ' - ' + formatTime(this.end);
     }
 
     equal(other: Lesson): boolean {
