@@ -1,5 +1,6 @@
 import {ClassType} from '../ClassType/ClassType';
 import {Lesson} from '../Lesson/Lesson';
+import * as firebase from 'firebase';
 
 
 export class Shift {
@@ -22,11 +23,11 @@ export class Shift {
   get campus(): string { return this._campus; }
   set campus(value: string) { this._campus = value; }
 
-  shiftConverter(): {} { // TODO: complete types
-    const lessons: {}[] = [];
-    for (const lesson of this.lessons) {
-        lessons.push(lesson.lessonConverter());
-    }
+  shiftConverter(): {name: string, type: string, lessons: {}[], campus: string} {
+    const lessons: {start: firebase.firestore.Timestamp, end: firebase.firestore.Timestamp, room: string, campus: string}[] = [];
+    this.lessons.forEach(lesson => {
+      lessons.push(lesson.lessonConverter());
+    });
     return {
         name: this.name,
         type: this.type,

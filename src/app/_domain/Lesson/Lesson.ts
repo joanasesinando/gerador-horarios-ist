@@ -19,7 +19,7 @@ export class Lesson {
     get campus(): string { return this._campus; }
     set campus(value: string) { this._campus = value; }
 
-    lessonConverter(): {} {
+    lessonConverter(): {start: firebase.firestore.Timestamp, end: firebase.firestore.Timestamp, room: string, campus: string} {
         return {
             start: firebase.firestore.Timestamp.fromDate(this.start),
             end: firebase.firestore.Timestamp.fromDate(this.end),

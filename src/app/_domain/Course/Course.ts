@@ -44,14 +44,15 @@ export class Course {
     return this.types !== undefined &&
       this.campus !== undefined &&
       this.shifts !== undefined &&
-      this.courseLoads !== undefined;
+      this.courseLoads !== undefined &&
+      this.degree !== undefined;
   }
 
-  convertShifts(): {}[] { // TODO: complete types
-    const shifts: {}[] = [];
-    for (const shift of this.shifts) {
+  convertShifts(): {name: string, type: string, lessons: {}[], campus: string}[] {
+    const shifts: {name: string, type: string, lessons: {}[], campus: string}[] = [];
+    this.shifts.forEach(shift => {
       shifts.push(shift.shiftConverter());
-    }
+    });
     return shifts;
   }
 }
