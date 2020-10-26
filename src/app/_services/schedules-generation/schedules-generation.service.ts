@@ -21,8 +21,9 @@ export class SchedulesGenerationService {
     proximity: number,
     nr_holes: number,
     total_duration: number,
+    total_deviation: number,
     nr_free_days: number
-  }> = new Map<number, {proximity: number; nr_holes: number; total_duration: number; nr_free_days: number}>();
+  }> = new Map<number, {proximity: number, nr_holes: number, total_duration: number, total_deviation: number, nr_free_days: number}>();
 
   constructor(public logger: LoggerService, private stateService: StateService) { }
 
@@ -65,11 +66,11 @@ export class SchedulesGenerationService {
   /* --------------------------------------------------------------------------------
    * Sorts schedules by most compact
    * --------------------------------------------------------------------------------
-   * [Heuristic]
+   * [Heuristic Preference Order]
    *  - less #holes
    *  - smaller sum of total duration + proximity level
+   *  - more balanced
    *  - more free days
-   * // TODO: add balanced
    * -------------------------------------------------------------------------------- */
   sortByMostCompact(schedules: Schedule[]): Schedule[] {
     schedules.sort((a, b) => {
@@ -78,8 +79,12 @@ export class SchedulesGenerationService {
       const compactSumA = aInfo.total_duration + aInfo.proximity;
       const compactSumB = bInfo.total_duration + bInfo.proximity;
 
-      if (aInfo.nr_holes === bInfo.nr_holes)
-        return compactSumA === compactSumB ? bInfo.nr_free_days - aInfo.nr_free_days : compactSumA - compactSumB;
+      if (aInfo.nr_holes === bInfo.nr_holes) {
+        if (compactSumA === compactSumB)
+          return aInfo.total_deviation === bInfo.total_deviation ?
+            bInfo.nr_free_days - aInfo.nr_free_days : aInfo.total_deviation - bInfo.total_deviation;
+        return compactSumA - compactSumB;
+      }
       return aInfo.nr_holes - bInfo.nr_holes;
     });
 
@@ -91,12 +96,42 @@ export class SchedulesGenerationService {
   }
 
   /* --------------------------------------------------------------------------------
+   * Sorts schedules by most balanced
+   * --------------------------------------------------------------------------------
+   * [Heuristic]
+   *  - more balanced
+   *  - more compact
+   *  - more free days
+   * -------------------------------------------------------------------------------- */
+  sortByMostBalanced(schedules: Schedule[]): Schedule[] {
+    schedules.sort((a, b) => {
+      const aInfo = this.generatedSchedulesInfo.get(a.id);
+      const bInfo = this.generatedSchedulesInfo.get(b.id);
+      const compactSumA = aInfo.total_duration + aInfo.proximity;
+      const compactSumB = bInfo.total_duration + bInfo.proximity;
+
+      if (aInfo.total_deviation === bInfo.total_deviation) {
+        if (aInfo.nr_holes === bInfo.nr_holes)
+          return compactSumA === compactSumB ? bInfo.nr_free_days - aInfo.nr_free_days : compactSumA - compactSumB;
+        return aInfo.nr_holes - bInfo.nr_holes;
+      }
+      return aInfo.total_deviation - bInfo.total_deviation;
+    });
+
+    // Save state
+    this.stateService.schedulesSortedByMostBalanced = _.cloneDeep(schedules);
+
+    this.logger.log('Sorted by most balanced', schedules);
+    return _.cloneDeep(schedules);
+  }
+
+  /* --------------------------------------------------------------------------------
    * Sorts schedules by most free days
    * --------------------------------------------------------------------------------
    * [Heuristic]
    *  - more free days
    *  - more compact
-   * // TODO: add balanced
+   *  - more balanced
    * -------------------------------------------------------------------------------- */
   sortByMostFreeDays(schedules: Schedule[]): Schedule[] {
     schedules.sort((a, b) => {
@@ -105,9 +140,10 @@ export class SchedulesGenerationService {
       const compactSumA = aInfo.total_duration + aInfo.proximity;
       const compactSumB = bInfo.total_duration + bInfo.proximity;
 
-      if (bInfo.nr_free_days === aInfo.nr_free_days) {
+      if (aInfo.nr_free_days === bInfo.nr_free_days) {
         if (aInfo.nr_holes === bInfo.nr_holes)
-          return compactSumA === compactSumB ? bInfo.nr_free_days - aInfo.nr_free_days : compactSumA - compactSumB;
+          return compactSumA === compactSumB ?
+            aInfo.total_deviation - bInfo.total_deviation : compactSumA - compactSumB;
         return aInfo.nr_holes - bInfo.nr_holes;
       }
       return bInfo.nr_free_days - aInfo.nr_free_days;
@@ -232,12 +268,14 @@ export class SchedulesGenerationService {
       const proximity = this.calculateProximityLevel(schedule);
       const classesPerWeekday: Map<number, {start: number, end: number}[]> = this.getClassesPerWeekday(schedule);
       const holesInfo = this.countHoles(classesPerWeekday);
+      const deviation = this.calculateDeviation(classesPerWeekday);
       const freeDays = this.calculateNumberFreeDays(classesPerWeekday);
 
       this.generatedSchedulesInfo.set(schedule.id, {
         proximity,
         nr_holes: holesInfo.nr_holes,
         total_duration: holesInfo.total_duration,
+        total_deviation: deviation,
         nr_free_days: freeDays
       });
     }
@@ -314,6 +352,31 @@ export class SchedulesGenerationService {
       });
     });
     return lessons;
+  }
+
+  calculateDeviation(classesPerWeekday: Map<number, {start: number, end: number}[]>): number {
+    const hoursPerWeekDay: Map<number, number> = new Map();
+    let totalHoursPerWeek = 0;
+
+    // Get hours per weekday
+    classesPerWeekday.forEach((value, key) => {
+      let total = 0;
+      value.forEach(classTimes => {
+        total += classTimes.end - classTimes.start;
+      });
+      hoursPerWeekDay.set(key, total);
+      totalHoursPerWeek += total;
+    });
+
+    // Calculate Balanced Index
+    const balancedIndex = totalHoursPerWeek / 5;
+
+    // Calculate deviation from Balanced Index
+    let deviation = 0;
+    hoursPerWeekDay.forEach(value => {
+      deviation += Math.abs(balancedIndex - value);
+    });
+    return deviation;
   }
 
   calculateNumberFreeDays(classesPerWeekday: Map<number, {start: number, end: number}[]>): number {

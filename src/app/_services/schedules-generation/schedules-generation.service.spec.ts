@@ -1,12 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 
 import { SchedulesGenerationService } from './schedules-generation.service';
+
 import {Course} from '../../_domain/Course';
 import {ClassType} from '../../_domain/ClassType';
 import {Shift} from '../../_domain/Shift';
 import {Lesson} from '../../_domain/Lesson';
 import {Class} from '../../_domain/Class';
 import {Schedule} from '../../_domain/Schedule';
+
 import {formatTime, getTimestamp} from '../../_util/Time';
 
 describe('SchedulesGenerationService', () => {
@@ -493,6 +495,10 @@ describe('SchedulesGenerationService', () => {
       // TODO
     });
 
+    describe('Sort by most balanced', () => {
+      // TODO
+    });
+
     describe('Sort by most free days', () => {
       // TODO
     });
@@ -618,7 +624,7 @@ describe('SchedulesGenerationService', () => {
     });
 
     it('should generate schedules successfully: sorted by most compact', () => {
-
+      // TODO
     });
   });
 

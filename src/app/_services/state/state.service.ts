@@ -20,6 +20,7 @@ export class StateService {
   private _selectedCourses: Course[] = null;
 
   private _schedulesSortedByMostCompact: Schedule[] = null;
+  private _schedulesSortedByMostBalanced: Schedule[] = null;
   private _schedulesSortedByMostFreeDays: Schedule[] = null;
 
   constructor() { }
@@ -45,6 +46,9 @@ export class StateService {
   get schedulesSortedByMostCompact(): Schedule[] { return this._schedulesSortedByMostCompact; }
   set schedulesSortedByMostCompact(value: Schedule[]) { this._schedulesSortedByMostCompact = value; }
 
+  get schedulesSortedByMostBalanced(): Schedule[] { return this._schedulesSortedByMostBalanced; }
+  set schedulesSortedByMostBalanced(value: Schedule[]) { this._schedulesSortedByMostBalanced = value; }
+
   get schedulesSortedByMostFreeDays(): Schedule[] { return this._schedulesSortedByMostFreeDays; }
   set schedulesSortedByMostFreeDays(value: Schedule[]) { this._schedulesSortedByMostFreeDays = value; }
 
@@ -68,6 +72,10 @@ export class StateService {
 
   hasSchedulesSortedByMostCompact(): boolean {
     return this._schedulesSortedByMostCompact !== null;
+  }
+
+  hasSchedulesSortedByMostBalanced(): boolean {
+    return this._schedulesSortedByMostBalanced !== null;
   }
 
   hasSchedulesSortedByMostFreeDays(): boolean {

@@ -11,8 +11,6 @@ import {PdfGenerationService} from '../_services/pdf-generation/pdf-generation.s
 import {Course} from '../_domain/Course';
 import {Schedule} from '../_domain/Schedule';
 
-import _ from 'lodash';
-
 
 @Component({
   selector: 'app-schedules',
@@ -94,7 +92,9 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     this.spinners.sorting = true;
     switch (option) {
       case 'balanced':
-        // TODO
+        this.generatedSchedules = this.stateService.hasSchedulesSortedByMostBalanced() ?
+          this.stateService.schedulesSortedByMostBalanced :
+          this.generationService.sortByMostBalanced(this.generatedSchedules);
         break;
 
       case 'free-days':
