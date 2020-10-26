@@ -1,4 +1,4 @@
-import {Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
 import {Observable, Subscription} from 'rxjs';
 
 import {LoggerService} from '../../_util/logger.service';
@@ -20,7 +20,7 @@ import {formatTime, getTimestamp, getWeekday} from '../../_util/Time';
   templateUrl: './timetable.component.html',
   styleUrls: ['./timetable.component.scss']
 })
-export class TimetableComponent implements OnInit, OnDestroy {
+export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
 
   SLOT_HEIGHT_DESKTOP = 27;
   SLOT_HEIGHT_MOBILE = 25;
@@ -32,8 +32,8 @@ export class TimetableComponent implements OnInit, OnDestroy {
   @Input() keydownEvents: Observable<string>;
   @Output() scheduleSelected = new EventEmitter<number>();
 
-  currentScheduleIndex = 0;
-  currentScheduleID = 0;
+  scheduleInViewIndex: number;
+  scheduleInViewID: number;
   eventsPerSchedule: Map<number, Event[]> = new Map(); // schedule.id --> events
   eventsPerWeekday: Map<string, Event[]> = new Map(); // weekday --> events
 
@@ -54,22 +54,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
     private errorService: ErrorService,
     private alertService: AlertService,
     public translateService: TranslateService
-  ) { }
-
-  ngOnInit(): void {
-    this.schedulesToShow = _.cloneDeep(this.schedules);
-    if (this.schedulesToShow.length > 0) {
-      this.createEvents(this.schedulesToShow);
-      this.organizeEventsPerWeekday(0);
-    }
-
-    this.onWindowResize();
-
-    this.keydownEventsSubscription = this.keydownEvents.subscribe(direction => {
-      if (direction === 'right') { this.next(); }
-      if (direction === 'left') { this.prev(); }
-    });
-
+  ) {
     setTimeout(() => {
       if (!this.pinActivated) {
         this.alertService.showAlert(
@@ -80,8 +65,50 @@ export class TimetableComponent implements OnInit, OnDestroy {
     }, 120000);
   }
 
+  ngOnInit(): void {
+    this.scheduleInViewIndex = 0;
+    this.scheduleInViewID = this.schedules[0].id;
+    this.schedulesToShow = _.cloneDeep(this.schedules);
+
+    if (this.schedulesToShow.length > 0) {
+      this.createEvents(this.schedulesToShow);
+      this.organizeEventsPerWeekday(this.scheduleInViewID);
+    }
+
+    this.onWindowResize();
+
+    this.keydownEventsSubscription = this.keydownEvents.subscribe(direction => {
+      if (direction === 'right') { this.next(); }
+      if (direction === 'left') { this.prev(); }
+    });
+  }
+
   ngOnDestroy(): void {
     this.keydownEventsSubscription.unsubscribe();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.schedules && changes.schedules.previousValue &&
+      changes.schedules.previousValue !== changes.schedules.currentValue) {
+
+      // Convert to array (comes as object)
+      const temp: Schedule[] = [];
+      for (const key in this.schedules) {
+        if (this.schedules.hasOwnProperty(key)) {
+          temp.push(this.schedules[key]);
+        }
+      }
+      this.schedules = temp;
+
+      this.schedulesToShow = this.filterSchedulesBasedOnPinnedShifts();
+      this.scheduleInViewIndex = 0;
+      this.scheduleInViewID = this.schedulesToShow[0].id;
+
+      // Update timetable
+      if (this.schedulesToShow.length > 0) {
+        this.organizeEventsPerWeekday(this.scheduleInViewID);
+      }
+    }
   }
 
   getTimelineHours(start, end): string[] {
@@ -135,9 +162,9 @@ export class TimetableComponent implements OnInit, OnDestroy {
     this.logger.log('events per schedule', this.eventsPerSchedule);
   }
 
-  organizeEventsPerWeekday(scheduleIndex: number): void { // TODO: testing
+  organizeEventsPerWeekday(scheduleID: number): void { // TODO: testing
     this.eventsPerWeekday.clear();
-    const events = this.eventsPerSchedule.get(scheduleIndex);
+    const events = this.eventsPerSchedule.get(scheduleID);
     events.forEach(ev => {
       this.eventsPerWeekday.has(ev.weekday) ?
         this.eventsPerWeekday.get(ev.weekday).push(ev) : this.eventsPerWeekday.set(ev.weekday, [ev]);
@@ -146,17 +173,17 @@ export class TimetableComponent implements OnInit, OnDestroy {
   }
 
   prev(): void {
-    if (this.currentScheduleIndex > 0) {
-      this.currentScheduleID = this.schedulesToShow[--this.currentScheduleIndex].id;
-      this.organizeEventsPerWeekday(this.currentScheduleID);
+    if (this.scheduleInViewIndex > 0) {
+      this.scheduleInViewID = this.schedulesToShow[--this.scheduleInViewIndex].id;
+      this.organizeEventsPerWeekday(this.scheduleInViewID);
       this.schedulePicked();
     }
   }
 
   next(): void {
-    if (this.currentScheduleIndex < this.schedulesToShow.length - 1) {
-      this.currentScheduleID = this.schedulesToShow[++this.currentScheduleIndex].id;
-      this.organizeEventsPerWeekday(this.currentScheduleID);
+    if (this.scheduleInViewIndex < this.schedulesToShow.length - 1) {
+      this.scheduleInViewID = this.schedulesToShow[++this.scheduleInViewIndex].id;
+      this.organizeEventsPerWeekday(this.scheduleInViewID);
       this.schedulePicked();
     }
   }
@@ -192,8 +219,8 @@ export class TimetableComponent implements OnInit, OnDestroy {
     // Update timetable
     if (this.schedulesToShow.length > 0) {
       this.createEvents(this.schedulesToShow);
-      this.updateCurrentScheduleIndex(this.schedulesToShow);
-      this.organizeEventsPerWeekday(this.currentScheduleID);
+      this.updateScheduleInViewIndex(this.schedulesToShow);
+      this.organizeEventsPerWeekday(this.scheduleInViewID);
 
     } else { this.errorService.showError('Something went wrong while pinning shifts.'); }
 
@@ -201,7 +228,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
   }
 
   filterSchedulesBasedOnPinnedShifts(): Schedule[] { // TODO: testing
-    let filteredSchedules = _.cloneDeep(this.schedules);
+    let filteredSchedules = this.schedules;
 
     this.pinnedShifts.forEach(pinnedShift => {
       const temp: Schedule[] = [];
@@ -209,28 +236,28 @@ export class TimetableComponent implements OnInit, OnDestroy {
       filteredSchedules.forEach(schedule => {
         schedule.classes.forEach(cl => {
           cl.shifts.forEach(shift => {
-            if (shift.name === pinnedShift) { temp.push(schedule); }
+            if (shift.name === pinnedShift) temp.push(schedule);
           });
         });
       });
 
-      filteredSchedules = _.cloneDeep(temp);
+      filteredSchedules = temp;
     });
     return filteredSchedules;
   }
 
-  updateCurrentScheduleIndex(schedules: Schedule[]): void {
+  updateScheduleInViewIndex(schedules: Schedule[]): void {
     for (let i = 0; i < schedules.length; i++) {
       const schedule = schedules[i];
-      if (schedule.id === this.currentScheduleID) {
-        this.currentScheduleIndex = i;
+      if (schedule.id === this.scheduleInViewID) {
+        this.scheduleInViewIndex = i;
         return;
       }
     }
   }
 
   schedulePicked(): void {
-    this.scheduleSelected.emit(this.currentScheduleID);
+    this.scheduleSelected.emit(this.scheduleInViewID);
   }
 
   @HostListener('window:resize', [])

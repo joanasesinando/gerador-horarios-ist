@@ -11,6 +11,7 @@ import {PdfGenerationService} from '../_services/pdf-generation/pdf-generation.s
 import {Course} from '../_domain/Course';
 import {Schedule} from '../_domain/Schedule';
 
+
 @Component({
   selector: 'app-schedules',
   templateUrl: './schedules.component.html',
@@ -21,11 +22,13 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
   generatedSchedules: Schedule[] = [];
   selectedCourses: Course[] = [];
 
-  scheduleInView = 0;
+  scheduleInViewID: number;
   schedulesPicked: Schedule[] = [];
 
-  spinner = true;
-  generationTime: number = null;
+  spinners = {
+    loadingPage: true,
+    sorting: false
+  };
 
   mobileView = false;
   keyDownSubject: Subject<string> = new Subject<string>();
@@ -34,7 +37,7 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     private logger: LoggerService,
     private router: Router,
     private alertService: AlertService,
-    private schedulesGenerationService: SchedulesGenerationService,
+    private generationService: SchedulesGenerationService,
     private stateService: StateService,
     private pdfService: PdfGenerationService
   ) { }
@@ -63,10 +66,11 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
 
       // Generate schedules
       const t0 = performance.now();
-      this.generatedSchedules = this.schedulesGenerationService.generateSchedules(this.selectedCourses);
+      this.generatedSchedules = this.generationService.generateSchedules(this.selectedCourses);
+      if (this.generatedSchedules[0]) this.scheduleInViewID = this.generatedSchedules[0].id;
       const t1 = performance.now();
-      this.generationTime = t1 - t0;
-      this.logger.log('generated in (milliseconds)', this.generationTime);
+      const generationTime = t1 - t0;
+      this.logger.log('generated in (milliseconds)', generationTime);
       this.logger.log('generated schedules', this.generatedSchedules);
 
       if (this.generatedSchedules.length === 0) {
@@ -79,18 +83,44 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
       }
 
       // Fake staling for UX
-      this.generationTime != null && this.generationTime < 1000 ?
-        setTimeout(() => this.spinner = false, 1000) : this.spinner = false;
+      generationTime != null && generationTime < 1000 ?
+        setTimeout(() => this.spinners.loadingPage = false, 1000) : this.spinners.loadingPage = false;
     }, 0);
   }
 
-  pickViewOption(event): void {
-    // TODO
-    console.log(event.innerText);
+  pickViewOption(option: string): void {
+    this.spinners.sorting = true;
+    switch (option) {
+      case 'balanced':
+        this.generatedSchedules = this.stateService.hasSchedulesSortedByMostBalanced() ?
+          this.stateService.schedulesSortedByMostBalanced :
+          this.generationService.sortByMostBalanced(this.generatedSchedules);
+        break;
+
+      case 'free-days':
+        this.generatedSchedules = this.stateService.hasSchedulesSortedByMostFreeDays() ?
+          this.stateService.schedulesSortedByMostFreeDays :
+          this.generationService.sortByMostFreeDays(this.generatedSchedules);
+
+        if (this.generationService.generatedSchedulesInfo.get(this.generatedSchedules[0].id).nr_free_days === 0)
+          this.alertService.showAlert('Atenção', 'Não existe nenhum horário com dias livres', 'warning');
+        break;
+
+      case 'compact':
+      default:
+        this.generatedSchedules = this.stateService.hasSchedulesSortedByMostCompact() ?
+          this.stateService.schedulesSortedByMostCompact :
+          this.generationService.sortByMostCompact(this.generatedSchedules);
+        break;
+    }
+    this.spinners.sorting = false;
+    this.logger.log('Changed view to ' + option);
   }
 
   addSchedule(scheduleID: number): void {
-    const scheduleToAdd = this.generatedSchedules[scheduleID];
+    const scheduleIndex = this.findScheduleIndex(scheduleID, this.generatedSchedules);
+    const scheduleToAdd = this.generatedSchedules[scheduleIndex];
+
     if (!this.schedulesPicked.includes(scheduleToAdd)) {
       this.schedulesPicked.push(scheduleToAdd);
     } else {
@@ -100,7 +130,9 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
   }
 
   removeSchedule(scheduleID: number): void {
-    const scheduleToRemove = this.generatedSchedules[scheduleID];
+    const scheduleIndex = this.findScheduleIndex(scheduleID, this.generatedSchedules);
+    const scheduleToRemove = this.generatedSchedules[scheduleIndex];
+
     if (this.schedulesPicked.includes(scheduleToRemove)) {
       this.schedulesPicked.splice(this.schedulesPicked.indexOf(scheduleToRemove), 1);
     }
@@ -110,6 +142,12 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
   save(): void {
     this.pdfService.generateSchedulesPdf(this.schedulesPicked);
     this.logger.log('PDF generated');
+  }
+
+  findScheduleIndex(scheduleID: number, schedules: Schedule[]): number {
+    for (let i = 0; i < schedules.length; i++) {
+      if (schedules[i].id === scheduleID) return i;
+    }
   }
 
   goBack(): void {

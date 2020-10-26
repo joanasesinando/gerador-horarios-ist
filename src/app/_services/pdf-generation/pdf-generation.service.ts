@@ -15,16 +15,38 @@ import {formatTime, getTimestamp} from '../../_util/Time';
 })
 export class PdfGenerationService {
 
-  doc: jsPDF;
-
-  CELL_HEIGHT = 28.14;
-  GRID_HEIGHT = this.CELL_HEIGHT * 25;
-  GRID_WIDTH = 462.06;
-  CELL_WIDTH = this.GRID_WIDTH / 5;
-  GRID_X_BEGIN = 83.94;
-  GRID_Y_BEGIN = 90;
-
   constructor(private translateService: TranslateService) { }
+
+  private doc: jsPDF;
+
+  private CELL_HEIGHT = 28.14;
+  private GRID_HEIGHT = this.CELL_HEIGHT * 25;
+  private GRID_WIDTH = 462.06;
+  private CELL_WIDTH = this.GRID_WIDTH / 5;
+  private GRID_X_BEGIN = 83.94;
+  private GRID_Y_BEGIN = 90;
+
+  private static getTimelineHours(start: number, end: number): string[] {
+    const timeline: string[] = [];
+    let current = start;
+
+    while (current !== end + 1) {
+      let s = '';
+      if (current.toString().length === 1) { s += '0'; }
+      s += current + ':00';
+      timeline.push(s);
+      current++;
+    }
+    return timeline;
+  }
+
+  private static getLessonTimes(lesson: Lesson): string {
+    return formatTime(lesson.start) + ' - ' + formatTime(lesson.end);
+  }
+
+  private static getLessonName(type: ClassType, acronym: string): string {
+    return acronym.replace(/[0-9]/g, '') + ' (' + minifyClassType(type) + ')';
+  }
 
   generateSchedulesPdf(schedules: Schedule[]): void {
     this.createPdf();
@@ -68,6 +90,7 @@ export class PdfGenerationService {
     this.doc.addPage();
     this.drawTitle(schedule.id + 1);
     this.drawGrid();
+    this.drawWeekdays();
     this.drawTimelineHours();
     this.drawClasses(schedule.classes);
   }
@@ -105,10 +128,33 @@ export class PdfGenerationService {
     }
   }
 
+  private drawWeekdays(): void {
+    let weekdays: string[];
+    switch (this.translateService.currentLang) {
+      case 'pt-PT':
+        weekdays = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
+        break;
+
+      case 'en-GB':
+      default:
+        weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        break;
+    }
+
+    const yOffset = this.GRID_Y_BEGIN + this.CELL_HEIGHT / 2 + 4;
+    for (let i = 0; i < weekdays.length; i++) {
+      this.doc.setFontSize(11);
+      const weekday = weekdays[i];
+      const xOffset = this.GRID_X_BEGIN + (this.CELL_WIDTH * i) + (this.CELL_WIDTH / 2) -
+        (this.doc.getStringUnitWidth(weekday) * this.doc.getFontSize() / 2);
+      this.drawText({ r: 0, g: 0, b: 0}, 'Poppins', 'semi-bold', 11, weekday, xOffset, yOffset);
+    }
+  }
+
   private drawTimelineHours(): void {
     const xOffset = 50;
     const yOffset = this.GRID_Y_BEGIN + this.CELL_HEIGHT + 3;
-    const times = this.getTimelineHours(8, 20);
+    const times = PdfGenerationService.getTimelineHours(8, 20);
 
     this.doc.setTextColor(0, 0, 0);
     this.doc.setFont('Poppins', 'regular');
@@ -163,9 +209,9 @@ export class PdfGenerationService {
     const textYOffset = yOffset + 12;
 
     this.drawText({r: 255, g: 255, b: 255}, 'Poppins', 'medium', 7.5,
-      this.getLessonTimes(lesson), textXOffset, textYOffset);
+      PdfGenerationService.getLessonTimes(lesson), textXOffset, textYOffset);
     this.drawText({r: 255, g: 255, b: 255}, 'Poppins', 'semi-bold', 9,
-      this.getLessonName(type, cl.course.acronym), textXOffset, textYOffset + 14);
+      PdfGenerationService.getLessonName(type, cl.course.acronym), textXOffset, textYOffset + 14);
     this.drawText({r: 255, g: 255, b: 255}, 'Poppins', 'medium', 8,
       lesson.room, textXOffset, textYOffset + 30);
   }
@@ -190,20 +236,6 @@ export class PdfGenerationService {
     }
   }
 
-  private getTimelineHours(start: number, end: number): string[] {
-    const timeline: string[] = [];
-    let current = start;
-
-    while (current !== end + 1) {
-      let s = '';
-      if (current.toString().length === 1) { s += '0'; }
-      s += current + ':00';
-      timeline.push(s);
-      current++;
-    }
-    return timeline;
-  }
-
   private getLessonXOffset(lesson: Lesson): number {
     const weekday = lesson.start.getDay();
     return this.GRID_X_BEGIN + this.CELL_WIDTH * (weekday - 1);
@@ -221,13 +253,5 @@ export class PdfGenerationService {
     const start = getTimestamp(formatTime(lesson.start));
     const duration = getTimestamp(formatTime(lesson.end)) - start;
     return this.CELL_HEIGHT * duration / timelineUnitDuration;
-  }
-
-  private getLessonTimes(lesson: Lesson): string {
-    return formatTime(lesson.start) + ' - ' + formatTime(lesson.end);
-  }
-
-  private getLessonName(type: ClassType, acronym: string): string {
-    return acronym.replace(/[0-9]/g, '') + ' (' + minifyClassType(type) + ')';
   }
 }

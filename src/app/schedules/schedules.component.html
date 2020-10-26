@@ -1,12 +1,12 @@
 <div class="container-fluid" tabindex="0" autofocus
      (keydown.arrowRight)="onKeyDownArrowRight()" (keydown.arrowLeft)="onKeyDownArrowLeft()">
 
-  <div *ngIf="spinner" class="loading-page text-center">
+  <div *ngIf="spinners.loadingPage" class="loading-page text-center">
     <div class="spinner-border text-primary mb-4" role="status"></div>
     <h5>Generating . . .</h5>
   </div>
 
-  <div *ngIf="!spinner" class="row no-gutter">
+  <div *ngIf="!spinners.loadingPage" class="row no-gutter">
 
     <!-- Main Content -->
     <div class="main-content col-lg-9">
@@ -22,31 +22,38 @@
             <div class="col-md-10 col-lg-9 mx-auto">
 
               <!-- Title -->
-              <h4 *ngIf="generatedSchedules.length !== 0"
+              <h4 *ngIf="generatedSchedules.length == 1"
+                  class="schedules-gen-heading mb-4">Gerado 1 horário possível</h4>
+              <h4 *ngIf="generatedSchedules.length > 1"
                   class="schedules-gen-heading mb-4">Gerados {{generatedSchedules.length}} horários possíveis</h4>
 
               <!-- Show options -->
-              <div class="show-options d-lg-flex">
-                <span class="mr-lg-4 mb-2 mb-lg-0"><b>Mostrar:</b></span>
+              <div *ngIf="generatedSchedules.length > 1" class="show-options d-lg-flex">
+                <div class="position-relative">
+                  <div *ngIf="spinners.sorting" class="loading-sort spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                  </div>
+                  <span class="mr-lg-4 mb-2 mb-lg-0"><b>Ordenar por:</b></span>
+                </div>
 
                 <div class="options">
 
                   <div class="custom-control custom-radio custom-control-inline mr-4 mb-2 mt-2 mt-lg-0">
                     <input type="radio" id="show-options-100Compact" name="show-options"
-                           class="custom-control-input" [checked]="true" (change)="pickViewOption($event)">
-                    <label class="custom-control-label" for="show-options-100Compact">100 mais compactos</label>
+                           class="custom-control-input" [checked]="true" (click)="pickViewOption('compact')">
+                    <label class="custom-control-label" for="show-options-100Compact">Mais compacto</label>
                   </div>
 
                   <div class="custom-control custom-radio custom-control-inline mr-4 mb-2">
                     <input type="radio" id="show-options-500Compact" name="show-options"
-                           class="custom-control-input" [checked]="false" (change)="pickViewOption($event)">
-                    <label class="custom-control-label" for="show-options-500Compact">500 mais compactos</label>
+                           class="custom-control-input" [checked]="false" (click)="pickViewOption('balanced')">
+                    <label class="custom-control-label" for="show-options-500Compact">Mais equilibrado</label>
                   </div>
 
                   <div class="custom-control custom-radio custom-control-inline mr-0 mb-2">
                     <input type="radio" id="show-options-all" name="show-options"
-                           class="custom-control-input" [checked]="false" (change)="pickViewOption($event)">
-                    <label class="custom-control-label" for="show-options-all">Todos</label>
+                           class="custom-control-input" [checked]="false" (click)="pickViewOption('free-days')">
+                    <label class="custom-control-label" for="show-options-all">Mais dias livres</label>
                   </div>
 
                 </div>
@@ -54,13 +61,13 @@
 
               <!-- Timetable -->
               <app-timetable *ngIf="generatedSchedules.length !== 0"
-                             [schedules]="generatedSchedules" (scheduleSelected)="scheduleInView = $event"
+                             [schedules]="generatedSchedules" (scheduleSelected)="scheduleInViewID = $event"
                              [keydownEvents]="keyDownSubject.asObservable()"></app-timetable>
 
               <!-- Add btn -->
               <div class="btn-add d-flex flex-column align-items-center">
                 <button class="btn btn-primary mt-4" [ngClass]="{'btn-block': mobileView}"
-                        type="button" (click)="addSchedule(scheduleInView)">Adicionar Horário</button>
+                        type="button" (click)="addSchedule(scheduleInViewID)">Adicionar Horário</button>
                 <a *ngIf="mobileView" href="#selected-schedules"
                    class="d-block text-center mt-4">Ver horários escolhidos</a>
               </div>
