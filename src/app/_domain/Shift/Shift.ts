@@ -1,5 +1,6 @@
 import {ClassType} from '../ClassType/ClassType';
 import {Lesson} from '../Lesson/Lesson';
+
 import * as firebase from 'firebase';
 
 
@@ -37,22 +38,23 @@ export class Shift {
   }
 
   overlap(other: Shift): boolean {
-    for (const lesson of this.lessons) {
-      for (const otherLesson of other.lessons) {
-        if (lesson.overlap(otherLesson)) { return true; }
-      }
-    }
+    for (const lesson of this.lessons)
+      for (const otherLesson of other.lessons)
+        if (lesson.overlap(otherLesson)) return true;
     return false;
   }
 
   equal(other: Shift): boolean {
-    this.lessons.forEach(lesson => {
+    for (const lesson of this.lessons) {
       let found = false;
-      other.lessons.forEach(otherLesson => {
-        if (lesson.equal(otherLesson)) { found = true; }
-      });
-      if (!found) { return false; }
-    });
+      for (const otherLesson of other.lessons) {
+        if (lesson.equal(otherLesson)) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) return false;
+    }
     return this.name === other.name &&
       this.type === other.type &&
       this.campus === other.campus;

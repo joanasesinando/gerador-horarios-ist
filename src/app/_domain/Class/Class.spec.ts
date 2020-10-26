@@ -2,14 +2,8 @@ import {Class} from './Class';
 import {Shift} from '../Shift/Shift';
 
 class MockShift extends Shift {
-  overlaps = false;
-
   constructor() {
     super(undefined, undefined, undefined, undefined);
-  }
-
-  overlap(): boolean {
-    return this.overlaps;
   }
 }
 
@@ -20,10 +14,6 @@ describe('Class', () => {
   beforeEach(() => {
     cl = new Class(undefined, [new MockShift(), new MockShift()]);
     other = new Class(undefined, [new MockShift(), new MockShift()]);
-  });
-
-  it('should create', () => {
-    expect(cl).toBeTruthy();
   });
 
   it('should overlap: one shift overlaps', () => {

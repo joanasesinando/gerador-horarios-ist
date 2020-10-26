@@ -1,67 +1,88 @@
 import {Shift} from './Shift';
-import {ClassType} from '../ClassType/ClassType';
 import {Lesson} from '../Lesson/Lesson';
+import {ClassType} from '../ClassType/ClassType';
+
+class MockLesson extends Lesson {
+  constructor() {
+    super(undefined, undefined, undefined, undefined);
+  }
+}
 
 describe('Shift', () => {
-  const NAME = 'T01';
-  const TYPE = ClassType.THEORY_PT;
-  const LESSONS = [
-    new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'QA02.2', 'Alameda'),
-    new Lesson(new Date('2020-09-09 10:00'), new Date('2020-09-09 11:30'), 'QA02.2', 'Alameda')
-  ];
-  const CAMPUS = 'Alameda';
-
   let shift: Shift;
+  let other: Shift;
 
-  beforeEach(() => {
-    shift = new Shift(NAME, TYPE, LESSONS, CAMPUS);
+  describe('Checking for overlaps', () => {
+
+    beforeEach(() => {
+      shift = new Shift(undefined, undefined, [new MockLesson(), new MockLesson()], undefined);
+      other = new Shift(undefined, undefined, [new MockLesson(), new MockLesson()], undefined);
+    });
+
+    it('should overlap: one lesson overlaps', () => {
+      shift.lessons.forEach((lesson, index) => {
+        index === 1 ?
+          spyOn(lesson, 'overlap').and.returnValue(true) :
+          spyOn(lesson, 'overlap').and.returnValue(false);
+      });
+      expect(shift.overlap(other)).toBeTrue();
+      shift.lessons.forEach(lesson => expect(lesson.overlap).toHaveBeenCalled());
+    });
+
+    it('should overlap: all lessons overlap', () => {
+      shift.lessons.forEach(lesson => spyOn(lesson, 'overlap').and.returnValue(true));
+      expect(shift.overlap(other)).toBeTrue();
+      shift.lessons.forEach((lesson, index) => {
+        index === 0 ? expect(lesson.overlap).toHaveBeenCalled() : expect(lesson.overlap).not.toHaveBeenCalled();
+      });
+    });
+
+    it('should NOT overlap', () => {
+      shift.lessons.forEach(lesson => spyOn(lesson, 'overlap').and.returnValue(false));
+      expect(shift.overlap(other)).toBeFalse();
+      shift.lessons.forEach(lesson => expect(lesson.overlap).toHaveBeenCalled());
+    });
   });
 
-  it('should create', () => {
-    expect(shift).toBeTruthy();
-  });
+  describe('Checking for equality', () => {
 
+    beforeEach(() => {
+      shift = new Shift('SN01', ClassType.THEORY_PT, [new MockLesson(), new MockLesson()], 'A');
+      other = new Shift('SN01', ClassType.THEORY_PT, [new MockLesson(), new MockLesson()], 'A');
+    });
 
-  /* ----------------------------
-   * Should overlap
-   * ---------------------------- */
-  it('should overlap: one lesson overlaps', () => {
-    const lessons = [
-      new Lesson(new Date('2020-09-07 09:00'), new Date('2020-09-07 10:00'), 'QA02.2', 'Alameda'),
-      new Lesson(new Date('2020-09-10 10:00'), new Date('2020-09-10 11:30'), 'QA02.2', 'Alameda')
-    ];
-    const other = new Shift('T01', ClassType.THEORY_PT, lessons, 'Alameda');
-    expect(shift.overlap(other)).toBeTrue();
-  });
+    it('should be equal', () => {
+      shift.lessons.forEach(lesson => spyOn(lesson, 'equal').and.returnValue(true));
+      expect(shift.equal(other)).toBeTrue();
+      shift.lessons.forEach(lesson => expect(lesson.equal).toHaveBeenCalled());
+    });
 
-  it('should overlap: all lessons overlap', () => {
-    const lessons = [
-      new Lesson(new Date('2020-09-07 09:00'), new Date('2020-09-07 10:00'), 'QA02.2', 'Alameda'),
-      new Lesson(new Date('2020-09-09 10:30'), new Date('2020-09-09 11:30'), 'QA02.2', 'Alameda')
-    ];
-    const other = new Shift('T01', ClassType.THEORY_PT, lessons, 'Alameda');
-    expect(shift.overlap(other)).toBeTrue();
-  });
+    it('should NOT be equal: different lessons', () => {
+      shift.lessons.forEach(lesson => spyOn(lesson, 'equal').and.returnValue(false));
+      expect(shift.equal(other)).toBeFalse();
+      shift.lessons.forEach((lesson, index) => {
+        index === 0 ?
+          expect(lesson.equal).toHaveBeenCalled() :
+          expect(lesson.equal).not.toHaveBeenCalled();
+      });
+    });
 
+    it('should NOT be equal: different name', () => {
+      shift.lessons.forEach(lesson => spyOn(lesson, 'equal').and.returnValue(true));
+      other.name = 'SN02';
+      expect(shift.equal(other)).toBeFalse();
+    });
 
-  /* ----------------------------
-   * Should NOT overlap
-   * ---------------------------- */
-  it('should NOT overlap: same week days', () => {
-    const lessons = [
-      new Lesson(new Date('2020-09-14 08:00'), new Date('2020-09-14 09:00'), 'QA02.2', 'Alameda'),
-      new Lesson(new Date('2020-09-16 12:00'), new Date('2020-09-09 13:00'), 'QA02.2', 'Alameda')
-    ];
-    const other = new Shift('T01', ClassType.THEORY_PT, lessons, 'Alameda');
-    expect(shift.overlap(other)).toBeFalse();
-  });
+    it('should NOT be equal: different type', () => {
+      shift.lessons.forEach(lesson => spyOn(lesson, 'equal').and.returnValue(true));
+      other.type = ClassType.THEORY_EN;
+      expect(shift.equal(other)).toBeFalse();
+    });
 
-  it('should NOT overlap: different week days', () => {
-    const lessons = [
-      new Lesson(new Date('2020-09-06 09:30'), new Date('2020-09-06 11:00'), 'QA02.2', 'Alameda'),
-      new Lesson(new Date('2020-09-08 10:00'), new Date('2020-09-08 11:30'), 'QA02.2', 'Alameda')
-    ];
-    const other = new Shift('T01', ClassType.THEORY_PT, lessons, 'Alameda');
-    expect(shift.overlap(other)).toBeFalse();
+    it('should NOT be equal: different campus', () => {
+      shift.lessons.forEach(lesson => spyOn(lesson, 'equal').and.returnValue(true));
+      other.campus = 'T';
+      expect(shift.equal(other)).toBeFalse();
+    });
   });
 });
