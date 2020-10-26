@@ -33,6 +33,19 @@ export function isOlderThan(timestamp1: number, timestamp2: number, days: number
 }
 
 /* ------------------------------------------------------------
+   * Checks if two dates are on the same week
+   * ---------------------------------------------------------- */
+export function isSameWeek(date1: Date, date2: Date): boolean {
+  const MILLISECONDS_IN_A_WEEK = 604800000;
+  const minDate = date1 < date2 ? date1 : date2;
+  const maxDate = minDate === date1 ? date2 : date1;
+  const minWeekday = minDate.getDay();
+  const maxWeekday = maxDate.getDay();
+
+  return !(maxDate.getTime() - minDate.getTime() >= MILLISECONDS_IN_A_WEEK || minWeekday > maxWeekday);
+}
+
+/* ------------------------------------------------------------
    * Gets weekday (full english version)
    * ---------------------------------------------------------- */
 export function getWeekday(day: number): string {

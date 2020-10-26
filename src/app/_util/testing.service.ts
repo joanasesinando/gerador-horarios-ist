@@ -46,7 +46,7 @@ export class TestingService {
    *  - start: HH:mm
    *  - end: HH:mm
    * -------------------------------------------------------------------------------- */
-  createTimeOnlyShift(times: {weekday: string, start: string, end: string}[]): Shift { // FIXME: if not used removed
+  createTimeOnlyShift(times: {weekday: string, start: string, end: string}[]): Shift {
     const lessons: Lesson[] = [];
     times.forEach(time => {
       lessons.push(this.createTimeOnlyLesson(time.weekday, time.start, time.end));

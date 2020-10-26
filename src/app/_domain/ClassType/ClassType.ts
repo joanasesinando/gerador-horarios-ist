@@ -55,3 +55,39 @@ export function minifyClassType(type: ClassType): string {
       return '';
   }
 }
+
+export function getClassTypeOrder(type: ClassType): number {
+  switch (type) {
+    case ClassType.THEORY_PT:
+    case ClassType.THEORY_EN:
+      return 0;
+
+    case ClassType.LAB_PT:
+    case ClassType.LAB_EN:
+      return 1;
+
+    case ClassType.PROBLEMS_PT:
+    case ClassType.PROBLEMS_EN:
+      return 2;
+
+    case ClassType.SEMINARY_PT:
+    case ClassType.SEMINARY_EN:
+      return 3;
+
+    case ClassType.TUTORIAL_ORIENTATION_PT:
+    case ClassType.TUTORIAL_ORIENTATION_EN:
+      return 4;
+
+    case ClassType.TRAINING_PERIOD_PT:
+    case ClassType.TRAINING_PERIOD_EN:
+      return 5;
+
+    case ClassType.FIELD_WORK_PT:
+    case ClassType.FIELD_WORK_EN:
+      return 6;
+
+    case ClassType.NONE:
+    default:
+      return 7;
+  }
+}

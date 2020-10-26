@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng test --watch=false && ng build --prod",
     "postbuild": "python scripts/preload_fonts.py",
-    "test": "ng test",
+    "test": "ng test --watch=false --code-coverage",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
