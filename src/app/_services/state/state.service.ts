@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
-import {Course} from '../../_domain/Course';
-import {Degree} from '../../_domain/Degree';
-import {Schedule} from '../../_domain/Schedule';
+import {Course} from '../../_domain/Course/Course';
+import {Degree} from '../../_domain/Degree/Degree';
+import {Schedule} from '../../_domain/Schedule/Schedule';
 
 @Injectable({
   providedIn: 'root'

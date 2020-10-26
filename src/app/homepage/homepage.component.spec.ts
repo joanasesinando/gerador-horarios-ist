@@ -17,11 +17,11 @@ import {FenixService} from '../_services/fenix/fenix.service';
 import {FirebaseService} from '../_services/firebase/firebase.service';
 import {StateService} from '../_services/state/state.service';
 
-import {Degree} from '../_domain/Degree';
-import {Course} from '../_domain/Course';
-import {ClassType} from '../_domain/ClassType';
-import {Shift} from '../_domain/Shift';
-import {Lesson} from '../_domain/Lesson';
+import {Degree} from '../_domain/Degree/Degree';
+import {Course} from '../_domain/Course/Course';
+import {ClassType} from '../_domain/ClassType/ClassType';
+import {Shift} from '../_domain/Shift/Shift';
+import {Lesson} from '../_domain/Lesson/Lesson';
 
 describe('HomepageComponent', () => {
   let component: HomepageComponent;

@@ -2,8 +2,8 @@ import {Component, EventEmitter, HostListener, Input, OnInit, Output} from '@ang
 
 import { faCaretDown, faCaretUp, faTimes } from '@fortawesome/free-solid-svg-icons';
 
-import { Schedule } from '../../_domain/Schedule';
-import {ClassType, minifyClassType} from '../../_domain/ClassType';
+import { Schedule } from '../../_domain/Schedule/Schedule';
+import {ClassType, minifyClassType} from '../../_domain/ClassType/ClassType';
 
 import {TranslateService} from '@ngx-translate/core';
 

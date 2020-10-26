@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
-import {Course} from '../../_domain/Course';
-import {ClassType} from '../../_domain/ClassType';
+import {Course} from '../../_domain/Course/Course';
+import {ClassType} from '../../_domain/ClassType/ClassType';
 
 @Component({
   selector: 'app-course-banner',

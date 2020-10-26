@@ -1,7 +1,7 @@
-import {ClassType} from './ClassType';
-import {Shift} from './Shift';
-import {Lesson} from './Lesson';
-import {Degree} from './Degree';
+import {ClassType} from '../ClassType/ClassType';
+import {Shift} from '../Shift/Shift';
+import {Lesson} from '../Lesson/Lesson';
+import {Degree} from '../Degree/Degree';
 
 
 export class Course {

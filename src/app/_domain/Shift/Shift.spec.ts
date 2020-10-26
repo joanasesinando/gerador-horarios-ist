@@ -1,6 +1,6 @@
 import {Shift} from './Shift';
-import {ClassType} from './ClassType';
-import {Lesson} from './Lesson';
+import {ClassType} from '../ClassType/ClassType';
+import {Lesson} from '../Lesson/Lesson';
 
 describe('Shift', () => {
   const NAME = 'T01';

@@ -8,8 +8,8 @@ import {SchedulesGenerationService} from '../_services/schedules-generation/sche
 import {StateService} from '../_services/state/state.service';
 import {PdfGenerationService} from '../_services/pdf-generation/pdf-generation.service';
 
-import {Course} from '../_domain/Course';
-import {Schedule} from '../_domain/Schedule';
+import {Course} from '../_domain/Course/Course';
+import {Schedule} from '../_domain/Schedule/Schedule';
 
 
 @Component({

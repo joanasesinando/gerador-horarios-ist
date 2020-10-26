@@ -9,9 +9,9 @@ import _ from 'lodash';
 
 import { faCaretRight, faCaretLeft, faThumbtack } from '@fortawesome/free-solid-svg-icons';
 
-import {Schedule} from '../../_domain/Schedule';
-import {Event} from '../../_domain/Event';
-import {minifyClassType} from '../../_domain/ClassType';
+import {Schedule} from '../../_domain/Schedule/Schedule';
+import {Event} from '../../_domain/Event/Event';
+import {minifyClassType} from '../../_domain/ClassType/ClassType';
 import {formatTime, getTimestamp, getWeekday} from '../../_util/Time';
 
 

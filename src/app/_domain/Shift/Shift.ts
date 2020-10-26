@@ -1,5 +1,5 @@
-import {ClassType} from './ClassType';
-import {Lesson} from './Lesson';
+import {ClassType} from '../ClassType/ClassType';
+import {Lesson} from '../Lesson/Lesson';
 
 
 export class Shift {

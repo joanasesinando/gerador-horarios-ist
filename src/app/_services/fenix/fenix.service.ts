@@ -2,11 +2,11 @@ import {Injectable} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {ErrorService} from '../../_util/error.service';
 
-import {Course} from '../../_domain/Course';
-import {Degree} from '../../_domain/Degree';
-import {Lesson} from '../../_domain/Lesson';
-import {Shift} from '../../_domain/Shift';
-import {ClassType} from '../../_domain/ClassType';
+import {Course} from '../../_domain/Course/Course';
+import {Degree} from '../../_domain/Degree/Degree';
+import {Lesson} from '../../_domain/Lesson/Lesson';
+import {Shift} from '../../_domain/Shift/Shift';
+import {ClassType} from '../../_domain/ClassType/ClassType';
 
 const NO_ROOM_FOUND = 'NO ROOM FOUND';
 

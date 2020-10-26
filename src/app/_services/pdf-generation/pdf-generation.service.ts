@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 
 import { jsPDF } from 'jspdf';
 
-import {Schedule} from '../../_domain/Schedule';
-import {Class} from '../../_domain/Class';
-import {ClassType, minifyClassType} from '../../_domain/ClassType';
-import {Lesson} from '../../_domain/Lesson';
+import {Schedule} from '../../_domain/Schedule/Schedule';
+import {Class} from '../../_domain/Class/Class';
+import {ClassType, minifyClassType} from '../../_domain/ClassType/ClassType';
+import {Lesson} from '../../_domain/Lesson/Lesson';
 
 import {TranslateService} from '@ngx-translate/core';
 import {formatTime, getTimestamp} from '../../_util/Time';

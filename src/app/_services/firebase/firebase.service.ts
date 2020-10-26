@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core';
 import {AngularFirestore} from '@angular/fire/firestore';
 import {LoggerService} from '../../_util/logger.service';
 
-import {Degree, degreeConverter} from '../../_domain/Degree';
-import {Course, courseConverter} from '../../_domain/Course';
+import {Degree, degreeConverter} from '../../_domain/Degree/Degree';
+import {Course, courseConverter} from '../../_domain/Course/Course';
 
 @Injectable({
   providedIn: 'root'

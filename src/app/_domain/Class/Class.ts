@@ -1,5 +1,5 @@
-import {Course} from './Course';
-import {Shift} from './Shift';
+import {Course} from '../Course/Course';
+import {Shift} from '../Shift/Shift';
 
 export class Class {
   constructor(private _course: Course, private _shifts: Shift[]) {}
@@ -10,20 +10,10 @@ export class Class {
   get shifts(): Shift[] { return this._shifts; }
   set shifts(value: Shift[]) { this._shifts = value; }
 
-  toString(): string {
-    let s = '';
-    for (const shift of this._shifts) {
-      s += shift.name + ' ';
-    }
-    return s;
-  }
-
   overlap(other: Class): boolean {
-    for (const shift of this.shifts) {
-      for (const otherShift of other.shifts) {
-        if (shift.overlap(otherShift)) { return true; }
-      }
-    }
+    for (const shift of this.shifts)
+      for (const otherShift of other.shifts)
+        if (shift.overlap(otherShift)) return true;
     return false;
   }
 }

@@ -1,9 +1,9 @@
 import {Component, Input, Output, EventEmitter, AfterViewInit} from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
-import {Course} from '../../_domain/Course';
-import {ClassType} from '../../_domain/ClassType';
-import {Degree} from '../../_domain/Degree';
+import {Course} from '../../_domain/Course/Course';
+import {ClassType} from '../../_domain/ClassType/ClassType';
+import {Degree} from '../../_domain/Degree/Degree';
 
 declare let $;
 

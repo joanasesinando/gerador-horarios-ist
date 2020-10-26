@@ -3,11 +3,11 @@ import { Injectable } from '@angular/core';
 import {LoggerService} from '../../_util/logger.service';
 import {StateService} from '../state/state.service';
 
-import {Schedule} from '../../_domain/Schedule';
-import {Class} from '../../_domain/Class';
-import {Course} from '../../_domain/Course';
-import {Shift} from '../../_domain/Shift';
-import {Lesson} from '../../_domain/Lesson';
+import {Schedule} from '../../_domain/Schedule/Schedule';
+import {Class} from '../../_domain/Class/Class';
+import {Course} from '../../_domain/Course/Course';
+import {Shift} from '../../_domain/Shift/Shift';
+import {Lesson} from '../../_domain/Lesson/Lesson';
 
 import {formatTime, getTimestamp} from '../../_util/Time';
 import _ from 'lodash';

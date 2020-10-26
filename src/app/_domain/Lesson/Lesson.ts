@@ -1,7 +1,7 @@
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 
-import {formatTime, getMinifiedWeekday} from '../_util/Time';
+import {formatTime, getMinifiedWeekday} from '../../_util/Time';
 
 
 export class Lesson {

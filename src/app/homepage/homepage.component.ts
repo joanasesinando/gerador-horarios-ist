@@ -5,9 +5,9 @@ import {TranslateService} from '@ngx-translate/core';
 import _ from 'lodash';
 
 import {LoggerService} from '../_util/logger.service';
-import {Course} from '../_domain/Course';
-import {Degree} from '../_domain/Degree';
-import {ClassType} from '../_domain/ClassType';
+import {Course} from '../_domain/Course/Course';
+import {Degree} from '../_domain/Degree/Degree';
+import {ClassType} from '../_domain/ClassType/ClassType';
 import {isOlderThan} from '../_util/Time';
 
 import {FenixService} from '../_services/fenix/fenix.service';

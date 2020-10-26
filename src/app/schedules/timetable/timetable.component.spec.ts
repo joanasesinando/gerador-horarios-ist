@@ -9,10 +9,10 @@ import {SchedulesGenerationService} from '../../_services/schedules-generation/s
 import {LoggerService} from '../../_util/logger.service';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
-import {Shift} from '../../_domain/Shift';
-import {ClassType} from '../../_domain/ClassType';
-import {Lesson} from '../../_domain/Lesson';
-import {Course} from '../../_domain/Course';
+import {Shift} from '../../_domain/Shift/Shift';
+import {ClassType} from '../../_domain/ClassType/ClassType';
+import {Lesson} from '../../_domain/Lesson/Lesson';
+import {Course} from '../../_domain/Course/Course';
 import {StateService} from '../../_services/state/state.service';
 
 describe('TimetableComponent', () => {
