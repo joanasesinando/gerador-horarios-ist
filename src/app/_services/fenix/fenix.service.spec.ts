@@ -1,13 +1,15 @@
 import {TestBed} from '@angular/core/testing';
+import {of} from 'rxjs';
 
 import {FenixService} from './fenix.service';
 import {TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService} from '@ngx-translate/core';
+import {TestingService} from '../../_util/testing.service';
+
 import {Course} from '../../_domain/Course/Course';
 import {ClassType} from '../../_domain/ClassType/ClassType';
 import {Shift} from '../../_domain/Shift/Shift';
-import {TestingService} from '../../_util/testing.service';
 import {Lesson} from '../../_domain/Lesson/Lesson';
-import {of} from 'rxjs';
+import {Degree} from '../../_domain/Degree/Degree';
 
 
 describe('FenixService', () => {
@@ -193,30 +195,79 @@ describe('FenixService', () => {
       });
 
       it('should have the right amount of hours per week', () => {
-        expect(service.hasTotalHoursPerWeek({type: 3}, lessons, 'type')).toBeTrue();
+        expect(service.hasTotalHoursPerWeek({[ClassType.THEORY_PT]: 3}, lessons, ClassType.THEORY_PT)).toBeTrue();
       });
 
       it('should NOT have the right amount of hours per week', () => {
-        expect(service.hasTotalHoursPerWeek({type: 1.5}, lessons, 'type')).toBeFalse();
+        expect(service.hasTotalHoursPerWeek({[ClassType.THEORY_PT]: 1.5}, lessons, ClassType.THEORY_PT)).toBeFalse();
       });
     });
   });
 
   describe('HTTP Requests', () => {
-    it('should get current academic term', () => {
+    let  originalTimeout;
+
+    beforeEach(() => {
+      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000; // FIXME: test when removing heroku proxy
+    });
+
+    it('should get current academic term', async () => {
+      const currentYear = new Date().getFullYear();
+      const currentMonth = new Date().getMonth() + 1;
+      const currentAcademicTerm = await service.getCurrentAcademicTerm();
+
+      currentMonth <= 8 ?
+        expect(currentAcademicTerm).toBe((currentYear - 1).toString() + '/' + currentYear.toString()) :
+        expect(currentAcademicTerm).toBe(currentYear.toString() + '/' + (currentYear + 1).toString());
+    });
+
+    it('should get degrees for current academic term', async () => {
+      const currentAcademicTerm = await service.getCurrentAcademicTerm();
+      const degrees = await service.getDegrees(currentAcademicTerm);
+      expect(degrees).toBeTruthy();
+
+      degrees.forEach((degree, i) => {
+        expect(degree).toBeTruthy();
+        expect(degree.constructor.name).toEqual(Degree.name);
+        expect(degree.id).toBeTruthy();
+        expect(degree.name).toBeTruthy();
+        expect(degree.acronym).toBeTruthy();
+
+        if (i < degrees.length - 1)
+          expect(degree.acronym.localeCompare(degrees[i + 1].acronym)).toBeLessThan(0);
+      });
+    });
+
+    it('should get course basic info for LEIC-A for current academic term', async () => {
+      const currentAcademicTerm = await service.getCurrentAcademicTerm();
+      const degreeID = 2761663971474;
+      const courses = await service.getCoursesBasicInfo(currentAcademicTerm, degreeID);
+      expect(courses).toBeTruthy();
+
+      courses.forEach((course, i) => {
+        expect(course).toBeTruthy();
+        expect(course.constructor.name).toEqual(Course.name);
+        expect(course.id).toBeTruthy();
+        expect(course.name).toBeTruthy();
+        expect(course.acronym).toBeTruthy();
+        expect(course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9').toBeFalse();
+
+        if (i < courses.length - 1)
+          expect(course.acronym.localeCompare(courses[i + 1].acronym)).toBeLessThan(0);
+      });
+    });
+
+    it('should get missing info for course BD of degree LEIC-A for current academic term', () => {
       // TODO
     });
 
-    it('should get degrees for an academic term', () => {
+    it('should check courses full info from all degrees for current academic term', () => {
       // TODO
     });
 
-    it('should get course basic info for an academic term & degree', () => {
-      // TODO
-    });
-
-    it('should load missing course info to DB', () => {
-      // TODO
+    afterEach(() => {
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
     });
   });
 

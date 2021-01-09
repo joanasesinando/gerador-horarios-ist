@@ -19,11 +19,11 @@ export class FenixService {
 
   url = 'https://cors-anywhere.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/';
 
-  totalHoursPerWeekDoNotMatchLessonsTime = false;
   campusNotFound = false;
   currentAcademicTerm: string;
 
   constructor(public translateService: TranslateService, public errorService: ErrorService) { }
+
 
   /********************** CORRECT STRUCTURE **********************/
 
@@ -109,7 +109,7 @@ export class FenixService {
     return course;
   }
 
-  hasTotalHoursPerWeek(hoursPerWeek: {}, lessons: Lesson[], shiftType: string): boolean {
+  hasTotalHoursPerWeek(hoursPerWeek: {[classType: string]: number}, lessons: Lesson[], shiftType: ClassType): boolean {
     const MILLISECONDS_IN_AN_HOUR = 60 * 60 * 1000;
     let totalHoursPerWeek = 0;
     for (const lesson of lessons)
@@ -138,7 +138,7 @@ export class FenixService {
       });
   }
 
-  getDegrees(academicTerm: string): Promise<Degree[]> { // TODO: testing
+  getDegrees(academicTerm: string): Promise<Degree[]> {
     return this.httpGet('degrees?academicTerm=' + academicTerm + '&lang=' + this.getLanguage())
       .then(r => r.json())
       .then(degreesJson => {
@@ -153,28 +153,26 @@ export class FenixService {
       });
   }
 
-  getCoursesBasicInfo(academicTerm: string, degreeId: number): Promise<Course[]> { // TODO: testing
+  getCoursesBasicInfo(academicTerm: string, degreeId: number): Promise<Course[]> {
     return this.httpGet('degrees/' + degreeId + '/courses?academicTerm=' + academicTerm + '&lang=' + this.getLanguage())
       .then(r => r.json())
       .then(coursesJson => {
         const courses: Course[] = [];
-
         for (let course of coursesJson) {
           try {
             course = this.parseCourseBasicInfo(course);
 
             // Remove optional courses (example acronym: O32)
-            if (course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9') { continue; }
+            if (course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9') continue;
 
             courses.push(course);
           } catch (error) { this.errorService.showError(error); }
         }
-
         return courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
       });
   }
 
-  loadMissingCourseInfo(course: Course): Promise<Course> { // TODO: testing
+  getMissingCourseInfo(course: Course): Promise<Course> { // TODO: testing
     return this.httpGet('courses/' + course.id + '/schedule' + '?lang=' + this.getLanguage())
       .then(r => r.json())
       .then(scheduleJson => {
@@ -184,11 +182,11 @@ export class FenixService {
           // Get types
           const types: ClassType[] = this.getCourseTypes(scheduleJson.courseLoads);
 
-          // Get course loads
-          let courseLoads = this.getCourseLoads(scheduleJson.courseLoads);
-
           // Get shifts
           let shifts = this.getShifts(scheduleJson.shifts, courseLoads);
+
+          // Get course loads
+          let courseLoads = this.getCourseLoads(scheduleJson.courseLoads);
 
           // Get campus
           const campus: string[] = this.getCourseCampus(shifts);
@@ -237,15 +235,15 @@ export class FenixService {
 
   /********************** COURSE RELATED **********************/
 
-  getCourseLoads(courseLoads): {} {
-    const loads = {};
+  getCourseLoads(courseLoads): {[key: string]: number} {
+    const loads: {[key: string]: number} = {};
     for (const cl of courseLoads)
       loads[cl.type] = parseFloat(cl.unitQuantity);
     return loads;
   }
 
   calculateCourseLoads(shifts: Shift[]): {} {
-    const courseLoads = {};
+    const courseLoads: {[key: string]: number} = {};
     for (const shift of shifts) {
       const type = shift.type;
       const MILLISECONDS_IN_AN_HOUR = 60 * 60 * 1000;
@@ -278,15 +276,34 @@ export class FenixService {
   /* --------------------------------------------------------------------------------
    * Returns lessons for a given shift.
    * --------------------------------------------------------------------------------
-   * [Algorithm]
-   *  - build lessons for 1st week
-   *  - if lessons are NOT according to total nr. hours/week, then repeat with
-   *    next week until it is
-   * (this strategy covers cases where there are days off in the 1st week of classes)
+   * [Algorithm] // FIXME: check if same week
+   *  - use 1st week as a baseline
+   *  - iterate through the weeks and try to find 3 weeks with the same number of
+   *    lessons as the baseline
+   *  - if another week gets discovered with more lessons than the baseline,
+   *    it becomes the new baseline, and tries to find 3 weeks similar to that again
+   *
+   * (it is a good enough assumption that if there are at least 3 weeks with the same
+   * type of schedule for the week, it's probably the de facto schedule; this
+   * accommodates weeks where there are holidays and such)
    * -------------------------------------------------------------------------------- */
-  private getShiftLessons(hoursPerWeek, lessons, shiftType): Lesson[] {
+  private getShiftLessons(lessons: {start: string, end: string, room?: {name: string, topLevelSpace?: {name: string}}}[]): Lesson[] {
     let shiftLessons: Lesson[] = [];
-    let weekIndex = 0;
+    let counter = 0;
+
+    const baseline = new Lesson(
+      new Date(lessons[0].start),
+      new Date(lessons[0].end),
+      lessons[0].room ? lessons[0].room.name : NO_ROOM_FOUND,
+      lessons[0].room.topLevelSpace ? lessons[0].room.topLevelSpace.name : null
+    );
+
+    for (let i = 1; i < lessons.length; i++) {
+
+    }
+
+
+
 
     while (shiftLessons.length === 0 || !this.hasTotalHoursPerWeek(hoursPerWeek, shiftLessons, shiftType)) {
       // Total hours per week are incorrect
@@ -308,7 +325,7 @@ export class FenixService {
       if (!baseLesson.campus) { this.campusNotFound = true; }
 
       // Find others on same week
-      for (const shiftLesson of lessons) {
+      for (const shiftLesson of lessons) { // FIXME
         if (!shiftLesson.equal(baseLesson) && isSameWeek(baseLesson.start, new Date(shiftLesson.start))) {
           const lesson = new Lesson(new Date(shiftLesson.start),
             new Date(shiftLesson.end),
@@ -326,7 +343,7 @@ export class FenixService {
     return shiftLessons;
   }
 
-  private getShifts(shiftsJson, courseLoads): Shift[] {
+  private getShifts(shiftsJson): Shift[] {
     const shifts: Shift[] = [];
     for (const shift of shiftsJson) {
 
@@ -334,7 +351,7 @@ export class FenixService {
       const shiftType = this.formatType(shift.types[0]);
 
       // Get shift lessons
-      const shiftLessons = this.getShiftLessons(courseLoads, shift.lessons, shiftType);
+      const shiftLessons = this.getShiftLessons(shift.lessons);
 
       // Get shift campus
       const shiftCampus = shiftLessons[0].campus;

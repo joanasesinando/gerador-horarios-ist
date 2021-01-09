@@ -356,7 +356,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
         // Load rest of info
         this.spinners.course = true;
-        this.fenixService.loadMissingCourseInfo(courseToAdd).then(course => {
+        this.fenixService.getMissingCourseInfo(courseToAdd).then(course => {
           courseToAdd = course;
           this.spinners.course = false;
           this.addCourseHelper(courseToAdd, courseIndex, addBtn);
