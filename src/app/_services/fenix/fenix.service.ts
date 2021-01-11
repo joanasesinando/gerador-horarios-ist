@@ -15,7 +15,7 @@ const NO_ROOM_FOUND = 'NO ROOM FOUND';
 })
 export class FenixService {
 
-  url = 'https://cors-anywhere.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/';
+  url = 'https://ist-corsaway.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/';
 
   totalHoursPerWeekDoNotMatchLessonsTime = false;
   campusNotFound = false;
