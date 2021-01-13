@@ -34,7 +34,7 @@ export class TestingService {
    *  - start: HH:mm
    *  - end: HH:mm
    * -------------------------------------------------------------------------------- */
-  createShiftsOnlyCourse(shifts: Shift[]): Course { // FIXME: if not used removed
+  createShiftsOnlyCourse(shifts: Shift[]): Course { // FIXME: if not used remove
     return new Course(this.COURSE_ID, this.COURSE_NAME, this.COURSE_ACRONYM, undefined, undefined, shifts);
   }
 

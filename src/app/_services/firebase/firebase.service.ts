@@ -28,12 +28,10 @@ export class FirebaseService {
   }
 
   hasDocument(collection: string, document: number, subCollection?: string, subDocument?: number): Promise<boolean> {
-    let ref;
-    if (subCollection && subDocument) {
-      ref = this.db.collection(collection).doc(document).collection(subCollection).doc(subDocument);
-    } else {
-      ref = this.db.collection(collection).doc(document);
-    }
+    const ref = subCollection && subDocument ?
+      this.db.collection(collection).doc(document).collection(subCollection).doc(subDocument) :
+      this.db.collection(collection).doc(document);
+
     return ref.get().then(doc => {
       return doc.exists;
     });
@@ -96,12 +94,10 @@ export class FirebaseService {
   }
 
   getCollection(collection: string, converter: any, document?: number, subCollection?: string): Promise<any> {
-    let ref;
-    if (document && subCollection) {
-      ref = this.db.collection(collection).doc(document).collection(subCollection);
-    } else {
-      ref = this.db.collection(collection);
-    }
+    const ref = document && subCollection ?
+      this.db.collection(collection).doc(document).collection(subCollection) :
+      this.db.collection(collection);
+
     return ref.withConverter(converter)
       .get()
       .then(querySnapshot => {

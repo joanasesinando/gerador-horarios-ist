@@ -64,7 +64,7 @@ export class StateService {
     if (this._coursesRepository.has(academicTerm) && this._coursesRepository.get(academicTerm).has(degreeID)) {
       const courses = this._coursesRepository.get(academicTerm).get(degreeID);
       for (const c of courses) {
-        if (c.id === courseID) { return true; }
+        if (c.id === courseID) return true;
       }
       return false;
     }

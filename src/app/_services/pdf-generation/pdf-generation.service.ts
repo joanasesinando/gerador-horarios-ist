@@ -32,7 +32,7 @@ export class PdfGenerationService {
 
     while (current !== end + 1) {
       let s = '';
-      if (current.toString().length === 1) { s += '0'; }
+      if (current.toString().length === 1) s += '0';
       s += current + ':00';
       timeline.push(s);
       current++;

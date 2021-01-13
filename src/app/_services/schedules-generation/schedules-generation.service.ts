@@ -174,7 +174,7 @@ export class SchedulesGenerationService {
     const classes: Class[] = [];
     for (const combination of this.allPossibleCases(shiftsArray)) {
       // Check for overlaps and discard
-      if (this.checkForOverlapsOnShifts(combination)) { continue; }
+      if (this.checkForOverlapsOnShifts(combination)) continue;
       classes.push(new Class(course, combination));
     }
 
@@ -187,7 +187,7 @@ export class SchedulesGenerationService {
     const schedules: Schedule[] = [];
     for (const combination of this.allPossibleCases(classes)) {
       // Check for overlaps and discard
-      if (this.checkForOverlapsOnClasses(combination)) { continue; }
+      if (this.checkForOverlapsOnClasses(combination)) continue;
       schedules.push(new Schedule(id++, combination));
     }
     return schedules;
@@ -210,13 +210,11 @@ export class SchedulesGenerationService {
     // Clean array: if any is [] remove
     for (let i = array.length - 1; i >= 0; i--) {
       const arrayToCheck = array[i];
-      if (arrayToCheck.length === 0) {
-        array.splice(i, 1);
-      }
+      if (arrayToCheck.length === 0) array.splice(i, 1);
     }
 
     // Nothing to combine
-    if (array.length === 0) { return []; }
+    if (array.length === 0) return [];
 
     return allPossibleCasesHelper(array, true);
 

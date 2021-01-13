@@ -225,8 +225,8 @@ describe('SchedulesGenerationService', () => {
           expect(cl.course).toEqual(course);
           expect(cl.shifts.length).toBe(2);
           expect(cl.shifts.includes(t1) || cl.shifts.includes(t2)).toBeTrue();
-          if (cl.shifts.includes(t1)) { expect(cl.shifts.includes(lab2)).toBeTrue(); }
-          else if (cl.shifts.includes(t2)){ expect(cl.shifts.includes(lab1)).toBeTrue(); }
+          if (cl.shifts.includes(t1)) expect(cl.shifts.includes(lab2)).toBeTrue();
+          else if (cl.shifts.includes(t2)) expect(cl.shifts.includes(lab1)).toBeTrue();
         });
       });
 

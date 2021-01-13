@@ -78,8 +78,8 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
     this.onWindowResize();
 
     this.keydownEventsSubscription = this.keydownEvents.subscribe(direction => {
-      if (direction === 'right') { this.next(); }
-      if (direction === 'left') { this.prev(); }
+      if (direction === 'right') this.next();
+      if (direction === 'left') this.prev();
     });
   }
 
@@ -94,9 +94,8 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
       // Convert to array (comes as object)
       const temp: Schedule[] = [];
       for (const key in this.schedules) {
-        if (this.schedules.hasOwnProperty(key)) {
+        if (this.schedules.hasOwnProperty(key))
           temp.push(this.schedules[key]);
-        }
       }
       this.schedules = temp;
 
@@ -105,9 +104,8 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
       this.scheduleInViewID = this.schedulesToShow[0].id;
 
       // Update timetable
-      if (this.schedulesToShow.length > 0) {
+      if (this.schedulesToShow.length > 0)
         this.organizeEventsPerWeekday(this.scheduleInViewID);
-      }
     }
   }
 
@@ -117,13 +115,13 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
 
     while (current !== end + 1) {
       let s = '';
-      if (current.toString().length === 1) { s += '0'; }
+      if (current.toString().length === 1) s += '0';
       s += current + ':00';
       timeline.push(s);
 
       if (current !== end) {
         s = '';
-        if (current.toString().length === 1) { s += '0'; }
+        if (current.toString().length === 1) s += '0';
         s += current + ':30';
         timeline.push(s);
       }

@@ -122,9 +122,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     // Check if request for academic terms is taking too long
     let tookToLong = true;
     setTimeout(() => {
-      if (tookToLong) {
+      if (tookToLong)
         alertService.showAlert('Serviço indisponível', 'O gerador encontra-se em baixo. Por favor, tenta de novo daqui a uns minutos.', 'danger');
-      }
     }, 15000);
 
     // Get academic terms

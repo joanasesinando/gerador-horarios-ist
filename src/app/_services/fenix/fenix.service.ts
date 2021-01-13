@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 
 import {TranslateService} from '@ngx-translate/core';
 import {ErrorService} from '../../_util/error.service';
+import _ from 'lodash';
 
 import {Course} from '../../_domain/Course/Course';
 import {Degree} from '../../_domain/Degree/Degree';
@@ -24,43 +25,45 @@ export class FenixService {
 
   constructor(public translateService: TranslateService, public errorService: ErrorService) { }
 
+  // FIXME: degree in course??
 
   /********************** CORRECT STRUCTURE **********************/
 
   parseDegree(degreeJson): Degree {
-    if (!degreeJson.id) { throw new Error('No ID found for degree'); }
-    if (!degreeJson.name) { throw new Error('No name found for degree ' + degreeJson.id); }
-    if (!degreeJson.acronym) { throw new Error('No acronym found for degree ' + degreeJson.id); }
+    if (!degreeJson.id) throw new Error('No ID found for degree');
+    if (!degreeJson.name) throw new Error('No name found for degree ' + degreeJson.id);
+    if (!degreeJson.acronym) throw new Error('No acronym found for degree ' + degreeJson.id);
 
     return new Degree(degreeJson.id, degreeJson.name, degreeJson.acronym);
   }
 
   parseCourseBasicInfo(course): Course {
-    if (!course.id) { throw new Error('No ID found for course'); }
-    if (!course.name) { throw new Error('No name found for course ' + course.id); }
-    if (!course.acronym) { throw new Error('No acronym found for course ' + course.id); }
+    if (!course.id) throw new Error('No ID found for course');
+    if (!course.name) throw new Error('No name found for course ' + course.id);
+    if (!course.acronym) throw new Error('No acronym found for course ' + course.id);
 
     return new Course(course.id, course.name, course.acronym);
   }
 
-  parseCourseMissingInfo(scheduleJson): void {
-    if (!scheduleJson.courseLoads) { throw new Error('No courseLoads found'); }
+  parseCourseMissingInfo(scheduleJson): {} {
+    if (!scheduleJson.courseLoads || scheduleJson.courseLoads.length === 0) throw new Error('No courseLoads found');
     scheduleJson.courseLoads.forEach(cl => {
-      if (!cl.type && cl.type !== '') { throw new Error('No type found in courseLoads'); }
-      if (!cl.unitQuantity && cl.unitQuantity !== 0) { throw new Error('No unitQuantity found in courseLoads'); }
+      if (!cl.type && cl.type !== '') throw new Error('No type found in courseLoads');
+      if (!cl.unitQuantity && cl.unitQuantity !== 0) throw new Error('No unitQuantity found in courseLoads');
     });
 
-    if (!scheduleJson.shifts) { throw new Error('No shifts found'); }
+    if (!scheduleJson.shifts) throw new Error('No shifts found');
     scheduleJson.shifts.forEach(shift => {
-      if (!shift.name) { throw new Error('No name found for shift'); }
-      if (!shift.types) { throw new Error('No type found for shift ' + shift.name); }
-      if (!shift.lessons) { throw new Error('No lessons found for shift ' + shift.name); }
+      if (!shift.name) throw new Error('No name found for shift');
+      if (!shift.types || shift.types.length === 0) throw new Error('No type found for shift ' + shift.name);
+      if (!shift.lessons || shift.lessons.length === 0) throw new Error('No lessons found for shift ' + shift.name);
 
       shift.lessons.forEach(lesson => {
-        if (!lesson.start && lesson.start !== '') { throw new Error('No start found for lesson'); }
-        if (!lesson.end && lesson.end !== '') { throw new Error('No end found for lesson'); }
+        if (!lesson.start) throw new Error('No start found for lesson');
+        if (!lesson.end) throw new Error('No end found for lesson');
       });
     });
+    return scheduleJson;
   }
 
   // Formats the type of class to one that's more readable
@@ -101,11 +104,10 @@ export class FenixService {
 
   // Fill-in missing info that's not crucial for generating schedules
   fillMissingInfo(course: Course): Course {
-    if (course.campus.length === 0) { course.campus = null; }
-    if (course.types.length === 0) { course.types = [ClassType.NONE]; }
-    if (course.shifts.length === 0) {
+    if (course.campus.length === 0) course.campus = null;
+    if (course.types.length === 0) course.types = [ClassType.NONE];
+    if (course.shifts.length === 0)
       throw new Error('No shifts found. Impossible to generate schedules for course: ' + course.name);
-    }
     return course;
   }
 
@@ -183,27 +185,20 @@ export class FenixService {
           const types: ClassType[] = this.getCourseTypes(scheduleJson.courseLoads);
 
           // Get shifts
-          let shifts = this.getShifts(scheduleJson.shifts, courseLoads);
+          const shifts = this.getShifts(scheduleJson.shifts);
 
           // Get course loads
-          let courseLoads = this.getCourseLoads(scheduleJson.courseLoads);
+          const courseLoads = this.calculateCourseLoads(shifts);
 
           // Get campus
           const campus: string[] = this.getCourseCampus(shifts);
 
-          // Update courseLoads & shifts if inconsistencies found
-          if (this.totalHoursPerWeekDoNotMatchLessonsTime) {
-            courseLoads = this.calculateCourseLoads(shifts);
-            shifts = this.getShifts(scheduleJson.shifts, courseLoads);
-            this.totalHoursPerWeekDoNotMatchLessonsTime = false;
-          }
-
           // Set shifts' & lessons' campus if none found, but found on course
           shifts.forEach(shift => {
-            if (!shift.campus && campus && campus.length === 1) { shift.campus = campus[0]; }
+            if (!shift.campus && campus && campus.length === 1) shift.campus = campus[0];
 
             shift.lessons.forEach(lesson => {
-              if (!lesson.campus && shift.campus) { lesson.campus = shift.campus; }
+              if (!lesson.campus && shift.campus) lesson.campus = shift.campus;
             });
           });
 
@@ -276,74 +271,62 @@ export class FenixService {
   /* --------------------------------------------------------------------------------
    * Returns lessons for a given shift.
    * --------------------------------------------------------------------------------
-   * [Algorithm] // FIXME: check if same week
+   * [Algorithm]
    *  - use 1st week as a baseline
    *  - iterate through the weeks and try to find 3 weeks with the same number of
    *    lessons as the baseline
    *  - if another week gets discovered with more lessons than the baseline,
    *    it becomes the new baseline, and tries to find 3 weeks similar to that again
+   *  - when 3 weeks with the same number of lessons are found, then return those
    *
    * (it is a good enough assumption that if there are at least 3 weeks with the same
    * type of schedule for the week, it's probably the de facto schedule; this
    * accommodates weeks where there are holidays and such)
    * -------------------------------------------------------------------------------- */
-  private getShiftLessons(lessons: {start: string, end: string, room?: {name: string, topLevelSpace?: {name: string}}}[]): Lesson[] {
+  getShiftLessons(lessons: {start: string, end: string, room?: {name: string, topLevelSpace?: {name: string}}}[]): Lesson[] {
+    let weekLessons: Lesson[] = [];
     let shiftLessons: Lesson[] = [];
     let counter = 0;
+    let max = 0;
 
-    const baseline = new Lesson(
-      new Date(lessons[0].start),
-      new Date(lessons[0].end),
-      lessons[0].room ? lessons[0].room.name : NO_ROOM_FOUND,
-      lessons[0].room.topLevelSpace ? lessons[0].room.topLevelSpace.name : null
-    );
+    while (counter < 3) {
+      weekLessons = [];
 
-    for (let i = 1; i < lessons.length; i++) {
-
-    }
-
-
-
-
-    while (shiftLessons.length === 0 || !this.hasTotalHoursPerWeek(hoursPerWeek, shiftLessons, shiftType)) {
-      // Total hours per week are incorrect
-      if (weekIndex === lessons.length) {
-        this.totalHoursPerWeekDoNotMatchLessonsTime = true;
-        break;
-      }
-
-      shiftLessons = [];
-
-      // Add lesson to compare to
-      const baseLesson = new Lesson(
-        new Date(lessons[weekIndex].start),
-        new Date(lessons[weekIndex].end),
-        lessons[weekIndex].room ? lessons[weekIndex].room.name : NO_ROOM_FOUND,
-        lessons[weekIndex].room ? lessons[weekIndex].room.topLevelSpace.name : null
+      const baseline = new Lesson(
+        new Date(lessons[0].start),
+        new Date(lessons[0].end),
+        lessons[0].room ? lessons[0].room.name : NO_ROOM_FOUND,
+        lessons[0].room && lessons[0].room.topLevelSpace ? lessons[0].room.topLevelSpace.name : null
       );
-      shiftLessons.push(baseLesson);
-      if (!baseLesson.campus) { this.campusNotFound = true; }
+      weekLessons.push(baseline);
+      lessons.shift();
 
-      // Find others on same week
-      for (const shiftLesson of lessons) { // FIXME
-        if (!shiftLesson.equal(baseLesson) && isSameWeek(baseLesson.start, new Date(shiftLesson.start))) {
-          const lesson = new Lesson(new Date(shiftLesson.start),
-            new Date(shiftLesson.end),
-            shiftLesson.room ? shiftLesson.room.name : NO_ROOM_FOUND,
-            shiftLesson.room ? shiftLesson.room.topLevelSpace.name : null
-          );
-          shiftLessons.push(lesson);
-          if (!baseLesson.campus) { this.campusNotFound = true; }
+      for (let i = lessons.length - 1; i >= 0; i--) {
+        const shiftLesson = new Lesson(
+          new Date(lessons[i].start),
+          new Date(lessons[i].end),
+          lessons[i].room ? lessons[i].room.name : NO_ROOM_FOUND,
+          lessons[i].room && lessons[i].room.topLevelSpace ? lessons[i].room.topLevelSpace.name : null
+        );
+
+        if (!shiftLesson.equal(baseline) && isSameWeek(baseline.start, shiftLesson.start)) {
+          weekLessons.push(shiftLesson);
+          lessons.splice(i, 1);
         }
       }
 
-      weekIndex++;
+      if (weekLessons.length > max) {
+        counter = 1;
+        max = weekLessons.length;
+        shiftLessons = _.cloneDeep(weekLessons);
+
+      } else if (weekLessons.length === max) counter++;
     }
 
     return shiftLessons;
   }
 
-  private getShifts(shiftsJson): Shift[] {
+  getShifts(shiftsJson): Shift[] {
     const shifts: Shift[] = [];
     for (const shift of shiftsJson) {
 
