@@ -170,8 +170,6 @@ describe('HomepageComponent', () => {
         const courseToAdd = courses[0];
         const index = 0;
 
-        spyOn(courseToAdd, 'hasFullInfo').and.returnValue(true);
-
         // Add course
         component.addCourse(courseToAdd.id);
         courses.splice(index, 1);
@@ -185,9 +183,6 @@ describe('HomepageComponent', () => {
         const courseToAdd1 = courses[0];
         const courseToAdd2 = courses[1];
         const index = 0;
-
-        spyOn(courseToAdd1, 'hasFullInfo').and.returnValue(true);
-        spyOn(courseToAdd2, 'hasFullInfo').and.returnValue(true);
 
         // Add course1
         component.addCourse(courseToAdd1.id);
@@ -204,18 +199,17 @@ describe('HomepageComponent', () => {
       });
 
       it('should add all courses of a degree', () => {
-        // const coursesToAdd = _.cloneDeep(courses);
-        //
-        // for (let i = courses.length - 1; i >= 0; i--) {
-        //   const courseToAdd = courses[i];
-        //   spyOn(courseToAdd, 'hasFullInfo').and.returnValue(true);
-        //   component.addCourse(courseToAdd.id);
-        //   courses.pop();
-        //   expect(component.selectedCoursesIDs.has(courseToAdd.id)).toBeTrue();
-        // }
-        //
-        // expect(component.selectedCourses).toEqual(coursesToAdd);
-        // expect(component.courses).toEqual([]);
+        const coursesToAdd = _.cloneDeep(courses);
+
+        for (let i = courses.length - 1; i >= 0; i--) {
+          const courseToAdd = courses[i];
+          component.addCourse(courseToAdd.id);
+          courses.pop();
+          expect(component.selectedCoursesIDs.has(courseToAdd.id)).toBeTrue();
+        }
+
+        expect(component.selectedCourses).toEqual(coursesToAdd);
+        expect(component.courses).toEqual([]);
       });
 
 

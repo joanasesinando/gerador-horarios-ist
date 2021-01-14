@@ -44,8 +44,7 @@ export class Course {
     return this.types !== undefined &&
       this.campus !== undefined &&
       this.shifts !== undefined &&
-      this.courseLoads !== undefined &&
-      this.degree !== undefined;
+      this.courseLoads !== undefined;
   }
 
   convertShifts(): {name: string, type: string, lessons: {}[], campus: string}[] {
