@@ -168,126 +168,83 @@ describe('FenixService', () => {
     describe('Catching course missing important info', () => {
       const parameters = [
         {
-          description: 'should catch no course loads',
-          input: {shifts: undefined},
-          error: new Error('No courseLoads found')
-        },
-        {
-          description: 'should catch null course loads',
-          input: {courseLoads: null, shifts: undefined},
-          error: new Error('No courseLoads found')
-        },
-        {
-          description: 'should catch empty course loads',
-          input: {courseLoads: [], shifts: undefined},
-          error: new Error('No courseLoads found')
-        },
-        {
-          description: 'should catch no type in course loads',
-          input: {courseLoads: [{unitQuantity: 0}], shifts: undefined},
-          error: new Error('No type found in courseLoads')
-        },
-        {
-          description: 'should catch null type in course loads',
-          input: {courseLoads: [{type: null, unitQuantity: 0}], shifts: undefined},
-          error: new Error('No type found in courseLoads')
-        },
-        {
-          description: 'should catch no unitQuantity in course loads',
-          input: {courseLoads: [{type: ''}], shifts: undefined},
-          error: new Error('No unitQuantity found in courseLoads')
-        },
-        {
-          description: 'should catch null unitQuantity in course loads',
-          input: {courseLoads: [{type: '', unitQuantity: null}], shifts: undefined},
-          error: new Error('No unitQuantity found in courseLoads')
-        },
-        {
           description: 'should catch no shifts',
-          input: {courseLoads: [{type: '', unitQuantity: 0}]},
+          input: {},
           error: new Error('No shifts found')
         },
         {
           description: 'should catch null shifts',
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: null},
+          input: {shifts: null},
           error: new Error('No shifts found')
         },
         {
           description: 'should catch no name for shift',
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{types: [], lessons: []}]},
+          input: {shifts: [{types: [], lessons: []}]},
           error: new Error('No name found for shift')
         },
         {
           description: 'should catch null name for shift',
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{name: null, types: [], lessons: []}]},
+          input: {shifts: [{name: null, types: [], lessons: []}]},
           error: new Error('No name found for shift')
         },
         {
           description: 'should catch empty name for shift',
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{name: '', types: [], lessons: []}]},
+          input: {shifts: [{name: '', types: [], lessons: []}]},
           error: new Error('No name found for shift')
         },
         {
           description: 'should catch no types for shift',
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{name: 'SN', lessons: []}]},
+          input: {shifts: [{name: 'SN', lessons: []}]},
           error: new Error('No type found for shift SN')
         },
         {
           description: 'should catch null types for shift',
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{name: 'SN', types: null, lessons: []}]},
+          input: {shifts: [{name: 'SN', types: null, lessons: []}]},
           error: new Error('No type found for shift SN')
         },
         {
           description: 'should catch empty types for shift',
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{name: 'SN', types: [], lessons: []}]},
+          input: {shifts: [{name: 'SN', types: [], lessons: []}]},
           error: new Error('No type found for shift SN')
         },
         {
           description: 'should catch no lessons for shift',
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{name: 'SN', types: ['']}]},
+          input: {shifts: [{name: 'SN', types: ['']}]},
           error: new Error('No lessons found for shift SN')
         },
         {
           description: 'should catch null lessons for shift',
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{name: 'SN', types: [''], lessons: null}]},
-          error: new Error('No lessons found for shift SN')
-        },
-        {
-          description: 'should catch empty lessons for shift',
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{name: 'SN', types: [''], lessons: []}]},
+          input: {shifts: [{name: 'SN', types: [''], lessons: null}]},
           error: new Error('No lessons found for shift SN')
         },
         {
           description: 'should catch no start for lesson',
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{name: 'SN', types: [''], lessons: [{end: ''}]}]},
+          input: {shifts: [{name: 'SN', types: [''], lessons: [{end: ''}]}]},
           error: new Error('No start found for lesson')
         },
         {
           description: 'should catch null start for lesson',
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{name: 'SN', types: [''], lessons: [{start: null, end: ''}]}]},
+          input: {shifts: [{name: 'SN', types: [''], lessons: [{start: null, end: ''}]}]},
           error: new Error('No start found for lesson')
         },
         {
           description: 'should catch empty start for lesson',
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{name: 'SN', types: [''], lessons: [{start: '', end: ''}]}]},
+          input: {shifts: [{name: 'SN', types: [''], lessons: [{start: '', end: ''}]}]},
           error: new Error('No start found for lesson')
         },
         {
           description: 'should catch no end for lesson',
-          // tslint:disable-next-line:max-line-length
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{name: 'SN', types: [''], lessons: [{start: '2020-09-21 08:00:00'}]}]},
+          input: {shifts: [{name: 'SN', types: [''], lessons: [{start: '2020-09-21 08:00:00'}]}]},
           error: new Error('No end found for lesson')
         },
         {
           description: 'should catch null end for lesson',
-          // tslint:disable-next-line:max-line-length
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{name: 'SN', types: [''], lessons: [{start: '2020-09-21 08:00:00', end: null}]}]},
+          input: {shifts: [{name: 'SN', types: [''], lessons: [{start: '2020-09-21 08:00:00', end: null}]}]},
           error: new Error('No end found for lesson')
         },
         {
           description: 'should catch empty end for lesson',
-          // tslint:disable-next-line:max-line-length
-          input: {courseLoads: [{type: '', unitQuantity: 0}], shifts: [{name: 'SN', types: [''], lessons: [{start: '2020-09-21 08:00:00', end: ''}]}]},
+          input: {shifts: [{name: 'SN', types: [''], lessons: [{start: '2020-09-21 08:00:00', end: ''}]}]},
           error: new Error('No end found for lesson')
         }
       ];
@@ -374,30 +331,16 @@ describe('FenixService', () => {
           .toThrow(new Error('No shifts found. Impossible to generate schedules for course: ' + course.name));
       });
     });
-
-    describe('Checking total hours per week for a shift', () => {
-      let testingService: TestingService;
-      let lessons: Lesson[];
-
-      beforeEach(() => {
-        testingService = new TestingService();
-        lessons = [
-          testingService.createTimeOnlyLesson('mon', '08:00', '09:30'),
-          testingService.createTimeOnlyLesson('wed', '08:00', '09:30')
-        ];
-      });
-
-      it('should have the right amount of hours per week', () => {
-        expect(service.hasTotalHoursPerWeek({[ClassType.THEORY_PT]: 3}, lessons, ClassType.THEORY_PT)).toBeTrue();
-      });
-
-      it('should NOT have the right amount of hours per week', () => {
-        expect(service.hasTotalHoursPerWeek({[ClassType.THEORY_PT]: 1.5}, lessons, ClassType.THEORY_PT)).toBeFalse();
-      });
-    });
   });
 
   describe('HTTP Requests', () => {
+    let  originalTimeout;
+
+    beforeEach(() => {
+      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
+    });
+
     it('should get current academic term', async () => {
       const currentYear = new Date().getFullYear();
       const currentMonth = new Date().getMonth() + 1;
@@ -425,7 +368,7 @@ describe('FenixService', () => {
       });
     });
 
-    it('should get course basic info for LEIC-A for current academic term', async () => {
+    it('should get basic info for all LEIC-A courses of current academic term', async () => {
       const currentAcademicTerm = await service.getCurrentAcademicTerm();
       const degreeID = 2761663971474;
       const courses = await service.getCoursesBasicInfo(currentAcademicTerm, degreeID);
@@ -444,20 +387,102 @@ describe('FenixService', () => {
       });
     });
 
-    it('should get missing info for course BD of degree LEIC-A', async () => {
+    it('should get course basic info for course BD of degree LEIC-A for current academic term', async () => {
       translation.use('pt-PT');
-      let course = new Course(846035542878562, 'Base de Dados', 'BD');
-      course = await service.getMissingCourseInfo(course);
 
-      expect(course).toBeTruthy();
-      expect(course.types).toEqual([ClassType.THEORY_PT, ClassType.LAB_PT]);
-      expect(course.campus).toEqual(['Alameda', 'Taguspark']);
-      expect(course.shifts).toBeTruthy();
-      expect(course.courseLoads).toEqual({[ClassType.THEORY_PT]: 3, [ClassType.LAB_PT]: 1.5});
+      const currentAcademicTerm = await service.getCurrentAcademicTerm();
+      const degreeID = 2761663971474;
+      const courses = await service.getCoursesBasicInfo(currentAcademicTerm, degreeID);
+      expect(courses).toBeTruthy();
+
+      for (const course of courses) {
+        // tslint:disable-next-line:triple-equals
+        if (course.id == 846035542878562) {
+          expect(course.name).toBe('Bases de Dados');
+          expect(course.acronym).toBe('BD225179577');
+          break;
+        }
+      }
     });
 
-    it('should check courses full info from all degrees for current academic term', () => {
-      // TODO
+    it('should get missing info for course BD of degree LEIC-A for current academic term', async () => {
+      translation.use('pt-PT');
+
+      const currentAcademicTerm = await service.getCurrentAcademicTerm();
+      const degreeID = 2761663971474;
+      const courses = await service.getCoursesBasicInfo(currentAcademicTerm, degreeID);
+
+      for (let course of courses) {
+        // tslint:disable-next-line:triple-equals
+        if (course.id == 846035542878562) {
+          course = await service.getMissingCourseInfo(course);
+          expect(course).toBeTruthy();
+          expect(course.types).toEqual([ClassType.THEORY_PT, ClassType.LAB_PT]);
+          expect(course.campus).toEqual(['Alameda', 'Taguspark']);
+          expect(course.shifts).toBeTruthy();
+          expect(course.courseLoads).toEqual({[ClassType.THEORY_PT]: 3, [ClassType.LAB_PT]: 1.5});
+          break;
+        }
+      }
+    });
+
+    it('should get missing info for all LEIC-A courses of current academic term', async () => {
+      const currentAcademicTerm = await service.getCurrentAcademicTerm();
+      const degreeID = 2761663971474;
+      const courses = await service.getCoursesBasicInfo(currentAcademicTerm, degreeID);
+      expect(courses).toBeTruthy();
+
+      for (let i = 0; i < courses.length; i++) {
+        const course = await service.getMissingCourseInfo(courses[i]);
+        expect(course).toBeTruthy();
+        expect(course.constructor.name).toEqual(Course.name);
+        expect(course.types).toBeTruthy();
+        expect(course.types.length !== 0).toBeTrue();
+        expect(course.campus).toBeTruthy();
+        expect(course.campus.length !== 0).toBeTrue();
+        expect(course.shifts).toBeTruthy();
+        expect(course.shifts.length !== 0).toBeTrue();
+        expect(course.courseLoads).toBeTruthy();
+
+        if (i < courses.length - 1)
+          expect(course.acronym.localeCompare(courses[i + 1].acronym)).toBeLessThan(0);
+      }
+    });
+
+    // it('should check courses full info from all degrees for current academic term', async () => {
+    //   const currentAcademicTerm = await service.getCurrentAcademicTerm();
+    //   const degrees = await service.getDegrees(currentAcademicTerm);
+    //
+    //   for (const degree of degrees) {
+    //     const courses = await service.getCoursesBasicInfo(currentAcademicTerm, degree.id);
+    //     expect(courses).toBeTruthy();
+    //
+    //     for (let course of courses) {
+    //       expect(course).toBeTruthy();
+    //       expect(course.constructor.name).toEqual(Course.name);
+    //       expect(course.id).toBeTruthy();
+    //       expect(course.name).toBeTruthy();
+    //       expect(course.acronym).toBeTruthy();
+    //       expect(course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9').toBeFalse();
+    //
+    //       course = await service.getMissingCourseInfo(course);
+    //
+    //       if (course) {
+    //         expect(course).toBeTruthy();
+    //         expect(course.constructor.name).toEqual(Course.name);
+    //         expect(course.types).toBeTruthy();
+    //         expect(course.types.length !== 0).toBeTrue();
+    //         expect(course.shifts).toBeTruthy();
+    //         expect(course.shifts.length !== 0).toBeTrue();
+    //         expect(course.courseLoads).toBeTruthy();
+    //       }
+    //     }
+    //   }
+    //   expect(true).toBeTrue();
+    // });
+
+    afterEach(() => {
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
     });
   });
 
@@ -474,10 +499,6 @@ describe('FenixService', () => {
   });
 
   describe('Course related', () => {
-    it('should get course loads', () => {
-      expect(service.getCourseLoads([{type: 'T', unitQuantity: '1.5'}])).toEqual({T: 1.5});
-    });
-
     describe('Calculating course loads', () => {
       let testingService: TestingService;
 
@@ -524,9 +545,33 @@ describe('FenixService', () => {
         .toEqual(['Alameda', 'Taguspark']);
     });
 
+    it('should get course campus: no campus', () => {
+      class MockShift extends Shift {
+        constructor(_campus: string) {
+          super(undefined, undefined, [new MockLesson(_campus), new MockLesson(_campus)], _campus);
+        }
+      }
+
+      class MockLesson extends Lesson {
+        constructor(_campus: string) {
+          super(undefined, undefined, undefined, _campus);
+        }
+      }
+      expect(service.getCourseCampus([new MockShift(null), new MockShift(null)]))
+        .toEqual([]);
+    });
+
     it('should get course types', () => {
       translation.use('pt-PT');
-      expect(service.getCourseTypes([{type: 'LABORATORIAL'}, {type: 'TEORICA'}]))
+      expect(service.getCourseTypes([
+        new Shift('SH01', ClassType.THEORY_PT, [], ''),
+        new Shift('SH02', ClassType.LAB_PT, [], ''),
+        new Shift('SH03', ClassType.THEORY_PT, [], ''),
+        new Shift('SH04', ClassType.LAB_PT, [], ''),
+        new Shift('SH05', ClassType.LAB_PT, [], ''),
+        new Shift('SH06', ClassType.LAB_PT, [], ''),
+        new Shift('SH07', ClassType.THEORY_PT, [], ''),
+      ]))
         .toEqual([ClassType.THEORY_PT, ClassType.LAB_PT]);
     });
 
@@ -566,6 +611,20 @@ describe('FenixService', () => {
             new Lesson(new Date('2020-09-21 08:00:00'), new Date('2020-09-21 09:30:00'), 'NO ROOM FOUND', null),
             new Lesson(new Date('2020-09-23 08:00:00'), new Date('2020-09-23 09:30:00'), 'NO ROOM FOUND', null),
           ]
+        },
+        {
+          description: 'should get shift lessons: only one lesson',
+          input: [
+            {start: '2020-09-21 08:00:00', end: '2020-09-21 09:30:00'},
+          ],
+          output: [
+            new Lesson(new Date('2020-09-21 08:00:00'), new Date('2020-09-21 09:30:00'), 'NO ROOM FOUND', null)
+          ]
+        },
+        {
+          description: 'should get shift lessons: no lessons',
+          input: [],
+          output: []
         }
       ];
 

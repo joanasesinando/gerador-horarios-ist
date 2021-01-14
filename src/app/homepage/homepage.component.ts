@@ -40,7 +40,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   mobileView = false;
   featuresHorizontal = false;
-  noShiftsFound = false;
 
   academicTerms: string[] = [];
   degrees: Degree[] = [];
@@ -394,10 +393,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
       // Reset select
       this.courseFormControl.patchValue(-1);
-
-    } else {
-      this.noShiftsFound = true;
-      this.errorService.showError('No shifts found. Impossible to generate schedules for this course');
     }
 
     addBtn.attr('disabled', false);
@@ -476,7 +471,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.updateTypesOfClasses();
 
     for (const course of this.stateService.selectedCourses) {
-      this.removeShiftsBasedOnCampus(course);
+      if (course.campus) this.removeShiftsBasedOnCampus(course);
       this.removeShiftsBasedOnTypesOfClasses(course);
     }
   }

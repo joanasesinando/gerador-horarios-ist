@@ -45,25 +45,18 @@ export class FenixService {
     return new Course(course.id, course.name, course.acronym);
   }
 
-  parseCourseMissingInfo(scheduleJson): {} {
-    if (!scheduleJson.courseLoads || scheduleJson.courseLoads.length === 0) throw new Error('No courseLoads found');
-    scheduleJson.courseLoads.forEach(cl => {
-      if (!cl.type && cl.type !== '') throw new Error('No type found in courseLoads');
-      if (!cl.unitQuantity && cl.unitQuantity !== 0) throw new Error('No unitQuantity found in courseLoads');
-    });
-
+  parseCourseMissingInfo(scheduleJson): void {
     if (!scheduleJson.shifts) throw new Error('No shifts found');
     scheduleJson.shifts.forEach(shift => {
       if (!shift.name) throw new Error('No name found for shift');
       if (!shift.types || shift.types.length === 0) throw new Error('No type found for shift ' + shift.name);
-      if (!shift.lessons || shift.lessons.length === 0) throw new Error('No lessons found for shift ' + shift.name);
+      if (!shift.lessons) throw new Error('No lessons found for shift ' + shift.name);
 
       shift.lessons.forEach(lesson => {
         if (!lesson.start) throw new Error('No start found for lesson');
         if (!lesson.end) throw new Error('No end found for lesson');
       });
     });
-    return scheduleJson;
   }
 
   // Formats the type of class to one that's more readable
@@ -109,14 +102,6 @@ export class FenixService {
     if (course.shifts.length === 0)
       throw new Error('No shifts found. Impossible to generate schedules for course: ' + course.name);
     return course;
-  }
-
-  hasTotalHoursPerWeek(hoursPerWeek: {[classType: string]: number}, lessons: Lesson[], shiftType: ClassType): boolean {
-    const MILLISECONDS_IN_AN_HOUR = 60 * 60 * 1000;
-    let totalHoursPerWeek = 0;
-    for (const lesson of lessons)
-      totalHoursPerWeek += Math.abs(lesson.end.getTime() - lesson.start.getTime()) / MILLISECONDS_IN_AN_HOUR;
-    return totalHoursPerWeek === hoursPerWeek[shiftType];
   }
 
 
@@ -174,18 +159,18 @@ export class FenixService {
       });
   }
 
-  getMissingCourseInfo(course: Course): Promise<Course> { // TODO: testing
+  getMissingCourseInfo(course: Course): Promise<Course> {
     return this.httpGet('courses/' + course.id + '/schedule' + '?lang=' + this.getLanguage())
       .then(r => r.json())
       .then(scheduleJson => {
         try {
           this.parseCourseMissingInfo(scheduleJson);
 
-          // Get types
-          const types: ClassType[] = this.getCourseTypes(scheduleJson.courseLoads);
-
           // Get shifts
           const shifts = this.getShifts(scheduleJson.shifts);
+
+          // Get types
+          const types: ClassType[] = this.getCourseTypes(shifts);
 
           // Get course loads
           const courseLoads = this.calculateCourseLoads(shifts);
@@ -230,13 +215,6 @@ export class FenixService {
 
   /********************** COURSE RELATED **********************/
 
-  getCourseLoads(courseLoads): {[key: string]: number} {
-    const loads: {[key: string]: number} = {};
-    for (const cl of courseLoads)
-      loads[cl.type] = parseFloat(cl.unitQuantity);
-    return loads;
-  }
-
   calculateCourseLoads(shifts: Shift[]): {} {
     const courseLoads: {[key: string]: number} = {};
     for (const shift of shifts) {
@@ -261,10 +239,11 @@ export class FenixService {
     return campus.sort();
   }
 
-  getCourseTypes(courseLoads): ClassType[] {
+  getCourseTypes(shifts: Shift[]): ClassType[] {
     const types: ClassType[] = [];
-    for (const cl of courseLoads)
-      types.push(this.formatType(cl.type));
+    for (const shift of shifts) {
+      if (!types.includes(shift.type)) types.push(shift.type);
+    }
     return types.sort((a, b) => getClassTypeOrder(a) - getClassTypeOrder(b));
   }
 
@@ -272,26 +251,19 @@ export class FenixService {
    * Returns lessons for a given shift.
    * --------------------------------------------------------------------------------
    * [Algorithm]
-   *  - use 1st week as a baseline
-   *  - iterate through the weeks and try to find 3 weeks with the same number of
-   *    lessons as the baseline
-   *  - if another week gets discovered with more lessons than the baseline,
-   *    it becomes the new baseline, and tries to find 3 weeks similar to that again
-   *  - when 3 weeks with the same number of lessons are found, then return those
-   *
-   * (it is a good enough assumption that if there are at least 3 weeks with the same
-   * type of schedule for the week, it's probably the de facto schedule; this
-   * accommodates weeks where there are holidays and such)
+   *  - iterate through the weeks and count number of lessons
+   *  - return lessons on a week with the highest number of lessons
+   * (this is to account for holidays and off days)
    * -------------------------------------------------------------------------------- */
   getShiftLessons(lessons: {start: string, end: string, room?: {name: string, topLevelSpace?: {name: string}}}[]): Lesson[] {
     let weekLessons: Lesson[] = [];
     let shiftLessons: Lesson[] = [];
-    let counter = 0;
     let max = 0;
 
-    while (counter < 3) {
+    while (lessons.length !== 0) {
       weekLessons = [];
 
+      // Set baseline
       const baseline = new Lesson(
         new Date(lessons[0].start),
         new Date(lessons[0].end),
@@ -301,6 +273,7 @@ export class FenixService {
       weekLessons.push(baseline);
       lessons.shift();
 
+      // Find lessons on same week as baseline
       for (let i = lessons.length - 1; i >= 0; i--) {
         const shiftLesson = new Lesson(
           new Date(lessons[i].start),
@@ -315,12 +288,11 @@ export class FenixService {
         }
       }
 
+      // Update max value
       if (weekLessons.length > max) {
-        counter = 1;
         max = weekLessons.length;
         shiftLessons = _.cloneDeep(weekLessons);
-
-      } else if (weekLessons.length === max) counter++;
+      }
     }
 
     return shiftLessons;
@@ -329,6 +301,7 @@ export class FenixService {
   getShifts(shiftsJson): Shift[] {
     const shifts: Shift[] = [];
     for (const shift of shiftsJson) {
+      if (shift.lessons.length === 0) continue;
 
       // Get shift type
       const shiftType = this.formatType(shift.types[0]);
