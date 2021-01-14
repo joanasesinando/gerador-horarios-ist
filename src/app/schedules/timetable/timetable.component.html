@@ -4,11 +4,10 @@
   (swipeleft)="next()" (swiperight)="prev()">
 
   <p *ngIf="!mobileView" class="schedule-ID">Horário ID: {{scheduleInViewID + 1}}</p>
-  <p *ngIf="mobileView" class="schedule-ID">HID: {{scheduleInViewID + 1}}</p>
+  <p *ngIf="mobileView" class="schedule-ID">ID: {{scheduleInViewID + 1}}</p>
 
   <!-- Previous btn -->
-  <fa-icon [ngClass]="{'invisible': schedulesToShow.length < 2 || scheduleInViewIndex === 0}"
-           [icon]="faCaretLeft" class="prev mr-4" (click)="prev()"></fa-icon>
+  <fa-icon [icon]="faCaretLeft" class="prev mr-4" (click)="prev()"></fa-icon>
 
   <div class="schedule">
 
@@ -142,6 +141,5 @@
   </div> <!-- .schedule -->
 
   <!-- Next btn -->
-  <fa-icon [ngClass]="{'invisible': schedulesToShow.length < 2 || scheduleInViewIndex >= schedulesToShow.length - 1}"
-           [icon]="faCaretRight" class="next ml-4" (click)="next()"></fa-icon>
+  <fa-icon [icon]="faCaretRight" class="next ml-4" (click)="next()"></fa-icon>
 </div>

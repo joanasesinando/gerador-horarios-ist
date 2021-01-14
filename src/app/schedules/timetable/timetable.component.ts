@@ -173,17 +173,25 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
   prev(): void {
     if (this.scheduleInViewIndex > 0) {
       this.scheduleInViewID = this.schedulesToShow[--this.scheduleInViewIndex].id;
-      this.organizeEventsPerWeekday(this.scheduleInViewID);
-      this.schedulePicked();
+
+    } else {
+      this.scheduleInViewIndex = this.schedulesToShow.length - 1;
+      this.scheduleInViewID = this.schedulesToShow[this.scheduleInViewIndex].id;
     }
+    this.organizeEventsPerWeekday(this.scheduleInViewID);
+    this.schedulePicked();
   }
 
   next(): void {
     if (this.scheduleInViewIndex < this.schedulesToShow.length - 1) {
       this.scheduleInViewID = this.schedulesToShow[++this.scheduleInViewIndex].id;
-      this.organizeEventsPerWeekday(this.scheduleInViewID);
-      this.schedulePicked();
+
+    } else {
+      this.scheduleInViewIndex = 0;
+      this.scheduleInViewID = this.schedulesToShow[this.scheduleInViewIndex].id;
     }
+    this.organizeEventsPerWeekday(this.scheduleInViewID);
+    this.schedulePicked();
   }
 
   getTop(start: string): string {
