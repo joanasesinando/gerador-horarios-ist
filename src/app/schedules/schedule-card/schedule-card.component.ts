@@ -3,7 +3,7 @@ import {Component, EventEmitter, HostListener, Input, OnInit, Output} from '@ang
 import { faCaretDown, faCaretUp, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import { Schedule } from '../../_domain/Schedule/Schedule';
-import {ClassType, minifyClassType} from '../../_domain/ClassType/ClassType';
+import {ClassType, getClassTypeOrder, minifyClassType} from '../../_domain/ClassType/ClassType';
 
 import {TranslateService} from '@ngx-translate/core';
 
@@ -30,6 +30,10 @@ export class ScheduleCardComponent implements OnInit {
 
   ngOnInit(): void {
     this.onWindowResize();
+
+    this.schedule.classes.forEach(cl => {
+      cl.shifts.sort((a, b) => getClassTypeOrder(a.type) - getClassTypeOrder(b.type));
+    });
   }
 
   toggle(): void {

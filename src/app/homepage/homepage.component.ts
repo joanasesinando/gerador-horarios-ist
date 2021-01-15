@@ -127,7 +127,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           alertService.showAlert('Serviço indisponível', 'O gerador encontra-se em baixo. Por favor, tenta de novo daqui a uns minutos.', 'danger') :
           alertService.showAlert('Unavailable service', 'The generator is down. Please try again later.', 'danger');
       }
-    }, 10000);
+    }, 15000);
 
     // Get academic terms
     this.fenixService.getAcademicTerms().then(academicTerms => {

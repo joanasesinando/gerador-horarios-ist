@@ -57,12 +57,31 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
   ) {
     setTimeout(() => {
       if (!this.pinActivated) {
-        this.alertService.showAlert(
-          '💬 Dica',
-          'Sabias que podes fixar uma aula clicando nela? Experimenta!',
-          'info');
+        this.translateService.currentLang === 'pt-PT' ?
+          this.alertService.showAlert(
+            '💬 Dica',
+            'Sabias que podes fixar uma aula clicando nela? Experimenta!',
+            'info') :
+          this.alertService.showAlert(
+            '💬 Tip',
+            'Did you know you can pin a class slot by clicking on it? Give it a try!',
+            'info');
       }
     }, 120000);
+
+    if (!this.mobileView && Math.random() < 0.3) {
+      setTimeout(() => {
+        this.translateService.currentLang === 'pt-PT' ?
+          this.alertService.showAlert(
+            '💬 Dica',
+            'Sabias que podes usar as setas do teclado para saltar entre horários? Experimenta!',
+            'info') :
+          this.alertService.showAlert(
+            '💬 Tip',
+            'Did you know you can use the keyboard arrows to jump between schedules? Give it a try!',
+            'info');
+      }, 50000);
+    }
   }
 
   ngOnInit(): void {
