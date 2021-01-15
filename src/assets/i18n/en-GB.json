@@ -31,9 +31,34 @@
   },
 
   "order-by": {
-    "most-compact": "Most compact",
-    "most-balanced": "Most balanced",
-    "most-free-days": "More free days"
+    "most-compact": "Favours schedules with fewer wholes and closer classes",
+    "most-balanced": "Favours schedules that are more balanced through the week (avoid strenuous days)",
+    "most-free-days": "Favours schedules that have more free days"
+  },
+
+  "schedules": {
+    "heading": {
+      "one": "Generated 1 possible schedule",
+      "more": {
+        "left": "Generated",
+        "right": "possible schedules"
+      }
+    },
+    "order-by": {
+      "title": "Order by:",
+      "most-compact": "Most compact",
+      "most-balanced": "Most balanced",
+      "more-free-days": "More free days"
+    },
+    "schedule": "Schedule",
+    "addSchedule": "Add Schedule",
+    "see": "See",
+    "selected": {
+      "one": "selected schedule",
+      "more": "selected schedules"
+    },
+    "none": "No",
+    "save": "Save"
   },
 
   "week-days": {

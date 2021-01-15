@@ -95,12 +95,12 @@
             <div class="btn-lang">
               <fa-icon [icon]="faGlobeEurope" class="fa-lg dropdown-toggle" type="button" data-toggle="dropdown"></fa-icon>
               <div class="dropdown-menu">
-                <a class="dropdown-item d-flex align-items-center" (click)="translateService.use('pt-PT')">
+                <a class="dropdown-item d-flex align-items-center" (click)="changeLanguage('pt-PT')">
                   <img class="mr-2" src="assets/imgs/pt.svg" alt="portuguese">
                   PT
                 </a>
 
-                <a class="dropdown-item d-flex align-items-center" (click)="translateService.use('en-GB')">
+                <a class="dropdown-item d-flex align-items-center" (click)="changeLanguage('en-GB')">
                   <img class="mr-2" src="assets/imgs/en.svg" alt="english">
                   EN
                 </a>

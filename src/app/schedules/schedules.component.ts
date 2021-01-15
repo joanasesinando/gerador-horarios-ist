@@ -132,8 +132,11 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
           this.stateService.schedulesSortedByMostFreeDays :
           this.generationService.sortByMostFreeDays(this.generatedSchedules);
 
-        if (this.generationService.generatedSchedulesInfo.get(this.generatedSchedules[0].id).nr_free_days === 0)
-          this.alertService.showAlert('Atenção', 'Não existe nenhum horário com dias livres', 'warning');
+        if (this.generationService.generatedSchedulesInfo.get(this.generatedSchedules[0].id).nr_free_days === 0) {
+          this.translateService.currentLang === 'pt-PT' ?
+            this.alertService.showAlert('Atenção', 'Não existe nenhum horário com dias livres', 'warning') :
+            this.alertService.showAlert('Attention', 'There is no schedule with free days', 'warning');
+        }
         break;
 
       case 'compact':
@@ -154,7 +157,9 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     if (!this.schedulesPicked.includes(scheduleToAdd)) {
       this.schedulesPicked.push(scheduleToAdd);
     } else {
-      this.alertService.showAlert('Atenção', 'Este horário já foi adicionado!', 'warning');
+      this.translateService.currentLang === 'pt-PT' ?
+        this.alertService.showAlert('Atenção', 'Este horário já foi adicionado!', 'warning') :
+        this.alertService.showAlert('Attention', 'Schedule already added!', 'warning');
     }
     this.logger.log('schedules picked', this.schedulesPicked);
   }
@@ -190,6 +195,10 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
 
   onKeyDownArrowLeft(): void {
     this.keyDownSubject.next('left');
+  }
+
+  capitalize(s: string): string {
+    return s[0].toUpperCase() + s.substr(1);
   }
 
   @HostListener('window:resize', [])

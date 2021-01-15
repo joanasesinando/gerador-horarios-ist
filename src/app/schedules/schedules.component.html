@@ -23,9 +23,9 @@
 
               <!-- Title -->
               <h4 *ngIf="generatedSchedules.length == 1"
-                  class="schedules-gen-heading mb-4">Gerado 1 horário possível</h4>
-              <h4 *ngIf="generatedSchedules.length > 1"
-                  class="schedules-gen-heading mb-4">Gerados {{generatedSchedules.length}} horários possíveis</h4>
+                  class="schedules-gen-heading mb-4">{{'schedules.heading.one' | translate}}</h4>
+              <h4 *ngIf="generatedSchedules.length > 1" class="schedules-gen-heading mb-4">
+                {{'schedules.heading.more.left' | translate}} {{generatedSchedules.length}} {{'schedules.heading.more.right' | translate}}</h4>
 
               <!-- Show options -->
               <div *ngIf="generatedSchedules.length > 1" class="show-options d-lg-flex">
@@ -33,7 +33,7 @@
                   <div *ngIf="spinners.sorting" class="loading-sort spinner-border spinner-border-sm text-primary" role="status">
                     <span class="sr-only">Loading...</span>
                   </div>
-                  <span class="mr-lg-4 mb-2 mb-lg-0"><b>Ordenar por:</b></span>
+                  <span class="mr-lg-4 mb-2 mb-lg-0"><b>{{'schedules.order-by.title' | translate}}</b></span>
                 </div>
 
                 <div class="options">
@@ -41,7 +41,7 @@
                   <div class="custom-control custom-radio custom-control-inline mr-4 mb-2 mt-2 mt-lg-0">
                     <input type="radio" id="show-options-compact" name="show-options"
                            class="custom-control-input" [checked]="true" (click)="pickViewOption('compact')">
-                    <label class="custom-control-label" for="show-options-compact">Mais compacto</label>
+                    <label class="custom-control-label" for="show-options-compact">{{'schedules.order-by.most-compact' | translate}}</label>
                     <fa-icon class="help ml-2" [icon]="faQuestionCircle"
                              id="compact-tooltip" data-toggle="tooltip" data-placement="top"></fa-icon>
                   </div>
@@ -49,7 +49,7 @@
                   <div class="custom-control custom-radio custom-control-inline mr-4 mb-2">
                     <input type="radio" id="show-options-balanced" name="show-options"
                            class="custom-control-input" [checked]="false" (click)="pickViewOption('balanced')">
-                    <label class="custom-control-label" for="show-options-balanced">Mais equilibrado</label>
+                    <label class="custom-control-label" for="show-options-balanced">{{'schedules.order-by.most-balanced' | translate}}</label>
                     <fa-icon class="help ml-2" [icon]="faQuestionCircle"
                              id="balanced-tooltip" data-toggle="tooltip" data-placement="top"></fa-icon>
                   </div>
@@ -57,7 +57,7 @@
                   <div class="custom-control custom-radio custom-control-inline mr-0 mb-2">
                     <input type="radio" id="show-options-free-days" name="show-options"
                            class="custom-control-input" [checked]="false" (click)="pickViewOption('free-days')">
-                    <label class="custom-control-label" for="show-options-free-days">Mais dias livres</label>
+                    <label class="custom-control-label" for="show-options-free-days">{{'schedules.order-by.more-free-days' | translate}}</label>
                     <fa-icon class="help ml-2" [icon]="faQuestionCircle"
                              id="free-days-tooltip" data-toggle="tooltip" data-placement="top"></fa-icon>
                   </div>
@@ -73,9 +73,9 @@
               <!-- Add btn -->
               <div class="btn-add d-flex flex-column align-items-center">
                 <button class="btn btn-primary mt-4" [ngClass]="{'btn-block': mobileView}"
-                        type="button" (click)="addSchedule(scheduleInViewID)">Adicionar Horário</button>
+                        type="button" (click)="addSchedule(scheduleInViewID)">{{'schedules.addSchedule' | translate}}</button>
                 <a *ngIf="mobileView" href="#selected-schedules"
-                   class="d-block text-center mt-4">Ver horários escolhidos</a>
+                   class="d-block text-center mt-4">{{'schedules.see' | translate}} {{'schedules.selected.more' | translate}}</a>
               </div>
 
             </div>
@@ -92,8 +92,8 @@
 
       <!-- Selected schedules -->
       <div class="selected-schedules-heading text-white">
-        <h5 class="mb-4 mb-lg-2">Horários escolhidos</h5>
-        <p *ngIf="schedulesPicked.length === 0" class="mt-3"><em>Nenhum horário escolhido</em></p>
+        <h5 class="mb-4 mb-lg-2">{{capitalize('schedules.selected.more' | translate)}}</h5>
+        <p *ngIf="schedulesPicked.length === 0" class="mt-3"><em>{{'schedules.none' | translate}} {{'schedules.selected.one' | translate}}</em></p>
       </div>
 
       <div class="schedules-deck">
@@ -106,7 +106,7 @@
 
       <!-- Save btn -->
       <button *ngIf="schedulesPicked.length > 0" class="btn btn-primary btn-block btn-lg btn-save mt-5"
-              type="button" (click)="save()">Guardar</button>
+              type="button" (click)="save()">{{'schedules.save' | translate}}</button>
 
     </div> <!-- /.sidebar -->
 

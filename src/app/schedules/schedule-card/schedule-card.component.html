@@ -11,7 +11,7 @@
       <fa-icon [icon]="faTimes"></fa-icon>
     </button>
 
-    <h6 class="text-primary font-weight-bold mb-1 mt-lg-1">Horário #{{schedule.id + 1}}</h6>
+    <h6 class="text-primary font-weight-bold mb-1 mt-lg-1">{{'schedules.schedule' | translate}} #{{schedule.id + 1}}</h6>
 
     <div class="collapse show" id="schedulesClasses-{{schedule.id}}">
       <div *ngFor="let cl of schedule.classes" class="schedule-class text-left mt-3">

@@ -9,6 +9,8 @@ import {Schedule} from '../../_domain/Schedule/Schedule';
 })
 export class StateService {
 
+  private _selectedLanguage = 'pt-PT';
+
   private _academicTermsRepository: string[] = null;
   private _degreesRepository: Map<string, Degree[]>
     = new Map<string, Degree[]>(); // academicTerm -> Degree[]
@@ -24,6 +26,10 @@ export class StateService {
   private _schedulesSortedByMostFreeDays: Schedule[] = null;
 
   constructor() { }
+
+  get selectedLanguage(): string { return this._selectedLanguage; }
+
+  set selectedLanguage(value: string) { this._selectedLanguage = value; }
 
   get academicTermsRepository(): string[] { return this._academicTermsRepository; }
   set academicTermsRepository(value: string[]) { this._academicTermsRepository = value; }

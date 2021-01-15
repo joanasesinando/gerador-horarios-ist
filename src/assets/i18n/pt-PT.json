@@ -36,6 +36,31 @@
     "most-free-days": "Favorece horários com maior número de dias livres"
   },
 
+  "schedules": {
+    "heading": {
+      "one": "Gerado 1 horário possível",
+      "more": {
+        "left": "Gerados",
+        "right": "horários possíveis"
+      }
+    },
+    "order-by": {
+      "title": "Ordenar por:",
+      "most-compact": "Mais compacto",
+      "most-balanced": "Mais equilibrado",
+      "more-free-days": "Mais dias livres"
+    },
+    "schedule": "Horário",
+    "addSchedule": "Adicionar Horário",
+    "see": "Ver",
+    "selected": {
+      "one": "horário escolhido",
+      "more": "horários escolhidos"
+    },
+    "none": "Nenhum",
+    "save": "Guardar"
+  },
+
   "week-days": {
     "short": {
       "monday": "Seg",

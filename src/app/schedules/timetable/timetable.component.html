@@ -3,7 +3,7 @@
 <div class="timetable d-flex justify-content-center align-items-center"
   (swipeleft)="next()" (swiperight)="prev()">
 
-  <p *ngIf="!mobileView" class="schedule-ID">Horário ID: {{scheduleInViewID + 1}}</p>
+  <p *ngIf="!mobileView" class="schedule-ID">{{'schedules.schedule' | translate}} ID: {{scheduleInViewID + 1}}</p>
   <p *ngIf="mobileView" class="schedule-ID">ID: {{scheduleInViewID + 1}}</p>
 
   <!-- Previous btn -->

@@ -38,6 +38,7 @@ declare let $;
 })
 export class HomepageComponent implements OnInit, AfterViewInit {
 
+  noShiftsFound = false;
   mobileView = false;
   featuresHorizontal = false;
 
@@ -121,9 +122,12 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     // Check if request for academic terms is taking too long
     let tookToLong = true;
     setTimeout(() => {
-      if (tookToLong)
-        alertService.showAlert('Serviço indisponível', 'O gerador encontra-se em baixo. Por favor, tenta de novo daqui a uns minutos.', 'danger');
-    }, 15000);
+      if (tookToLong) {
+        translateService.currentLang === 'pt-PT' ?
+          alertService.showAlert('Serviço indisponível', 'O gerador encontra-se em baixo. Por favor, tenta de novo daqui a uns minutos.', 'danger') :
+          alertService.showAlert('Unavailable service', 'The generator is down. Please try again later.', 'danger');
+      }
+    }, 10000);
 
     // Get academic terms
     this.fenixService.getAcademicTerms().then(academicTerms => {
@@ -171,9 +175,43 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     });
   }
 
+  async changeLanguage(lang: string): Promise<void> {
+    this.translateService.use(lang);
+    this.noShiftsFound = false;
+
+    await this.checkIfDatabaseIsOld();
+
+    // Reset academic term
+    this.academicTermFormControl.patchValue(null);
+    this.academicTermFormControl.enable();
+
+    // Reset degrees
+    this.degreeFormControl.patchValue(null);
+    this.degreeFormControl.disable();
+
+    // Reset courses
+    this.courseFormControl.patchValue(null);
+    this.courseFormControl.disable();
+
+    // Clean selected courses
+    for (const course of this.selectedCourses) {
+      this.removeCourse(course.id);
+    }
+
+    // Reset state
+    this.stateService.academicTermSelected = null;
+    this.stateService.degreeIDSelected = null;
+    this.stateService.degreesRepository = new Map<string, Degree[]>();
+    this.stateService.coursesRepository = new Map<string, Map<number, Course[]>>();
+    this.stateService.selectedCourses = null;
+  }
+
   resetState(): void {
     const academicTerm = this.stateService.academicTermSelected;
     const degreeID = this.stateService.degreeIDSelected;
+
+    // Reset language
+    this.translateService.use(this.stateService.selectedLanguage);
 
     // Reset academic terms state
     this.academicTerms = this.stateService.academicTermsRepository;
@@ -393,6 +431,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
       // Reset select
       this.courseFormControl.patchValue(-1);
+
+    } else {
+      this.noShiftsFound = true;
     }
 
     addBtn.attr('disabled', false);
@@ -457,6 +498,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       this.stateService.academicTermSelected = this.academicTermFormControl.value;
       this.stateService.degreeIDSelected = this.degreeFormControl.value;
       this.stateService.selectedCourses = _.cloneDeep(this.selectedCourses);
+      this.stateService.selectedLanguage = this.translateService.currentLang;
 
       // Alter selected courses based on user choices
       this.prepareCoursesToGenerate();
