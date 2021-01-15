@@ -38,6 +38,15 @@
       font-family: 'poppins-semiBold', sans-serif;
     }
 
+    .help {
+      color: $gh-gray;
+      cursor: pointer;
+
+      &:hover, &:focus {
+        color: darken($gh-gray, 10);
+      }
+    }
+
     .btn-add {
       button {
         padding: .375rem 3rem;

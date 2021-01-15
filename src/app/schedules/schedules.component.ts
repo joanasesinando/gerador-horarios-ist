@@ -10,7 +10,11 @@ import {PdfGenerationService} from '../_services/pdf-generation/pdf-generation.s
 
 import {Course} from '../_domain/Course/Course';
 import {Schedule} from '../_domain/Schedule/Schedule';
+import {TranslateService} from '@ngx-translate/core';
 
+import {faQuestionCircle} from '@fortawesome/free-solid-svg-icons';
+
+declare let $;
 
 @Component({
   selector: 'app-schedules',
@@ -33,13 +37,17 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
   mobileView = false;
   keyDownSubject: Subject<string> = new Subject<string>();
 
+  // FontAwesome icons
+  faQuestionCircle = faQuestionCircle;
+
   constructor(
     private logger: LoggerService,
     private router: Router,
     private alertService: AlertService,
     private generationService: SchedulesGenerationService,
     private stateService: StateService,
-    private pdfService: PdfGenerationService
+    private pdfService: PdfGenerationService,
+    public translateService: TranslateService
   ) { }
 
   ngOnInit(): void {
@@ -82,10 +90,32 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      // Fake staling for UX
-      generationTime != null && generationTime < 1000 ?
-        setTimeout(() => this.spinners.loadingPage = false, 1000) : this.spinners.loadingPage = false;
+      this.spinners.loadingPage = false;
+      setTimeout(() => this.loadTooltips(), 100);
     }, 0);
+  }
+
+  loadTooltips(): void {
+    this.translateService.stream('order-by.most-compact').subscribe(value => {
+      const tooltip = $('#compact-tooltip');
+      tooltip.attr('title', value);
+      tooltip.tooltip('dispose');
+      tooltip.tooltip();
+    });
+
+    this.translateService.stream('order-by.most-balanced').subscribe(value => {
+      const tooltip = $('#balanced-tooltip');
+      tooltip.attr('title', value);
+      tooltip.tooltip('dispose');
+      tooltip.tooltip();
+    });
+
+    this.translateService.stream('order-by.most-free-days').subscribe(value => {
+      const tooltip = $('#free-days-tooltip');
+      tooltip.attr('title', value);
+      tooltip.tooltip('dispose');
+      tooltip.tooltip();
+    });
   }
 
   pickViewOption(option: string): void {

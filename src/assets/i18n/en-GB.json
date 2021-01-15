@@ -30,6 +30,12 @@
     "no-more-courses": "No more courses available"
   },
 
+  "order-by": {
+    "most-compact": "Most compact",
+    "most-balanced": "Most balanced",
+    "most-free-days": "More free days"
+  },
+
   "week-days": {
     "short": {
       "monday": "Mon",

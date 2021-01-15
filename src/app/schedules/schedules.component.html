@@ -39,21 +39,27 @@
                 <div class="options">
 
                   <div class="custom-control custom-radio custom-control-inline mr-4 mb-2 mt-2 mt-lg-0">
-                    <input type="radio" id="show-options-100Compact" name="show-options"
+                    <input type="radio" id="show-options-compact" name="show-options"
                            class="custom-control-input" [checked]="true" (click)="pickViewOption('compact')">
-                    <label class="custom-control-label" for="show-options-100Compact">Mais compacto</label>
+                    <label class="custom-control-label" for="show-options-compact">Mais compacto</label>
+                    <fa-icon class="help ml-2" [icon]="faQuestionCircle"
+                             id="compact-tooltip" data-toggle="tooltip" data-placement="top"></fa-icon>
                   </div>
 
                   <div class="custom-control custom-radio custom-control-inline mr-4 mb-2">
-                    <input type="radio" id="show-options-500Compact" name="show-options"
+                    <input type="radio" id="show-options-balanced" name="show-options"
                            class="custom-control-input" [checked]="false" (click)="pickViewOption('balanced')">
-                    <label class="custom-control-label" for="show-options-500Compact">Mais equilibrado</label>
+                    <label class="custom-control-label" for="show-options-balanced">Mais equilibrado</label>
+                    <fa-icon class="help ml-2" [icon]="faQuestionCircle"
+                             id="balanced-tooltip" data-toggle="tooltip" data-placement="top"></fa-icon>
                   </div>
 
                   <div class="custom-control custom-radio custom-control-inline mr-0 mb-2">
-                    <input type="radio" id="show-options-all" name="show-options"
+                    <input type="radio" id="show-options-free-days" name="show-options"
                            class="custom-control-input" [checked]="false" (click)="pickViewOption('free-days')">
-                    <label class="custom-control-label" for="show-options-all">Mais dias livres</label>
+                    <label class="custom-control-label" for="show-options-free-days">Mais dias livres</label>
+                    <fa-icon class="help ml-2" [icon]="faQuestionCircle"
+                             id="free-days-tooltip" data-toggle="tooltip" data-placement="top"></fa-icon>
                   </div>
 
                 </div>
