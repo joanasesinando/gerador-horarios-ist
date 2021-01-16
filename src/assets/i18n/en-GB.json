@@ -81,6 +81,8 @@
   },
 
   "errors": {
+    "no-degrees-found": "No degrees found",
+    "no-courses-found": "No courses found",
     "no-shifts-found": "Course with not enough info"
   }
 }

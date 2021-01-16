@@ -1,5 +1,4 @@
 import {AfterViewInit, Component, HostListener, OnInit} from '@angular/core';
-import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
 import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import _ from 'lodash';
@@ -13,7 +12,6 @@ import {isOlderThan} from '../_util/Time';
 import {FenixService} from '../_services/fenix/fenix.service';
 import {FirebaseService} from '../_services/firebase/firebase.service';
 import {AlertService} from '../_util/alert.service';
-import {ErrorService} from '../_util/error.service';
 import {StateService} from '../_services/state/state.service';
 
 import {faGithub} from '@fortawesome/free-brands-svg-icons';
@@ -46,20 +44,14 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   degrees: Degree[] = [];
   courses: Course[] = [];
 
+  selectedAcademicTerm: string;
+  selectedDegree: number;
+  selectedCourse: number;
+
   selectedCourses: Course[] = [];
   selectedCoursesIDs = new Map<number, boolean>();
   campusPicked = new Map<number, string[]>();
   typesOfClassesPicked = new Map<number, ClassType[]>();
-
-  generateForm = new FormGroup({
-    academicTerm: new FormControl({value: null, disabled: true}),
-    degree: new FormControl({value: null, disabled: true}),
-    course: new FormControl({value: -1, disabled: true}),
-  });
-
-  get academicTermFormControl(): AbstractControl { return this.generateForm.get('academicTerm'); }
-  get degreeFormControl(): AbstractControl { return this.generateForm.get('degree'); }
-  get courseFormControl(): AbstractControl { return this.generateForm.get('course'); }
 
   spinners = {
     academicTerm: true,
@@ -86,7 +78,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     public firebaseService: FirebaseService,
     private router: Router,
     private alertService: AlertService,
-    private errorService: ErrorService,
     public stateService: StateService) {
 
     this.spinners.loadingPage = true;
@@ -141,7 +132,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       // Save state
       this.saveAcademicTermsState(this.academicTerms);
 
-      this.academicTermFormControl.enable();
       this.spinners.academicTerm = false;
     });
     this.spinners.loadingPage = false;
@@ -154,10 +144,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     $('[data-toggle="tooltip"]').tooltip();
   }
-
-  hasAcademicTermSelected(): boolean { return this.academicTermFormControl.value != null; }
-  hasDegreeSelected(): boolean { return this.degreeFormControl.value != null; }
-  hasCourseSelected(): boolean { return this.courseFormControl.value !== -1; }
 
   showScrollDown(): boolean {
     return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
@@ -181,17 +167,18 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
     await this.checkIfDatabaseIsOld();
 
-    // Reset academic term
-    this.academicTermFormControl.patchValue(null);
-    this.academicTermFormControl.enable();
+    // Reset
+    this.selectedAcademicTerm = null;
+    this.selectedDegree = null;
+    this.selectedCourse = null;
 
-    // Reset degrees
-    this.degreeFormControl.patchValue(null);
-    this.degreeFormControl.disable();
+    this.degrees = [];
+    this.courses = [];
+    this.selectedCourses = [];
 
-    // Reset courses
-    this.courseFormControl.patchValue(null);
-    this.courseFormControl.disable();
+    this.selectedCoursesIDs.clear();
+    this.campusPicked.clear();
+    this.typesOfClassesPicked.clear();
 
     // Clean selected courses
     for (const course of this.selectedCourses) {
@@ -215,14 +202,13 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
     // Reset academic terms state
     this.academicTerms = this.stateService.academicTermsRepository;
-    this.academicTermFormControl.patchValue(academicTerm);
-    this.academicTermFormControl.enable();
+    this.selectedAcademicTerm = academicTerm;
     this.spinners.academicTerm = false;
     this.logger.log('has academic terms state saved', this.academicTerms);
 
     // Reset degrees state
     this.loadDegrees(academicTerm);
-    this.degreeFormControl.patchValue(degreeID);
+    this.selectedDegree = degreeID;
 
     // Reset courses state
     this.loadCoursesBasicInfo(academicTerm, degreeID);
@@ -261,13 +247,16 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   // TODO: same academic term; reset when picking different
   loadDegrees(academicTerm: string): Promise<void | Degree[]> | void {
     this.spinners.degree = true;
+    this.selectedDegree = null;
+    this.degrees = [];
+    this.selectedCourse = null;
+    this.courses = [];
 
     // If state saved, don't call APIs
     if (this.stateService.degreesRepository.has(academicTerm)) {
       this.logger.log('has degrees state saved');
       this.degrees = this.stateService.degreesRepository.get(academicTerm)
         .sort((a, b) => a.acronym.localeCompare(b.acronym));
-      this.degreeFormControl.enable();
       this.spinners.degree = false;
       this.logger.log('degrees', this.degrees);
       return;
@@ -278,7 +267,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         this.logger.log('has degrees saved');
         this.firebaseService.getDegrees(academicTerm).then(degrees => {
           this.degrees = degrees.sort((a, b) => a.acronym.localeCompare(b.acronym));
-          this.degreeFormControl.enable();
           this.spinners.degree = false;
           this.logger.log('degrees', this.degrees);
 
@@ -290,7 +278,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         this.logger.log('no degrees found');
         this.fenixService.getDegrees(academicTerm).then(degrees => {
           this.degrees = degrees;
-          this.degreeFormControl.enable();
           this.spinners.degree = false;
           this.logger.log('degrees', this.degrees);
 
@@ -317,6 +304,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   loadCoursesBasicInfo(academicTerm: string, degreeID: number): Promise<void | Course[]> | void {
     this.spinners.course = true;
+    this.selectedCourse = null;
+    this.courses = [];
 
     // If state saved, don't call APIs
     if (this.stateService.coursesRepository.has(academicTerm)
@@ -326,7 +315,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       this.courses = this.stateService.coursesRepository.get(academicTerm).get(degreeID)
         .sort((a, b) => a.acronym.localeCompare(b.acronym))
         .filter((course) => !this.selectedCoursesIDs.has(course.id));
-      this.courseFormControl.enable();
       this.spinners.course = false;
       this.logger.log('courses', this.courses);
       return;
@@ -339,7 +327,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           this.courses = courses
             .sort((a, b) => a.acronym.localeCompare(b.acronym))
             .filter((course) => !this.selectedCoursesIDs.has(course.id));
-          this.courseFormControl.enable();
           this.spinners.course = false;
           this.logger.log('courses', this.courses);
 
@@ -351,7 +338,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         this.logger.log('no courses found');
         this.fenixService.getCoursesBasicInfo(academicTerm, degreeID).then(courses => {
           this.courses = courses.filter((course) => !this.selectedCoursesIDs.has(course.id));
-          this.courseFormControl.enable();
           this.spinners.course = false;
           this.logger.log('courses', this.courses);
 
@@ -376,7 +362,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   addCourse(courseID: number): void {
     const courseIndex = this.findCourseIndex(courseID, this.courses);
-    const degreeIndex = this.findDegreeIndex(this.degreeFormControl.value, this.degrees);
+    const degreeIndex = this.findDegreeIndex(this.selectedDegree, this.degrees);
 
     if (courseID && courseID !== -1 && courseIndex != null) {
       const addBtn = $('#addBtn');
@@ -397,8 +383,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           this.spinners.course = false;
           this.addCourseHelper(courseToAdd, courseIndex, addBtn);
 
-          const academicTerm = this.academicTermFormControl.value;
-          const degreeID = this.degreeFormControl.value;
+          const academicTerm = this.selectedAcademicTerm;
+          const degreeID = this.selectedDegree;
 
           // Load to database
           if (course) {
@@ -430,7 +416,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       $('#' + course.id).remove();
 
       // Reset select
-      this.courseFormControl.patchValue(-1);
+      this.selectedCourse = null;
 
     } else {
       this.noShiftsFound = true;
@@ -441,8 +427,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   removeCourse(courseID: number): Promise<void> | null {
-    const academicTerm = this.academicTermFormControl.value;
-    const degreeID = this.degreeFormControl.value;
+    const academicTerm = this.selectedAcademicTerm;
+    const degreeID = this.selectedDegree;
     const courseIndex = this.findCourseIndex(courseID, this.selectedCourses);
 
     // Course to remove is not selected
@@ -495,8 +481,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   generateSchedules(): void {
     if (this.selectedCourses.length > 0) {
       // Save state
-      this.stateService.academicTermSelected = this.academicTermFormControl.value;
-      this.stateService.degreeIDSelected = this.degreeFormControl.value;
+      this.stateService.academicTermSelected = this.selectedAcademicTerm;
+      this.stateService.degreeIDSelected = this.selectedDegree;
       this.stateService.selectedCourses = _.cloneDeep(this.selectedCourses);
       this.stateService.selectedLanguage = this.translateService.currentLang;
 

@@ -113,18 +113,19 @@
               <!-- Pick courses -->
               <h3 class="pick-courses-heading mb-4">{{'main-content.headers.pick-courses' | translate}}</h3>
 
-              <form id="generateForm" class="mb-5" [formGroup]="generateForm">
+              <div class="selects mb-5">
                 <div class="d-lg-flex align-items-center justify-content-between mb-3">
 
                   <!-- Academic Term -->
-                  <div class="position-relative w-100 mr-lg-3 mb-4 mb-lg-2">
+                  <div class="position-relative col-12 col-lg-5 mr-lg-3 mb-4 mb-lg-2 p-0">
                     <div class="form-label-group">
                       <label for="inputAcademicTerm">{{'main-content.labels.term' | translate}}</label>
-                      <select class="custom-select" id="inputAcademicTerm" autofocus formControlName="academicTerm"
-                              (change)="loadDegrees(academicTermFormControl.value)">
-                        <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.term' | translate).toLowerCase()}}...</option>
-                        <option *ngFor="let term of academicTerms" value="{{term}}">{{term}}</option>
-                      </select>
+                      <ng-select id="inputAcademicTerm" [(ngModel)]="selectedAcademicTerm" autofocus [disabled]="this.academicTerms.length === 0"
+                                 [clearable]="false" [searchable]="false"
+                                 placeholder="{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.term' | translate).toLowerCase()}}..."
+                                 (change)="loadDegrees(selectedAcademicTerm)">
+                        <ng-option *ngFor="let term of academicTerms" [value]="term">{{term}}</ng-option>
+                      </ng-select>
                     </div>
                     <div *ngIf="spinners.academicTerm" class="spinner-border spinner-border-sm text-primary" role="status">
                       <span class="sr-only">Loading...</span>
@@ -132,14 +133,15 @@
                   </div>
 
                   <!-- Degree -->
-                  <div class="position-relative w-100 ml-lg-3 mb-4 mb-lg-2">
+                  <div class="position-relative col-12 col-lg-6 ml-lg-3 mb-4 mb-lg-2 p-0">
                     <div class="form-label-group">
                       <label for="inputDegree">{{'main-content.labels.degree' | translate}}</label>
-                      <select class="custom-select" id="inputDegree" formControlName="degree"
-                              (change)="loadCoursesBasicInfo(academicTermFormControl.value, degreeFormControl.value)">
-                        <option disabled selected value="null">{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.degree' | translate).toLowerCase()}}...</option>
-                        <option *ngFor="let degree of degrees" value="{{degree.id}}">{{degree.acronym}} - {{degree.name}}</option>
-                      </select>
+                      <ng-select id="inputDegree" [(ngModel)]="selectedDegree" [disabled]="this.degrees.length === 0" [clearable]="false"
+                                 placeholder="{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.degree' | translate).toLowerCase()}}..."
+                                 notFoundText="{{'errors.no-degrees-found' | translate}}"
+                                 (change)="loadCoursesBasicInfo(selectedAcademicTerm, selectedDegree)">
+                        <ng-option *ngFor="let degree of degrees" value="{{degree.id}}">{{degree.acronym}} - {{degree.name}}</ng-option>
+                      </ng-select>
                     </div>
                     <div *ngIf="spinners.degree" class="spinner-border spinner-border-sm text-primary" role="status">
                       <span class="sr-only">Loading...</span>
@@ -148,29 +150,30 @@
                 </div>
 
                 <!-- Course -->
-                <div class="position-relative">
+                <div class="position-relative col-12 p-0">
                   <label for="inputCourse">{{'main-content.labels.course' | translate}}</label>
                   <div class="input-group w-100">
-                    <select class="custom-select" id="inputCourse" formControlName="course"
-                            (change)="noShiftsFound = false">
-                      <option disabled selected value="{{-1}}">{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.course' | translate).toLowerCase()}}...</option>
-                      <option *ngFor="let course of courses" id="{{course.id}}" value="{{course.id}}">[{{course.acronym}}] {{course.name}}</option>
-                    </select>
+                    <ng-select id="inputCourse" [(ngModel)]="selectedCourse" [disabled]="this.courses.length === 0" [clearable]="false"
+                               placeholder="{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.course' | translate).toLowerCase()}}..."
+                               notFoundText="{{'errors.no-courses-found' | translate}}"
+                               (change)="noShiftsFound = false">
+                      <ng-option *ngFor="let course of courses" id="{{course.id}}" value="{{course.id}}">[{{course.acronym}}] {{course.name}}</ng-option>
+                    </ng-select>
                     <div class="input-group-append">
                       <button id="addBtn" class="btn btn-primary" type="button"
-                              [disabled]="hasAcademicTermSelected() && hasDegreeSelected() && courses.length === 0 && !spinners.course"
-                              (click)="addCourse(courseFormControl.value)">{{'main-content.add-btn' | translate}}</button>
+                              [disabled]="!selectedCourse"
+                              (click)="addCourse(selectedCourse)">{{'main-content.add-btn' | translate}}</button>
                     </div>
                   </div>
                   <div *ngIf="spinners.course" class="spinner-border spinner-border-sm text-primary" role="status">
                     <span class="sr-only">Loading...</span>
                   </div>
-                  <p *ngIf="hasAcademicTermSelected() && hasDegreeSelected() && courses.length === 0 && !spinners.course"
+                  <p *ngIf="selectedAcademicTerm && selectedDegree && courses.length === 0 && !spinners.course"
                      class="text-danger"><small>{{'main-content.no-more-courses' | translate}}</small></p>
                   <p *ngIf="noShiftsFound"
                      class="text-danger"><small>{{'errors.no-shifts-found' | translate}}</small></p>
                 </div>
-              </form>
+              </div>
 
               <!-- Selected courses -->
               <h3 class="pick-courses-heading mb-4">{{'main-content.headers.selected-courses' | translate}}
@@ -185,7 +188,7 @@
               <!-- Generate btn -->
               <button *ngIf="selectedCourses.length !== 0"
                       class="btn btn-lg btn-primary btn-block btn-generate mt-5"
-                      type="submit" form="generateForm" (click)="generateSchedules()">{{'main-content.generate-btn' | translate}}</button>
+                      type="button" (click)="generateSchedules()">{{'main-content.generate-btn' | translate}}</button>
 
             </div>
           </div>

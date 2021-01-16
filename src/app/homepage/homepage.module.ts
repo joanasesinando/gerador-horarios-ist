@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 import { HomepageRoutingModule } from './homepage-routing.module';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { HomepageComponent } from './homepage.component';
 import { CourseCardComponent } from './course-card/course-card.component';
@@ -26,7 +27,8 @@ import { HelpModalComponent } from './help-modal/help-modal.component';
         HomepageRoutingModule,
         TranslateModule,
         FontAwesomeModule,
-        ReactiveFormsModule
+        FormsModule,
+        NgSelectModule
     ]
 })
 export class HomepageModule { }

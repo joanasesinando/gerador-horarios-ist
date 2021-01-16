@@ -5,9 +5,10 @@
  *    2. Buttons
  *    3. Checkboxes
  *    4. Dropdowns
- *    5. Alerts
- *    6. Scrollbar
- *    7. Loading page
+ *    5. Selects
+ *    6. Alerts
+ *    7. Scrollbar
+ *    8. Loading page
  *
  * =================================================================== */
 
@@ -99,7 +100,37 @@ a { color: $gh-blue; }
 
 
 /* ===================================================================
- *  5. Alerts
+ *  5. Selects
+ *
+ * ------------------------------------------------------------------- */
+
+.ng-select.ng-select-single .ng-select-container {
+  height: 38px;
+}
+
+.ng-select#inputCourse {
+  width: calc(100% - 102.46px);
+  .ng-select-container {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .ng-dropdown-panel .scroll-host {
+    overflow-x: auto !important;
+
+    div {
+      width: fit-content;
+      min-width: 100%;
+    }
+  }
+}
+
+
+
+/* ===================================================================
+ *  6. Alerts
  *
  * ------------------------------------------------------------------- */
 .alerts {
@@ -222,7 +253,7 @@ a { color: $gh-blue; }
 
 
 /* ===================================================================
- *  6. Scrollbar
+ *  7. Scrollbar
  *
  * ------------------------------------------------------------------- */
 
@@ -251,17 +282,21 @@ $scrollbarWidth: 10px;
     }
   }
 
-  .schedules-deck::-webkit-scrollbar {
+  .schedules-deck::-webkit-scrollbar,
+  .ng-dropdown-panel .scroll-host::-webkit-scrollbar{
     width: $scrollbarWidth - 5px;
+    height: $scrollbarWidth - 5px;
     background-color: transparent;
   }
 
-  .schedules-deck::-webkit-scrollbar-track {
+  .schedules-deck::-webkit-scrollbar-track,
+  .ng-dropdown-panel .scroll-host::-webkit-scrollbar-track{
     background-color: transparent;
     @include border-radius($scrollbarWidth);
   }
 
-  .schedules-deck::-webkit-scrollbar-thumb {
+  .schedules-deck::-webkit-scrollbar-thumb,
+  .ng-dropdown-panel .scroll-host::-webkit-scrollbar-thumb{
     @include border-radius($scrollbarWidth);
     background-color: $scrollbarColor;
 
@@ -274,7 +309,7 @@ $scrollbarWidth: 10px;
 
 
 /* ===================================================================
- *  7. Loading page
+ *  8. Loading page
  *
  * ------------------------------------------------------------------- */
 
