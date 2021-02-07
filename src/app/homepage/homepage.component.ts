@@ -414,6 +414,13 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       let courseToAdd = this.courses[courseIndex];
       courseToAdd.degree = this.degrees[degreeIndex];
 
+      if (!this.isSameSemester(courseToAdd)) {
+        this.translateService.currentLang === 'pt-PT' ?
+          this.alertService.showAlert('Atenção', 'Esta cadeira é lecionada num semestre diferente das cadeiras que já foram selecionadas.', 'warning') :
+          this.alertService.showAlert('Attention', 'This course is taught in a different semester than the courses already added.', 'warning');
+        return;
+      }
+
       if (courseToAdd.hasFullInfo()) {
         this.addCourseHelper(courseToAdd, courseIndex, addBtn);
 
@@ -465,6 +472,13 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
     addBtn.attr('disabled', false);
     this.logger.log('selected courses', this.selectedCourses);
+  }
+
+  isSameSemester(course: Course): boolean {
+    for (const c of this.selectedCourses) {
+      if (c.semester !== course.semester) return false;
+    }
+    return true;
   }
 
   removeCourse(courseID: number): Promise<void> | null {
