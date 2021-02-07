@@ -149,6 +149,10 @@ a { color: $gh-blue; }
   background-color: #e9ecef;
 }
 
+.bootstrap-select>select.bs-select-hidden, select.bs-select-hidden, select.selectpicker {
+  display: block !important;
+}
+
 
 
 /* ===================================================================

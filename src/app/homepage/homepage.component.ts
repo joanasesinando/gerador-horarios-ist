@@ -232,11 +232,12 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     }
 
     // Reset selects
-    for (const s of ['inputAcademicTerm', 'inputDegree', 'inputCourse']) {
-      const select = $('#' + s);
-      select.selectpicker('destroy');
-      select.selectpicker();
-    }
+    setTimeout(() => {
+      $('#inputAcademicTerm').selectpicker();
+      $('#inputAcademicTerm').selectpicker('val', this.selectedAcademicTerm);
+      $('#inputDegree').selectpicker();
+      $('#inputCourse').selectpicker();
+    }, 0);
   }
 
   saveAcademicTermsState(academicTerms: string[]): void {
