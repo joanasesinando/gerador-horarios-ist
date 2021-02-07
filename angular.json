@@ -41,12 +41,13 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "node_modules/@ng-select/ng-select/themes/default.theme.css",
+              "node_modules/bootstrap-select/dist/css/bootstrap-select.min.css",
               "src/styles/global.scss"
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "node_modules/bootstrap-select/dist/js/bootstrap-select.min.js"
             ]
           },
           "configurations": {

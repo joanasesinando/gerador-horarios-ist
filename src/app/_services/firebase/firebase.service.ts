@@ -1,3 +1,4 @@
+/* tslint:disable:max-line-length */
 import { Injectable } from '@angular/core';
 
 import {AngularFirestore} from '@angular/fire/firestore';
@@ -21,7 +22,7 @@ export class FirebaseService {
     this.db = angularFireStore.firestore;
   }
 
-  hasCollection(collection: string, document?: number, subCollection?: string): Promise<boolean> {
+  hasCollection(collection: string, document?: string, subCollection?: string): Promise<boolean> {
     if (document && subCollection) {
       return this.db.collection(collection).doc(document).collection(subCollection).get().then(querySnapshot => {
         return !querySnapshot.empty;
@@ -32,7 +33,7 @@ export class FirebaseService {
     });
   }
 
-  hasDocument(collection: string, document: number, subCollection?: string, subDocument?: number): Promise<boolean> {
+  hasDocument(collection: string, document: string, subCollection?: string, subDocument?: string): Promise<boolean> {
     const ref = subCollection && subDocument ?
       this.db.collection(collection).doc(document).collection(subCollection).doc(subDocument) :
       this.db.collection(collection).doc(document);
@@ -50,18 +51,18 @@ export class FirebaseService {
 
   hasCourses(academicTerm: string, degreeID: number): Promise<boolean> {
     return this.translateService.currentLang === 'pt-PT' ?
-      this.hasCollection(academicTerm.replace('/', '-') + '[PT]', degreeID, 'courses') :
-      this.hasCollection(academicTerm.replace('/', '-') + '[EN]', degreeID, 'courses');
+      this.hasCollection(academicTerm.replace('/', '-') + '[PT]', degreeID.toString(), 'courses') :
+      this.hasCollection(academicTerm.replace('/', '-') + '[EN]', degreeID.toString(), 'courses');
   }
 
   hasCourseInDegree(academicTerm: string, degreeID: number, courseID: number): Promise<any> {
     return this.translateService.currentLang === 'pt-PT' ?
-      this.hasDocument(academicTerm.replace('/', '-') + '[PT]', degreeID, 'courses', courseID) :
-      this.hasDocument(academicTerm.replace('/', '-') + '[EN]', degreeID, 'courses', courseID);
+      this.hasDocument(academicTerm.replace('/', '-') + '[PT]', degreeID.toString(), 'courses', courseID.toString()) :
+      this.hasDocument(academicTerm.replace('/', '-') + '[EN]', degreeID.toString(), 'courses', courseID.toString());
   }
 
   // tslint:disable-next-line:max-line-length
-  loadDocument(collection: string, document: number, data: any, converter: any, subCollection?: string, subDocument?: number): Promise<any> {
+  loadDocument(collection: string, document: string, data: any, converter: any, subCollection?: string, subDocument?: string): Promise<any> {
     if (subCollection && subDocument) {
        return this.db.collection(collection).doc(document).collection(subCollection).doc(subDocument)
          .withConverter(converter)
@@ -74,13 +75,13 @@ export class FirebaseService {
     return this.translateService.currentLang === 'pt-PT' ?
       this.loadDocument(
       academicTerm.replace('/', '-') + '[PT]',
-      degree.id,
+      degree.id.toString(),
       degree,
       degreeConverter)
       :
       this.loadDocument(
         academicTerm.replace('/', '-') + '[EN]',
-        degree.id,
+        degree.id.toString(),
         degree,
         degreeConverter);
   }
@@ -89,19 +90,19 @@ export class FirebaseService {
     return this.translateService.currentLang === 'pt-PT' ?
       this.loadDocument(
       academicTerm.replace('/', '-') + '[PT]',
-      degreeID,
+      degreeID.toString(),
       course,
       courseConverter,
       'courses',
-      course.id)
+      course.id.toString())
       :
       this.loadDocument(
         academicTerm.replace('/', '-') + '[EN]',
-        degreeID,
+        degreeID.toString(),
         course,
         courseConverter,
         'courses',
-        course.id);
+        course.id.toString());
   }
 
   updateCourse(academicTerm: string, degreeID: number, course: Course): Promise<any> {
@@ -133,7 +134,7 @@ export class FirebaseService {
         .update({updated: Date.now()});
   }
 
-  getCollection(collection: string, converter: any, document?: number, subCollection?: string): Promise<any> {
+  getCollection(collection: string, converter: any, document?: string, subCollection?: string): Promise<any> {
     const ref = document && subCollection ?
       this.db.collection(collection).doc(document).collection(subCollection) :
       this.db.collection(collection);
@@ -178,8 +179,8 @@ export class FirebaseService {
 
   getCourses(academicTerm: string, degreeID: number): Promise<any> {
     return this.translateService.currentLang === 'pt-PT' ?
-      this.getCollection(academicTerm.replace('/', '-') + '[PT]', courseConverter, degreeID, 'courses') :
-      this.getCollection(academicTerm.replace('/', '-') + '[EN]', courseConverter, degreeID, 'courses');
+      this.getCollection(academicTerm.replace('/', '-') + '[PT]', courseConverter, degreeID.toString(), 'courses') :
+      this.getCollection(academicTerm.replace('/', '-') + '[EN]', courseConverter, degreeID.toString(), 'courses');
   }
 
   deleteDocument(collection: string, document: string, subCollection?: string, subDocument?: string): void {
@@ -210,19 +211,19 @@ export class FirebaseService {
                       if (courses) {
                         courses.forEach(course => {
                           this.translateService.currentLang === 'pt-PT' ?
-                            this.deleteDocument(academicTerm.replace('/', '-') + '[PT]', degree.id, 'courses', course.id) :
-                            this.deleteDocument(academicTerm.replace('/', '-') + '[EN]', degree.id, 'courses', course.id);
+                            this.deleteDocument(academicTerm.replace('/', '-') + '[PT]', degree.id.toString(), 'courses', course.id.toString()) :
+                            this.deleteDocument(academicTerm.replace('/', '-') + '[EN]', degree.id.toString(), 'courses', course.id.toString());
                         });
                       }
                       this.translateService.currentLang === 'pt-PT' ?
-                        this.deleteDocument(academicTerm.replace('/', '-') + '[PT]', degree.id) :
-                        this.deleteDocument(academicTerm.replace('/', '-') + '[EN]', degree.id);
+                        this.deleteDocument(academicTerm.replace('/', '-') + '[PT]', degree.id.toString()) :
+                        this.deleteDocument(academicTerm.replace('/', '-') + '[EN]', degree.id.toString());
                     });
 
                   } else {
                     this.translateService.currentLang === 'pt-PT' ?
-                      this.deleteDocument(academicTerm.replace('/', '-') + '[PT]', degree.id) :
-                      this.deleteDocument(academicTerm.replace('/', '-') + '[EN]', degree.id);
+                      this.deleteDocument(academicTerm.replace('/', '-') + '[PT]', degree.id.toString()) :
+                      this.deleteDocument(academicTerm.replace('/', '-') + '[EN]', degree.id.toString());
                   }
                 });
               });

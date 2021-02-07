@@ -22,7 +22,10 @@
       "term": "Ano letivo",
       "degree": "Curso",
       "course": "Cadeira",
-      "placeholder": "Escolher"
+      "placeholder": "Escolher",
+      "first-semester": "1º Semestre",
+      "second-semester": "2º Semestre",
+      "not-found": "Sem semestre definido"
     },
     "add-btn": "Adicionar",
     "generate-btn": "Gerar Horários",

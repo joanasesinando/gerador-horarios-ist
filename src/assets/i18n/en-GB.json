@@ -22,7 +22,10 @@
       "term": "Academic term",
       "degree": "Degree",
       "course": "Course",
-      "placeholder": "Select"
+      "placeholder": "Select",
+      "first-semester": "1st Semester",
+      "second-semester": "2nd Semester",
+      "not-found": "Undefined semester"
     },
     "add-btn": "Add",
     "generate-btn": "Generate Schedules",

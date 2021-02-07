@@ -117,15 +117,15 @@
                 <div class="d-lg-flex align-items-center justify-content-between mb-3">
 
                   <!-- Academic Term -->
-                  <div class="position-relative col-12 col-lg-5 mr-lg-3 mb-4 mb-lg-2 p-0">
-                    <div class="form-label-group">
-                      <label for="inputAcademicTerm">{{'main-content.labels.term' | translate}}</label>
-                      <ng-select id="inputAcademicTerm" [(ngModel)]="selectedAcademicTerm" autofocus [disabled]="this.academicTerms.length === 0"
-                                 [clearable]="false" [searchable]="false"
-                                 placeholder="{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.term' | translate).toLowerCase()}}..."
-                                 (change)="loadDegrees(selectedAcademicTerm)">
-                        <ng-option *ngFor="let term of academicTerms" [value]="term">{{term}}</ng-option>
-                      </ng-select>
+                  <div class="position-relative col-12 col-lg-4 mb-4 mb-lg-2 px-0 pr-lg-3">
+                    <div class="form-group mb-0">
+                      <label for="inputAcademicTerm" class="d-block">{{'main-content.labels.term' | translate}}</label>
+                      <select id="inputAcademicTerm" class="selectpicker show-tick form-control" autofocus [(ngModel)]="selectedAcademicTerm"
+                              title="{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.term' | translate).toLowerCase()}}..."
+                              data-style="custom-select"
+                              [disabled]="this.academicTerms.length === 0" (change)="loadDegrees(selectedAcademicTerm)">
+                        <option *ngFor="let term of academicTerms" [value]="term">{{term}}</option>
+                      </select>
                     </div>
                     <div *ngIf="spinners.academicTerm" class="spinner-border spinner-border-sm text-primary" role="status">
                       <span class="sr-only">Loading...</span>
@@ -133,15 +133,16 @@
                   </div>
 
                   <!-- Degree -->
-                  <div class="position-relative col-12 col-lg-6 ml-lg-3 mb-4 mb-lg-2 p-0">
-                    <div class="form-label-group">
-                      <label for="inputDegree">{{'main-content.labels.degree' | translate}}</label>
-                      <ng-select id="inputDegree" [(ngModel)]="selectedDegree" [disabled]="this.degrees.length === 0" [clearable]="false"
-                                 placeholder="{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.degree' | translate).toLowerCase()}}..."
-                                 notFoundText="{{'errors.no-degrees-found' | translate}}"
-                                 (change)="loadCoursesBasicInfo(selectedAcademicTerm, selectedDegree)">
-                        <ng-option *ngFor="let degree of degrees" value="{{degree.id}}">{{degree.acronym}} - {{degree.name}}</ng-option>
-                      </ng-select>
+                  <div class="position-relative col-12 col-lg-8 mb-4 mb-lg-2 px-0 pl-lg-3">
+                    <div class="form-group mb-0">
+                      <label for="inputDegree" class="d-block">{{'main-content.labels.degree' | translate}}</label>
+                      <select id="inputDegree" class="selectpicker show-tick form-control" [(ngModel)]="selectedDegree"
+                              title="{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.degree' | translate).toLowerCase()}}..."
+                              data-style="custom-select" data-size="10"
+                              data-live-search="true" data-live-search-placeholder="Search..."
+                              [disabled]="this.degrees.length === 0" (change)="loadCoursesBasicInfo(selectedAcademicTerm, selectedDegree)">
+                        <option *ngFor="let degree of degrees" value="{{degree.id}}">{{degree.acronym}} - {{degree.name}}</option>
+                      </select>
                     </div>
                     <div *ngIf="spinners.degree" class="spinner-border spinner-border-sm text-primary" role="status">
                       <span class="sr-only">Loading...</span>
@@ -150,21 +151,31 @@
                 </div>
 
                 <!-- Course -->
-                <div class="position-relative col-12 p-0">
-                  <label for="inputCourse">{{'main-content.labels.course' | translate}}</label>
+                <div class="position-relative col-12 px-0">
+                  <label for="inputCourse" class="d-block">{{'main-content.labels.course' | translate}}</label>
                   <div class="input-group w-100">
-                    <ng-select id="inputCourse" [(ngModel)]="selectedCourse" [disabled]="this.courses.length === 0" [clearable]="false"
-                               placeholder="{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.course' | translate).toLowerCase()}}..."
-                               notFoundText="{{'errors.no-courses-found' | translate}}"
-                               (change)="noShiftsFound = false">
-                      <ng-option *ngFor="let course of courses" id="{{course.id}}" value="{{course.id}}">[{{course.acronym}}] {{course.name}}</ng-option>
-                    </ng-select>
+                    <select id="inputCourse" class="selectpicker show-tick form-control" [(ngModel)]="selectedCourse"
+                            title="{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.course' | translate).toLowerCase()}}..."
+                            data-style="custom-select" data-size="10"
+                            data-live-search="true" data-live-search-placeholder="Search..."
+                            [disabled]="this.courses.length === 0" (change)="noShiftsFound = false">
+                      <optgroup label="{{'main-content.labels.first-semester' | translate}}">
+                        <option *ngFor="let course of getCoursesBySemester(1)" value="{{course.id}}">[{{course.acronym}}] {{course.name}}</option>
+                      </optgroup>
+                      <optgroup label="{{'main-content.labels.second-semester' | translate}}">
+                        <option *ngFor="let course of getCoursesBySemester(2)" value="{{course.id}}">[{{course.acronym}}] {{course.name}}</option>
+                      </optgroup>
+                      <optgroup label="{{'main-content.labels.not-found' | translate}}">
+                        <option *ngFor="let course of getCoursesBySemester(0)" value="{{course.id}}">[{{course.acronym}}] {{course.name}}</option>
+                      </optgroup>
+                    </select>
                     <div class="input-group-append">
                       <button id="addBtn" class="btn btn-primary" type="button"
                               [disabled]="!selectedCourse"
                               (click)="addCourse(selectedCourse)">{{'main-content.add-btn' | translate}}</button>
                     </div>
                   </div>
+
                   <div *ngIf="spinners.course" class="spinner-border spinner-border-sm text-primary" role="status">
                     <span class="sr-only">Loading...</span>
                   </div>

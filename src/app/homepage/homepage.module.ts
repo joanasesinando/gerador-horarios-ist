@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 
 import { HomepageRoutingModule } from './homepage-routing.module';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgSelectModule } from '@ng-select/ng-select';
 
 import { HomepageComponent } from './homepage.component';
 import { CourseCardComponent } from './course-card/course-card.component';
@@ -27,8 +26,7 @@ import { HelpModalComponent } from './help-modal/help-modal.component';
         HomepageRoutingModule,
         TranslateModule,
         FontAwesomeModule,
-        FormsModule,
-        NgSelectModule
+        FormsModule
     ]
 })
 export class HomepageModule { }

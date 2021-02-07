@@ -25,7 +25,7 @@ describe('TimetableComponent', () => {
   const ROOM = 'Room';
 
   const COURSES: Course[] = [
-    new Course(1, 'C1', 'C01', TYPES_OF_CLASSES, CAMPUS,
+    new Course(1, 'C1', 'C01', 1, TYPES_OF_CLASSES, CAMPUS,
       [
         new Shift('C1T01', TYPES_OF_CLASSES[0], [
           new Lesson(new Date('2020-10-05 08:00'), new Date('2020-10-05 09:30'), ROOM, CAMPUS[0]),
@@ -42,7 +42,7 @@ describe('TimetableComponent', () => {
           new Lesson(new Date('2020-10-06 09:30'), new Date('2020-10-06 11:00'), ROOM, CAMPUS[0])
         ], CAMPUS[0]),
       ]),
-    new Course(2, 'C2', 'C02', TYPES_OF_CLASSES, CAMPUS,
+    new Course(2, 'C2', 'C02', 1, TYPES_OF_CLASSES, CAMPUS,
       [
         new Shift('C2T01', TYPES_OF_CLASSES[0], [
           new Lesson(new Date('2020-10-06 12:00'), new Date('2020-10-06 13:30'), ROOM, CAMPUS[0]),
@@ -59,7 +59,7 @@ describe('TimetableComponent', () => {
           new Lesson(new Date('2020-10-07 13:30'), new Date('2020-10-06 15:00'), ROOM, CAMPUS[0])
         ], CAMPUS[0]),
       ]),
-    new Course(3, 'C3', 'C03', TYPES_OF_CLASSES, CAMPUS,
+    new Course(3, 'C3', 'C03', 1, TYPES_OF_CLASSES, CAMPUS,
       [
         new Shift('C3T01', TYPES_OF_CLASSES[0], [
           new Lesson(new Date('2020-10-05 12:00'), new Date('2020-10-05 13:30'), ROOM, CAMPUS[0]),

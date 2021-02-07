@@ -104,27 +104,49 @@ a { color: $gh-blue; }
  *
  * ------------------------------------------------------------------- */
 
-.ng-select.ng-select-single .ng-select-container {
-  height: 38px;
-}
+.bootstrap-select {
 
-.ng-select#inputCourse {
-  width: calc(100% - 102.46px);
-  .ng-select-container {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-}
+  .dropdown-toggle {
+    &::after {
+      content: none;
+    }
 
-@include media-breakpoint-up(lg) {
-  .ng-dropdown-panel .scroll-host {
-    overflow-x: auto !important;
+    &:focus {
+      outline: none !important;
+    }
 
-    div {
-      width: fit-content;
-      min-width: 100%;
+    &.bs-placeholder,
+    &.bs-placeholder:active,
+    &.bs-placeholder:focus,
+    &.bs-placeholder:hover {
+      color: #495057;
     }
   }
+
+  .dropdown-item.active,
+  .dropdown-item:active {
+    background-color: $gh-blue;
+  }
+
+  .dropdown-menu {
+    max-width: 100%;
+    @include media-breakpoint-up(lg) {
+      max-width: 120%;
+
+      ul {
+        overflow-x: hidden;
+      }
+    }
+  }
+}
+
+.bootstrap-select #inputCourse ~ .dropdown-menu {
+  max-width: calc(100% + 102.46px);
+}
+
+.custom-select.disabled {
+  color: #6c757d;
+  background-color: #e9ecef;
 }
 
 
@@ -282,21 +304,33 @@ $scrollbarWidth: 10px;
     }
   }
 
+  //.bootstrap-select .dropdown-menu .inner::-webkit-scrollbar {
+  //  width: calc(#{$scrollbarWidth} - 5);
+  //}
+  //
+  //.bootstrap-select .dropdown-menu .inner::-webkit-scrollbar-track {
+  //  @include border-radius(calc(#{$scrollbarWidth} - 5));
+  //}
+  //
+  //.bootstrap-select .dropdown-menu .inner::-webkit-scrollbar-thumb {
+  //  @include border-radius(calc(#{$scrollbarWidth} - 5));
+  //}
+
   .schedules-deck::-webkit-scrollbar,
-  .ng-dropdown-panel .scroll-host::-webkit-scrollbar{
+  .ng-dropdown-panel .scroll-host::-webkit-scrollbar {
     width: $scrollbarWidth - 5px;
     height: $scrollbarWidth - 5px;
     background-color: transparent;
   }
 
   .schedules-deck::-webkit-scrollbar-track,
-  .ng-dropdown-panel .scroll-host::-webkit-scrollbar-track{
+  .ng-dropdown-panel .scroll-host::-webkit-scrollbar-track {
     background-color: transparent;
     @include border-radius($scrollbarWidth);
   }
 
   .schedules-deck::-webkit-scrollbar-thumb,
-  .ng-dropdown-panel .scroll-host::-webkit-scrollbar-thumb{
+  .ng-dropdown-panel .scroll-host::-webkit-scrollbar-thumb {
     @include border-radius($scrollbarWidth);
     background-color: $scrollbarColor;
 

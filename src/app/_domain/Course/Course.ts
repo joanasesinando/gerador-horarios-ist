@@ -9,6 +9,7 @@ export class Course {
     private _id: number,
     private _name: string,
     private _acronym: string,
+    private _semester: number,
     private _types?: ClassType[],
     private _campus?: string[],
     private _shifts?: Shift[],
@@ -24,6 +25,9 @@ export class Course {
 
   get acronym(): string { return this._acronym; }
   set acronym(value: string) { this._acronym = value; }
+
+  get semester(): number { return this._semester; }
+  set semester(value: number) { this._semester = value; }
 
   get types(): ClassType[] { return this._types; }
   set types(value: ClassType[]) { this._types = value; }
@@ -62,7 +66,8 @@ export const courseConverter = {
     return {
       id: course.id,
       name: course.name,
-      acronym: course.acronym
+      acronym: course.acronym,
+      semester: course.semester
     };
   },
   fromFirestore: (snapshot, options) => {
@@ -78,8 +83,8 @@ export const courseConverter = {
         }
         shifts.push(new Shift(shift.name, shift.type, lessons, shift.campus));
       }
-      return new Course(data.id, data.name, data.acronym, data.types, data.campus, shifts, data.courseLoads);
+      return new Course(data.id, data.name, data.acronym, data.semester, data.types, data.campus, shifts, data.courseLoads);
     }
-    return new Course(data.id, data.name, data.acronym);
+    return new Course(data.id, data.name, data.acronym, data.semester);
   }
 };

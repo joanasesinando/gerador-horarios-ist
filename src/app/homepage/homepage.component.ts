@@ -103,6 +103,13 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       widget.tooltip();
     });
 
+    // Selects translation subscription
+    this.translateService.stream('main-content.labels.placeholder').subscribe(value => {
+      translateSelect('inputAcademicTerm', value, 'main-content.labels.term', this.translateService);
+      translateSelect('inputDegree', value, 'main-content.labels.degree', this.translateService);
+      translateSelect('inputCourse', value, 'main-content.labels.course', this.translateService);
+    });
+
     // Reset state if coming back
     if (this.stateService.hasStateSaved()) {
       this.resetState();
@@ -123,6 +130,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     // Get academic terms
     this.fenixService.getAcademicTerms().then(academicTerms => {
       this.academicTerms = academicTerms;
+      setTimeout(() => $('#inputAcademicTerm').selectpicker('refresh'), 0);
       this.logger.log('academic terms', this.academicTerms);
       tookToLong = false;
 
@@ -135,6 +143,13 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       this.spinners.academicTerm = false;
     });
     this.spinners.loadingPage = false;
+
+    function translateSelect(selectID: string, value: string, translationKey: string, service: TranslateService): void {
+      const select = $('#' + selectID);
+      select.attr('title', value + ' ' + service.instant(translationKey).toLowerCase() + '...');
+      select.selectpicker('destroy');
+      select.selectpicker();
+    }
   }
 
   ngOnInit(): void {
@@ -162,10 +177,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   async changeLanguage(lang: string): Promise<void> {
-    this.translateService.use(lang);
+    this.translateService.use(lang).subscribe(() => this.checkIfDatabaseIsOld());
     this.noShiftsFound = false;
-
-    await this.checkIfDatabaseIsOld();
 
     // Reset
     this.selectedAcademicTerm = null;
@@ -181,7 +194,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.typesOfClassesPicked.clear();
 
     // Clean selected courses
-    for (const course of this.selectedCourses) {
+    for (const course of this.selectedCourses) { // FIXME: no need?
       this.removeCourse(course.id);
     }
 
@@ -214,8 +227,15 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.loadCoursesBasicInfo(academicTerm, degreeID);
 
     // Reset selected courses state
-    for (const course of this.stateService.selectedCourses) {
+    for (const course of this.stateService.selectedCourses) { // FIXME: no need?
       this.addCourse(course.id);
+    }
+
+    // Reset selects
+    for (const s of ['inputAcademicTerm', 'inputDegree', 'inputCourse']) {
+      const select = $('#' + s);
+      select.selectpicker('destroy');
+      select.selectpicker();
     }
   }
 
@@ -248,15 +268,14 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   loadDegrees(academicTerm: string): Promise<void | Degree[]> | void {
     this.spinners.degree = true;
     this.selectedDegree = null;
-    this.degrees = [];
     this.selectedCourse = null;
-    this.courses = [];
 
     // If state saved, don't call APIs
     if (this.stateService.degreesRepository.has(academicTerm)) {
       this.logger.log('has degrees state saved');
       this.degrees = this.stateService.degreesRepository.get(academicTerm)
         .sort((a, b) => a.acronym.localeCompare(b.acronym));
+      setTimeout(() => $('#inputDegree').selectpicker('refresh'), 0);
       this.spinners.degree = false;
       this.logger.log('degrees', this.degrees);
       return;
@@ -267,6 +286,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         this.logger.log('has degrees saved');
         this.firebaseService.getDegrees(academicTerm).then(degrees => {
           this.degrees = degrees.sort((a, b) => a.acronym.localeCompare(b.acronym));
+          setTimeout(() => $('#inputDegree').selectpicker('refresh'), 0);
           this.spinners.degree = false;
           this.logger.log('degrees', this.degrees);
 
@@ -278,6 +298,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         this.logger.log('no degrees found');
         this.fenixService.getDegrees(academicTerm).then(degrees => {
           this.degrees = degrees;
+          setTimeout(() => $('#inputDegree').selectpicker('refresh'), 0);
           this.spinners.degree = false;
           this.logger.log('degrees', this.degrees);
 
@@ -305,7 +326,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   loadCoursesBasicInfo(academicTerm: string, degreeID: number): Promise<void | Course[]> | void {
     this.spinners.course = true;
     this.selectedCourse = null;
-    this.courses = [];
 
     // If state saved, don't call APIs
     if (this.stateService.coursesRepository.has(academicTerm)
@@ -315,6 +335,11 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       this.courses = this.stateService.coursesRepository.get(academicTerm).get(degreeID)
         .sort((a, b) => a.acronym.localeCompare(b.acronym))
         .filter((course) => !this.selectedCoursesIDs.has(course.id));
+
+      const select = $('#inputCourse');
+      select.selectpicker('destroy');
+      setTimeout(() => select.selectpicker(), 0);
+
       this.spinners.course = false;
       this.logger.log('courses', this.courses);
       return;
@@ -327,6 +352,11 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           this.courses = courses
             .sort((a, b) => a.acronym.localeCompare(b.acronym))
             .filter((course) => !this.selectedCoursesIDs.has(course.id));
+
+          const select = $('#inputCourse');
+          select.selectpicker('destroy');
+          setTimeout(() => select.selectpicker(), 0);
+
           this.spinners.course = false;
           this.logger.log('courses', this.courses);
 
@@ -338,6 +368,11 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         this.logger.log('no courses found');
         this.fenixService.getCoursesBasicInfo(academicTerm, degreeID).then(courses => {
           this.courses = courses.filter((course) => !this.selectedCoursesIDs.has(course.id));
+
+          const select = $('#inputCourse');
+          select.selectpicker('destroy');
+          setTimeout(() => select.selectpicker(), 0);
+
           this.spinners.course = false;
           this.logger.log('courses', this.courses);
 
@@ -358,6 +393,13 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         });
       }
     });
+  }
+
+  getCoursesBySemester(semester: number): Course[] {
+    if (semester === 0)
+      return this.courses.filter(course => course.semester !== 1 && course.semester !== 2);
+
+    return this.courses.filter(course => course.semester === semester);
   }
 
   addCourse(courseID: number): void {
@@ -412,10 +454,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       this.selectedCoursesIDs.set(course.id, true);
       this.courses.splice(index, 1);
 
-      // Remove course from select
-      $('#' + course.id).remove();
-
-      // Reset select
+      // Update select
+      setTimeout(() => $('#inputCourse').selectpicker('refresh'), 0);
       this.selectedCourse = null;
 
     } else {
@@ -439,6 +479,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       const courseToRemove = this.selectedCourses[courseIndex];
       this.courses.push(courseToRemove);
       this.courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
+      setTimeout(() => $('#inputCourse').selectpicker('refresh'), 0);
     }
 
     remove(this.selectedCourses, this.selectedCoursesIDs, this.campusPicked, this.typesOfClassesPicked, this.logger);
@@ -455,7 +496,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   findCourseIndex(courseID: number, courses: Course[]): number {
     let index = 0;
     for (const course of courses) {
-      if (course.id === courseID) { return index; }
+      if (course.id === courseID) return index;
       index++;
     }
     return null;

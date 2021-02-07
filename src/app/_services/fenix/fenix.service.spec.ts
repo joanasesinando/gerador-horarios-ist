@@ -102,11 +102,12 @@ describe('FenixService', () => {
     });
 
     it('should parse course basic info correctly', () => {
-      const course = service.parseCourseBasicInfo({id: 123, name: 'Course Name', acronym: 'CS01'});
+      const course = service.parseCourseBasicInfo({id: 123, name: 'Course Name', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'});
       expect(course).toBeTruthy();
       expect(course.id).toBe(123);
       expect(course.name).toBe('Course Name');
       expect(course.acronym).toBe('CS01');
+      expect(course.semester).toBe(1);
     });
 
     describe('Invalid course basic info parsing', () => {
@@ -316,17 +317,17 @@ describe('FenixService', () => {
       }
 
       it('should fill course missing info: no campus', () => {
-        const course = new Course(123, 'C1', 'C01', [ClassType.THEORY_PT], [], [new MockShift()]);
+        const course = new Course(123, 'C1', 'C01', 1, [ClassType.THEORY_PT], [], [new MockShift()]);
         expect(service.fillMissingInfo(course).campus).toBe(null);
       });
 
       it('should fill course missing info: no types', () => {
-        const course = new Course(123, 'C1', 'C01', [], ['A'], [new MockShift()]);
+        const course = new Course(123, 'C1', 'C01', 1, [], ['A'], [new MockShift()]);
         expect(service.fillMissingInfo(course).types).toEqual([ClassType.NONE]);
       });
 
       it('should throw an error if there are no shifts', () => {
-        const course = new Course(123, 'C1', 'C01', [ClassType.THEORY_PT], ['A'], []);
+        const course = new Course(123, 'C1', 'C01', 1, [ClassType.THEORY_PT], ['A'], []);
         expect(() => service.fillMissingInfo(course))
           .toThrow(new Error('No shifts found. Impossible to generate schedules for course: ' + course.name));
       });

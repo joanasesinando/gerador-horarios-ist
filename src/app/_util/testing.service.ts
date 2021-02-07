@@ -14,6 +14,7 @@ export class TestingService {
   private COURSE_ID = 123456789;
   private COURSE_NAME = 'Course Name';
   private COURSE_ACRONYM = 'CN01';
+  private COURSE_SEMESTER = 1;
 
   // Shift defaults
   private SHIFT_NAME = 'SN01';
@@ -35,7 +36,7 @@ export class TestingService {
    *  - end: HH:mm
    * -------------------------------------------------------------------------------- */
   createShiftsOnlyCourse(shifts: Shift[]): Course { // FIXME: if not used remove
-    return new Course(this.COURSE_ID, this.COURSE_NAME, this.COURSE_ACRONYM, undefined, undefined, shifts);
+    return new Course(this.COURSE_ID, this.COURSE_NAME, this.COURSE_ACRONYM, this.COURSE_SEMESTER, undefined, undefined, shifts);
   }
 
   /* --------------------------------------------------------------------------------
