@@ -19,8 +19,6 @@ const NO_ROOM_FOUND = 'NO ROOM FOUND';
 export class FenixService {
 
   url = 'https://ist-corsaway.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/';
-
-  campusNotFound = false;
   currentAcademicTerm: string;
 
   constructor(public translateService: TranslateService, public errorService: ErrorService) { }
@@ -34,7 +32,7 @@ export class FenixService {
     if (!degreeJson.name) throw new Error('No name found for degree ' + degreeJson.id);
     if (!degreeJson.acronym) throw new Error('No acronym found for degree ' + degreeJson.id);
 
-    return new Degree(degreeJson.id, degreeJson.name, degreeJson.acronym);
+    return new Degree(parseInt(degreeJson.id, 10), degreeJson.name, degreeJson.acronym);
   }
 
   parseCourseBasicInfo(course): Course {
@@ -43,7 +41,7 @@ export class FenixService {
     if (!course.acronym) throw new Error('No acronym found for course ' + course.id);
     if (!course.academicTerm) throw new Error('No academic term found for course ' + course.id);
 
-    return new Course(course.id, course.name, course.acronym, parseInt(course.academicTerm[0], 10));
+    return new Course(parseInt(course.id, 10), course.name, course.acronym, parseInt(course.academicTerm[0], 10));
   }
 
   parseCourseMissingInfo(scheduleJson): void {

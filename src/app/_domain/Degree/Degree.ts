@@ -22,6 +22,6 @@ export const degreeConverter = {
   },
   fromFirestore: (snapshot, options) => {
     const data = snapshot.data(options);
-    return new Degree(data.id, data.name, data.acronym);
+    return new Degree(parseInt(data.id, 10), data.name, data.acronym);
   }
 };

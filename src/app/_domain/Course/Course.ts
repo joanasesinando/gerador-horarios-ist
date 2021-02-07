@@ -83,8 +83,9 @@ export const courseConverter = {
         }
         shifts.push(new Shift(shift.name, shift.type, lessons, shift.campus));
       }
-      return new Course(data.id, data.name, data.acronym, data.semester, data.types, data.campus, shifts, data.courseLoads);
+      // tslint:disable-next-line:max-line-length
+      return new Course(parseInt(data.id, 10), data.name, data.acronym, parseInt(data.semester, 10), data.types, data.campus, shifts, data.courseLoads);
     }
-    return new Course(data.id, data.name, data.acronym, data.semester);
+    return new Course(parseInt(data.id, 10), data.name, data.acronym, parseInt(data.semester, 10));
   }
 };

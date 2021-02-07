@@ -1,3 +1,4 @@
+/* tslint:disable:max-line-length */
 import {TestBed} from '@angular/core/testing';
 import {of} from 'rxjs';
 
@@ -38,11 +39,15 @@ describe('FenixService', () => {
 
   describe('Correct structure', () => {
     it('should parse a degree correctly', () => {
-      const degree = service.parseDegree({id: 123, name: 'Degree Name', acronym: 'DG01'});
-      expect(degree).toBeTruthy();
-      expect(degree.id).toBe(123);
-      expect(degree.name).toBe('Degree Name');
-      expect(degree.acronym).toBe('DG01');
+      const degree1 = service.parseDegree({id: 123, name: 'Degree Name', acronym: 'DG01'});
+      const degree2 = service.parseDegree({id: '123', name: 'Degree Name', acronym: 'DG01'});
+
+      for (const degree of [degree1, degree2]) {
+        expect(degree).toBeTruthy();
+        expect(degree.id).toBe(123);
+        expect(degree.name).toBe('Degree Name');
+        expect(degree.acronym).toBe('DG01');
+      }
     });
 
     describe('Invalid degree parsing', () => {
@@ -102,60 +107,79 @@ describe('FenixService', () => {
     });
 
     it('should parse course basic info correctly', () => {
-      const course = service.parseCourseBasicInfo({id: 123, name: 'Course Name', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'});
-      expect(course).toBeTruthy();
-      expect(course.id).toBe(123);
-      expect(course.name).toBe('Course Name');
-      expect(course.acronym).toBe('CS01');
-      expect(course.semester).toBe(1);
+      const course1 = service.parseCourseBasicInfo({id: 123, name: 'Course Name', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'});
+      const course2 = service.parseCourseBasicInfo({id: '123', name: 'Course Name', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'});
+
+      for (const course of [course1, course2]) {
+        expect(course).toBeTruthy();
+        expect(course.id).toBe(123);
+        expect(course.name).toBe('Course Name');
+        expect(course.acronym).toBe('CS01');
+        expect(course.semester).toBe(1);
+      }
     });
 
     describe('Invalid course basic info parsing', () => {
       const parameters = [
         {
           description: 'should parse course basic info: no ID',
-          input: {name: 'Course Name', acronym: 'CS01'},
+          input: {name: 'Course Name', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No ID found for course')
         },
         {
           description: 'should parse course basic info: null ID',
-          input: {id: null, name: 'Course Name', acronym: 'CS01'},
+          input: {id: null, name: 'Course Name', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No ID found for course')
         },
         {
           description: 'should parse course basic info: zero ID',
-          input: {id: 0, name: 'Course Name', acronym: 'CS01'},
+          input: {id: 0, name: 'Course Name', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No ID found for course')
         },
         {
           description: 'should parse course basic info: no name',
-          input: {id: 123, acronym: 'CS01'},
+          input: {id: 123, acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No name found for course 123')
         },
         {
           description: 'should parse course basic info: null name',
-          input: {id: 123, name: null, acronym: 'CS01'},
+          input: {id: 123, name: null, acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No name found for course 123')
         },
         {
           description: 'should parse course basic info: empty name',
-          input: {id: 123, name: '', acronym: 'CS01'},
+          input: {id: 123, name: '', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No name found for course 123')
         },
         {
           description: 'should parse course basic info: no acronym',
-          input: {id: 123, name: 'Course Name'},
+          input: {id: 123, name: 'Course Name', academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No acronym found for course 123')
         },
         {
           description: 'should parse course basic info: null acronym',
-          input: {id: 123, name: 'Course Name', acronym: null},
+          input: {id: 123, name: 'Course Name', acronym: null, academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No acronym found for course 123')
         },
         {
           description: 'should parse course basic info: empty acronym',
-          input: {id: 123, name: 'Course Name', acronym: ''},
+          input: {id: 123, name: 'Course Name', acronym: '', academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No acronym found for course 123')
+        },
+        {
+          description: 'should parse course basic info: no academicTerm',
+          input: {id: 123, name: 'Course Name', acronym: 'CS01'},
+          error: new Error('No academic term found for course 123')
+        },
+        {
+          description: 'should parse course basic info: null academicTerm',
+          input: {id: 123, name: 'Course Name', acronym: 'CS01', academicTerm: null},
+          error: new Error('No academic term found for course 123')
+        },
+        {
+          description: 'should parse course basic info: empty academicTerm',
+          input: {id: 123, name: 'Course Name', acronym: 'CS01', academicTerm: ''},
+          error: new Error('No academic term found for course 123')
         },
       ];
 
@@ -340,6 +364,7 @@ describe('FenixService', () => {
     beforeEach(() => {
       originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
       jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
+      translation.use('pt-PT');
     });
 
     it('should get current academic term', async () => {
@@ -381,6 +406,7 @@ describe('FenixService', () => {
         expect(course.id).toBeTruthy();
         expect(course.name).toBeTruthy();
         expect(course.acronym).toBeTruthy();
+        expect(course.semester).toBeTruthy();
         expect(course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9').toBeFalse();
 
         if (i < courses.length - 1)
@@ -389,26 +415,22 @@ describe('FenixService', () => {
     });
 
     it('should get course basic info for course BD of degree LEIC-A for current academic term', async () => {
-      translation.use('pt-PT');
-
       const currentAcademicTerm = await service.getCurrentAcademicTerm();
       const degreeID = 2761663971474;
       const courses = await service.getCoursesBasicInfo(currentAcademicTerm, degreeID);
       expect(courses).toBeTruthy();
 
       for (const course of courses) {
-        // tslint:disable-next-line:triple-equals
-        if (course.id == 846035542878562) {
+        if (course.id === 846035542878562) {
           expect(course.name).toBe('Bases de Dados');
           expect(course.acronym).toBe('BD225179577');
+          expect(course.semester).toBe(1);
           break;
         }
       }
     });
 
     it('should get missing info for course BD of degree LEIC-A for current academic term', async () => {
-      translation.use('pt-PT');
-
       const currentAcademicTerm = await service.getCurrentAcademicTerm();
       const degreeID = 2761663971474;
       const courses = await service.getCoursesBasicInfo(currentAcademicTerm, degreeID);
@@ -464,6 +486,7 @@ describe('FenixService', () => {
     //       expect(course.id).toBeTruthy();
     //       expect(course.name).toBeTruthy();
     //       expect(course.acronym).toBeTruthy();
+    //       expect(course.semester).toBeTruthy();
     //       expect(course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9').toBeFalse();
     //
     //       course = await service.getMissingCourseInfo(course);

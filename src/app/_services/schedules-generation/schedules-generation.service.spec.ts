@@ -102,7 +102,7 @@ describe('SchedulesGenerationService', () => {
       });
     });
 
-    describe('Combining shifts', () => { // TODO: check total hours is correct also
+    describe('Combining shifts', () => {
 
       let course: Course;
 
@@ -144,6 +144,15 @@ describe('SchedulesGenerationService', () => {
             expect(cl.shifts.includes(t1)).toBeTrue();
             t1Included = true;
           }
+
+          cl.shifts.forEach(shift => {
+            const MILLISECONDS_IN_AN_HOUR = 60 * 60 * 1000;
+            let totalHours = 0;
+            shift.lessons.forEach(lesson => {
+              totalHours += Math.abs(lesson.end.getTime() - lesson.start.getTime()) / MILLISECONDS_IN_AN_HOUR;
+            });
+            expect(totalHours).toBe(1.5);
+          });
         });
       });
 
@@ -177,6 +186,15 @@ describe('SchedulesGenerationService', () => {
           expect(cl.course).toEqual(course);
           expect(cl.shifts.length).toBe(1);
           expect(cl.shifts.includes(t1) || cl.shifts.includes(t2) || cl.shifts.includes(t3)).toBeTrue();
+
+          cl.shifts.forEach(shift => {
+            const MILLISECONDS_IN_AN_HOUR = 60 * 60 * 1000;
+            let totalHours = 0;
+            shift.lessons.forEach(lesson => {
+              totalHours += Math.abs(lesson.end.getTime() - lesson.start.getTime()) / MILLISECONDS_IN_AN_HOUR;
+            });
+            expect(totalHours).toBe(1.5);
+          });
         });
       });
 
@@ -192,6 +210,14 @@ describe('SchedulesGenerationService', () => {
         expect(classes[0].shifts.length).toBe(2);
         expect(classes[0].shifts.includes(t1)).toBeTrue();
         expect(classes[0].shifts.includes(lab)).toBeTrue();
+        classes[0].shifts.forEach(shift => {
+          const MILLISECONDS_IN_AN_HOUR = 60 * 60 * 1000;
+          let totalHours = 0;
+          shift.lessons.forEach(lesson => {
+            totalHours += Math.abs(lesson.end.getTime() - lesson.start.getTime()) / MILLISECONDS_IN_AN_HOUR;
+          });
+          expect(totalHours).toBe(1.5);
+        });
       });
 
 
@@ -227,6 +253,24 @@ describe('SchedulesGenerationService', () => {
           expect(cl.shifts.includes(t1) || cl.shifts.includes(t2)).toBeTrue();
           if (cl.shifts.includes(t1)) expect(cl.shifts.includes(lab2)).toBeTrue();
           else if (cl.shifts.includes(t2)) expect(cl.shifts.includes(lab1)).toBeTrue();
+
+          cl.shifts.forEach(shift => {
+            const MILLISECONDS_IN_AN_HOUR = 60 * 60 * 1000;
+            let totalHours = 0;
+            shift.lessons.forEach(lesson => {
+              totalHours += Math.abs(lesson.end.getTime() - lesson.start.getTime()) / MILLISECONDS_IN_AN_HOUR;
+            });
+            expect(totalHours).toBe(1.5);
+          });
+
+          cl.shifts.forEach(shift => {
+            const MILLISECONDS_IN_AN_HOUR = 60 * 60 * 1000;
+            let totalHours = 0;
+            shift.lessons.forEach(lesson => {
+              totalHours += Math.abs(lesson.end.getTime() - lesson.start.getTime()) / MILLISECONDS_IN_AN_HOUR;
+            });
+            expect(totalHours).toBe(1.5);
+          });
         });
       });
 
@@ -240,6 +284,14 @@ describe('SchedulesGenerationService', () => {
         expect(classes.length).toBe(1);
         expect(classes[0].course).toEqual(course);
         expect(classes[0].shifts).toEqual(course.shifts);
+        classes[0].shifts.forEach(shift => {
+          const MILLISECONDS_IN_AN_HOUR = 60 * 60 * 1000;
+          let totalHours = 0;
+          shift.lessons.forEach(lesson => {
+            totalHours += Math.abs(lesson.end.getTime() - lesson.start.getTime()) / MILLISECONDS_IN_AN_HOUR;
+          });
+          expect(totalHours).toBe(1.5);
+        });
       });
 
       it('should combine shifts correctly: no shifts', () => {

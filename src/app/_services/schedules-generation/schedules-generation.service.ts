@@ -161,14 +161,12 @@ export class SchedulesGenerationService {
     const shiftsArray: Shift[][] = [];
 
     // Group shifts based on type of class
-    for (const shift of course.shifts) {
+    for (const shift of course.shifts)
       shiftsMap.has(shift.type) ? shiftsMap.get(shift.type).push(shift) : shiftsMap.set(shift.type, [shift]);
-    }
 
     // Get input ready for combination
-    for (const key of shiftsMap.keys()) {
+    for (const key of shiftsMap.keys())
       shiftsArray.push(shiftsMap.get(key));
-    }
 
     // Get combinations of shifts & arrange into classes
     const classes: Class[] = [];
@@ -220,12 +218,10 @@ export class SchedulesGenerationService {
 
     function allPossibleCasesHelper(arr: any[][], isFirst: boolean): any[][] {
       if (arr.length === 1) {
-        if (isFirst) {
+        if (isFirst)
           // Make an array of every item, if nothing to combine
-          for (let i = 0; i < arr[0].length; i++) {
+          for (let i = 0; i < arr[0].length; i++)
             arr[0][i] = [arr[0][i]];
-          }
-        }
         return arr[0];
 
       } else {
@@ -233,8 +229,8 @@ export class SchedulesGenerationService {
         const allCasesOfRest = allPossibleCasesHelper(arr.slice(1), false);
         for (let rest of allCasesOfRest) {
           for (let item of arr[0]) {
-            if (!Array.isArray(item)) { item = [item]; }
-            if (!Array.isArray(rest)) { rest = [rest]; }
+            if (!Array.isArray(item)) item = [item];
+            if (!Array.isArray(rest)) rest = [rest];
             result.push(item.concat(rest));
           }
         }
@@ -244,20 +240,16 @@ export class SchedulesGenerationService {
   }
 
   checkForOverlapsOnShifts(shifts: Shift[]): boolean {
-    for (let i = 0; i < shifts.length - 1; i++) {
-      for (let j = i + 1; j < shifts.length; j++) {
-        if (shifts[i].overlap(shifts[j])) { return true; }
-      }
-    }
+    for (let i = 0; i < shifts.length - 1; i++)
+      for (let j = i + 1; j < shifts.length; j++)
+        if (shifts[i].overlap(shifts[j])) return true;
     return false;
   }
 
   checkForOverlapsOnClasses(classes: Class[]): boolean {
-    for (let i = 0; i < classes.length - 1; i++) {
-      for (let j = i + 1; j < classes.length; j++) {
-        if (classes[i].overlap(classes[j])) { return true; }
-      }
-    }
+    for (let i = 0; i < classes.length - 1; i++)
+      for (let j = i + 1; j < classes.length; j++)
+        if (classes[i].overlap(classes[j])) return true;
     return false;
   }
 
@@ -315,11 +307,9 @@ export class SchedulesGenerationService {
     });
 
     // Sort by start time
-    for (let i = 1; i <= 5; i++) {
-      if (classesPerWeekday.has(i) && classesPerWeekday.get(i).length > 1) {
+    for (let i = 1; i <= 5; i++)
+      if (classesPerWeekday.has(i) && classesPerWeekday.get(i).length > 1)
         classesPerWeekday.get(i).sort((a, b) => a.start - b.start);
-      }
-    }
     return classesPerWeekday;
   }
 
@@ -379,9 +369,8 @@ export class SchedulesGenerationService {
 
   calculateNumberFreeDays(classesPerWeekday: Map<number, {start: number, end: number}[]>): number {
     let freeDays = 0;
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 5; i++)
       if (!classesPerWeekday.has(i) || classesPerWeekday.get(i).length === 0) freeDays++;
-    }
     return freeDays;
   }
 }
