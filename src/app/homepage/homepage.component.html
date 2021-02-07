@@ -141,7 +141,8 @@
                               data-style="custom-select" data-size="10"
                               data-live-search="true" data-live-search-placeholder="Search..."
                               [disabled]="this.degrees.length === 0" (change)="loadCoursesBasicInfo(selectedAcademicTerm, selectedDegree)">
-                        <option *ngFor="let degree of degrees" value="{{degree.id}}">{{degree.acronym}} - {{degree.name}}</option>
+                        <option *ngFor="let degree of degrees" value="{{degree.id}}"
+                                [attr.data-tokens]="removePortugueseCharacters(degree.name)">{{degree.acronym}} - {{degree.name}}</option>
                       </select>
                     </div>
                     <div *ngIf="spinners.degree" class="spinner-degree spinner-border spinner-border-sm text-primary" role="status">
@@ -160,13 +161,16 @@
                             data-live-search="true" data-live-search-placeholder="Search..."
                             [disabled]="this.courses.length === 0" (change)="noShiftsFound = false">
                       <optgroup label="{{'main-content.labels.first-semester' | translate}}">
-                        <option *ngFor="let course of getCoursesBySemester(1)" value="{{course.id}}">[{{course.acronym}}] {{course.name}}</option>
+                        <option *ngFor="let course of getCoursesBySemester(1)" value="{{course.id}}"
+                                [attr.data-tokens]="removePortugueseCharacters(course.name)">[{{course.acronym}}] {{course.name}}</option>
                       </optgroup>
                       <optgroup label="{{'main-content.labels.second-semester' | translate}}">
-                        <option *ngFor="let course of getCoursesBySemester(2)" value="{{course.id}}">[{{course.acronym}}] {{course.name}}</option>
+                        <option *ngFor="let course of getCoursesBySemester(2)" value="{{course.id}}"
+                                [attr.data-tokens]="removePortugueseCharacters(course.name)">[{{course.acronym}}] {{course.name}}</option>
                       </optgroup>
                       <optgroup label="{{'main-content.labels.not-found' | translate}}">
-                        <option *ngFor="let course of getCoursesBySemester(0)" value="{{course.id}}">[{{course.acronym}}] {{course.name}}</option>
+                        <option *ngFor="let course of getCoursesBySemester(0)" value="{{course.id}}"
+                                [attr.data-tokens]="removePortugueseCharacters(course.name)">[{{course.acronym}}] {{course.name}}</option>
                       </optgroup>
                     </select>
                     <div class="input-group-append">

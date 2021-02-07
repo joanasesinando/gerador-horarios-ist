@@ -642,6 +642,15 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     }
   }
 
+  removePortugueseCharacters(s: string): string {
+    return s.replace(/[ãáâà]/ig, 'a')
+            .replace(/[óôõ]/ig, 'o')
+            .replace(/ç/ig, 'c')
+            .replace(/[éê]/ig, 'e')
+            .replace(/í/ig, 'i')
+            .replace(/ú/ig, 'u');
+  }
+
   @HostListener('window:resize', [])
   onWindowResize(): void {
     this.mobileView = window.innerWidth <= 991.98; // phones & tablets
