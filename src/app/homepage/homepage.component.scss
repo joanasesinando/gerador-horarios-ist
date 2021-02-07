@@ -135,6 +135,12 @@
   left: -1.5rem;
 }
 
+@include media-breakpoint-up(lg) {
+  .spinner-border.spinner-degree {
+    left: -1.5%;
+  }
+}
+
 .links {
   position: absolute;
   top: 1.5rem;

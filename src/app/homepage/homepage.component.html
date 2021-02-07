@@ -144,7 +144,7 @@
                         <option *ngFor="let degree of degrees" value="{{degree.id}}">{{degree.acronym}} - {{degree.name}}</option>
                       </select>
                     </div>
-                    <div *ngIf="spinners.degree" class="spinner-border spinner-border-sm text-primary" role="status">
+                    <div *ngIf="spinners.degree" class="spinner-degree spinner-border spinner-border-sm text-primary" role="status">
                       <span class="sr-only">Loading...</span>
                     </div>
                   </div>
