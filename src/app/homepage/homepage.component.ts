@@ -55,8 +55,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   spinners = {
     academicTerm: true,
-    degree: true,
-    course: true,
+    degree: false,
+    course: false,
     loadingPage: false
   };
 
@@ -140,7 +140,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       // Save state
       this.saveAcademicTermsState(this.academicTerms);
 
-      // this.spinners.academicTerm = false;
+      this.spinners.academicTerm = false;
     });
     this.spinners.loadingPage = false;
 
