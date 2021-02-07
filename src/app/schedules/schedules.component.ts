@@ -64,14 +64,6 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      // if (!this.data) { // FIXME
-      //   this.alertService.showAlert(
-      //     'Acção inválida',
-      //     'Não é possível andar para a frente. Por favor, preenche os campos de novo.',
-      //     'danger');
-      //   return;
-      // }
-
       // Generate schedules
       const t0 = performance.now();
       this.generatedSchedules = this.generationService.generateSchedules(this.selectedCourses);

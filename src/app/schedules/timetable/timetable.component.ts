@@ -60,11 +60,11 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
         this.translateService.currentLang === 'pt-PT' ?
           this.alertService.showAlert(
             '💬 Dica',
-            'Sabias que podes fixar uma aula clicando nela? Experimenta!',
+            'Podes fixar uma aula clicando nela. Assim, apenas serão mostrados horários que a incluam.',
             'info') :
           this.alertService.showAlert(
             '💬 Tip',
-            'Did you know you can pin a class slot by clicking on it? Give it a try!',
+            'You can pin a class slot by clicking on it. This way, only schedules that include that class will be shown.',
             'info');
       }
     }, 120000);
@@ -74,11 +74,11 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
         this.translateService.currentLang === 'pt-PT' ?
           this.alertService.showAlert(
             '💬 Dica',
-            'Sabias que podes usar as setas do teclado para saltar entre horários? Experimenta!',
+            'Podes usar as setas do teclado para saltar mais rapidamente entre horários.',
             'info') :
           this.alertService.showAlert(
             '💬 Tip',
-            'Did you know you can use the keyboard arrows to jump between schedules? Give it a try!',
+            'You can use the keyboard arrows to jump more quickly between schedules.',
             'info');
       }, 50000);
     }

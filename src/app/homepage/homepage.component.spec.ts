@@ -11,7 +11,7 @@ import {AboutModalComponent} from './about-modal/about-modal.component';
 import {RouterTestingModule} from '@angular/router/testing';
 import {TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService} from '@ngx-translate/core';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {ReactiveFormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {FenixService} from '../_services/fenix/fenix.service';
 import {FirebaseService} from '../_services/firebase/firebase.service';
@@ -22,6 +22,7 @@ import {Course} from '../_domain/Course/Course';
 import {ClassType} from '../_domain/ClassType/ClassType';
 import {Shift} from '../_domain/Shift/Shift';
 import {Lesson} from '../_domain/Lesson/Lesson';
+import {HelpModalComponent} from './help-modal/help-modal.component';
 
 describe('HomepageComponent', () => {
   let component: HomepageComponent;
@@ -94,13 +95,15 @@ describe('HomepageComponent', () => {
         }),
         RouterTestingModule,
         FontAwesomeModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        FormsModule
       ],
       declarations: [
         HomepageComponent,
         CourseCardComponent,
         CoursesBannerComponent,
-        AboutModalComponent
+        AboutModalComponent,
+        HelpModalComponent
       ],
       providers: [
         TranslateService,

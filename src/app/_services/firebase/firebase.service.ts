@@ -107,8 +107,8 @@ export class FirebaseService {
 
   updateCourse(academicTerm: string, degreeID: number, course: Course): Promise<any> {
     return this.translateService.currentLang === 'pt-PT' ?
-      this.db.collection(academicTerm.replace('/', '-') + '[PT]').doc(degreeID)
-      .collection('courses').doc(course.id)
+      this.db.collection(academicTerm.replace('/', '-') + '[PT]').doc(degreeID.toString())
+      .collection('courses').doc(course.id.toString())
       .update({
         types: course.types,
         campus: course.campus,
@@ -116,8 +116,8 @@ export class FirebaseService {
         courseLoads: course.courseLoads,
       })
       :
-      this.db.collection(academicTerm.replace('/', '-') + '[EN]').doc(degreeID)
-        .collection('courses').doc(course.id)
+      this.db.collection(academicTerm.replace('/', '-') + '[EN]').doc(degreeID.toString())
+        .collection('courses').doc(course.id.toString())
         .update({
           types: course.types,
           campus: course.campus,

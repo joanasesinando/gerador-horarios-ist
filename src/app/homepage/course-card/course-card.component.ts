@@ -59,7 +59,7 @@ export class CourseCardComponent implements AfterViewInit {
   }
 
   campusPicked(course): void {
-    const radioBtns = $('input[name^=radioCampus-' + this.formatName(course.name) + ']');
+    const radioBtns = $('input[name^=radioCampus-' + this.formatName(course.acronym) + ']');
     for (const btn of radioBtns) {
       if (btn.checked)
         this.campusSelected.emit({courseID: course.id, campus: btn.labels[0].innerText});
@@ -67,7 +67,7 @@ export class CourseCardComponent implements AfterViewInit {
   }
 
   typesOfClassesPicked(course): void {
-    const checkboxes = $('input[name^=checkTypeClass-' + this.formatName(course.name) + ']');
+    const checkboxes = $('input[name^=checkTypeClass-' + this.formatName(course.acronym) + ']');
     const typesChecked: ClassType[] = [];
     for (const box of checkboxes) {
       if (box.checked) typesChecked.push(box.labels[0].innerText);

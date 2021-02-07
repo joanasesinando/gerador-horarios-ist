@@ -265,7 +265,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.logger.log('updated course state');
   }
 
-  // TODO: same academic term; reset when picking different
   loadDegrees(academicTerm: string): Promise<void | Degree[]> | void {
     this.spinners.degree = true;
     this.selectedDegree = null;
@@ -403,7 +402,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     return this.courses.filter(course => course.semester === semester);
   }
 
-  addCourse(courseID: number): void {
+  addCourse(courseID): void {
     const courseIndex = this.findCourseIndex(courseID, this.courses);
     const degreeIndex = this.findDegreeIndex(this.selectedDegree, this.degrees);
 
@@ -511,7 +510,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   findCourseIndex(courseID: number, courses: Course[]): number {
     let index = 0;
     for (const course of courses) {
-      if (course.id === courseID) return index;
+      // tslint:disable-next-line:triple-equals
+      if (course.id == courseID) return index;
       index++;
     }
     return null;
@@ -520,7 +520,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   findDegreeIndex(degreeID: number, degrees: Degree[]): number {
     let index = 0;
     for (const degree of degrees) {
-      if (degree.id === degreeID) { return index; }
+      // tslint:disable-next-line:triple-equals
+      if (degree.id == degreeID) { return index; }
       index++;
     }
     return null;
@@ -605,6 +606,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       const index = this.findCourseIndex(key, this.stateService.selectedCourses);
       this.stateService.selectedCourses[index].campus = this.campusPicked.get(key);
     }
+    console.log('CAMPUS UPDATED')
+    console.log(this.stateService.selectedCourses);
   }
 
   /* -----------------------------------------------------------
