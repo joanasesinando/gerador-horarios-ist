@@ -3,7 +3,7 @@
     "header": "Generate all possible schedules and pick the best one",
     "features": {
       "f1": "Compact schedules",
-      "f2": "Pinned courses",
+      "f2": "Pinned classes",
       "f3": "Save for later"
     },
     "widgets": {

@@ -46,33 +46,40 @@ A schedule generator for [IST](https://tecnico.ulisboa.pt/en/ )'s students to pl
 
 # Table of contents
 
-- [Usage](#usage)
+- [Features](#features)
 - [Development](#development)
-  - [Adding to Chrome](#adding-to-chrome)
-  - [Adding to Firefox](#adding-to-firefox)
 - [Contribute](#contribute)
+- [License](#license)
 
-# Usage
+# Features
 
-After adding the extension to Chrome/Firefox, it will light-up everytime you load a compatable website.
+### Sort schedules
 
-When a page is loaded, the extension would hide all the images in the page and only show images that have been classified as **NOT NSFW**.
+You can sort the generated schedules to favor a specific characteristic.
+There are 3 sorting options:
+ - Most compact - favours schedules with fewer wholes and closer classes;
+ - Most balanced - favours schedules that are more balanced through the week (avoid strenuous days);
+ - More free days - favours schedules that have more free days.
 
-You can toggle(off/on) the extension from the ```chrome://extensions``` page in Chrome and ```about:debugging#/runtime/this-firefox``` in Firefox.
+<p align="center">
+  <img alt="Sort schedules" src="https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/src/assets/readme/feature1.gif">
+</p>
 
-Open popup window to change NSFW Filter settings
+### Pin classes
 
-<table>
-  <tr>
-    <td vlign="center">
-      <img src="./demo/images/pin_popup.png" alt="Pin popup window">
-    </td>
-    <td vlign="center">
-      <img src="./demo/images/popup.png" alt="Popup window">
-    </td>
-  </tr>
-</table>
+Once you've found a class you like you can pin it. This way only schedules with pinned classes will be shown.
 
+<p align="center">
+  <img alt="Pin classes" src="https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/src/assets/readme/feature2.gif">
+</p>
+
+### Save for later
+
+You can add schedules you like to the queue and when you're done print them to a PDF file.
+
+<p align="center">
+  <img alt="Save for later" src="https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/src/assets/readme/feature3.gif">
+</p>
 
 # Development
 
