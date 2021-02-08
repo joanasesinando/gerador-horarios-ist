@@ -17,6 +17,15 @@
         "translation",
         "test"
       ]
+    },
+    {
+      "login": "bernardocmarques",
+      "name": "Bernardo Marques",
+      "avatar_url": "https://avatars.githubusercontent.com/u/28487792?v=4",
+      "profile": "https://github.com/bernardocmarques",
+      "contributions": [
+        "infra"
+      ]
     }
   ],
   "contributorsPerLine": 7,
