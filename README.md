@@ -1,9 +1,7 @@
 ![](./src/assets/readme/banner.png)
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-<p align="center">
+<div align="center" style="display: flex; flex-wrap: wrap; justify-content: center">
+  
   <a href="https://github.com/joanasesinando/gerador-horarios-ist/releases/" target="_blank">
     <img alt="GitHub release" src="https://img.shields.io/github/v/release/joanasesinando/gerador-horarios-ist?include_prereleases&style=flat-square">
   </a>
@@ -12,9 +10,11 @@
     <img src="https://img.shields.io/github/last-commit/joanasesinando/gerador-horarios-ist?style=flat-square" alt="GitHub last commit">
   </a>
 
-  </br>
+</div>
 
-<a href="https://github.com/joanasesinando/gerador-horarios-ist/issues" target="_blank">
+<div align="center" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center">
+
+  <a href="https://github.com/joanasesinando/gerador-horarios-ist/issues" target="_blank">
     <img src="https://img.shields.io/github/issues/joanasesinando/gerador-horarios-ist?style=flat-square&color=red" alt="GitHub issues">
   </a>
 
@@ -22,14 +22,15 @@
     <img src="https://img.shields.io/github/issues-pr/joanasesinando/gerador-horarios-ist?style=flat-square&color=blue" alt="GitHub pull requests">
   </a>
 
-  <a href="https://github.com/joanasesinando/gerador-horarios-ist#contribute" target="_blank">
-    <img alt="Contributors" src="https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square">
-  </a>
+  <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+  [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+  <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
   <a href="https://github.com/joanasesinando/gerador-horarios-ist/blob/master/LICENSE" target="_blank">
     <img alt="LICENSE" src="https://img.shields.io/github/license/joanasesinando/gerador-horarios-ist?style=flat-square&color=yellow">
   <a/>
-</p>
+</div>
+
 <hr>
 <h1>Gerador Horários | IST</h1>
 
