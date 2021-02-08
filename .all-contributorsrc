@@ -1,0 +1,27 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "joanasesinando",
+      "name": "Joana Sesinando",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43472922?v=4",
+      "profile": "https://github.com/joanasesinando",
+      "contributions": [
+        "code",
+        "design",
+        "translation",
+        "test"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "gerador-horarios-ist",
+  "projectOwner": "joanasesinando",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
