@@ -1,7 +1,6 @@
 ![](./src/assets/readme/banner.png)
 
-<div align="center" style="display: flex; flex-wrap: wrap; justify-content: center">
-  
+<p align="center">
   <a href="https://github.com/joanasesinando/gerador-horarios-ist/releases/" target="_blank">
     <img alt="GitHub release" src="https://img.shields.io/github/v/release/joanasesinando/gerador-horarios-ist?include_prereleases&style=flat-square">
   </a>
@@ -10,9 +9,7 @@
     <img src="https://img.shields.io/github/last-commit/joanasesinando/gerador-horarios-ist?style=flat-square" alt="GitHub last commit">
   </a>
 
-</div>
-
-<div align="center" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center">
+  </br>
 
   <a href="https://github.com/joanasesinando/gerador-horarios-ist/issues" target="_blank">
     <img src="https://img.shields.io/github/issues/joanasesinando/gerador-horarios-ist?style=flat-square&color=red" alt="GitHub issues">
@@ -22,14 +19,15 @@
     <img src="https://img.shields.io/github/issues-pr/joanasesinando/gerador-horarios-ist?style=flat-square&color=blue" alt="GitHub pull requests">
   </a>
 
-  <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-  [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
-  <!-- ALL-CONTRIBUTORS-BADGE:END -->
+  <a href="https://github.com/joanasesinando/gerador-horarios-ist#contribute" target="_blank">
+    <img alt="Contributors" src="https://img.shields.io/badge/dynamic/json?color=orange&style=flat-square&label=all%20contributors&query=%24.contributors.length&url=https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/.all-contributorsrc">
+  </a>
 
   <a href="https://github.com/joanasesinando/gerador-horarios-ist/blob/master/LICENSE" target="_blank">
     <img alt="LICENSE" src="https://img.shields.io/github/license/joanasesinando/gerador-horarios-ist?style=flat-square&color=yellow">
   <a/>
-</div>
+
+</p>
 
 <hr>
 <h1>Gerador Horários | IST</h1>
