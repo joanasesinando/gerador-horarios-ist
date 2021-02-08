@@ -129,7 +129,7 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 # Contribute
 
-Please check the [**Contributing Guidelines**](https://github.com/joanasesinando/gerador-horarios-ist/blob/master/.github/markdown/CONTRIBUTING.md) before contributing.
+Please check the [**Contributing Guidelines**](https://github.com/joanasesinando/gerador-horarios-ist/blob/master/CONTRIBUTING.md) before contributing.
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
