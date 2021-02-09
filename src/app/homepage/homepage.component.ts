@@ -167,7 +167,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   checkIfDatabaseIsOld(): void {
     this.firebaseService.getLastTimeUpdatedTimestamp().then(timestamp => {
       const now = Date.now();
-      if (isOlderThan(timestamp, now, 30)) {
+      if (isOlderThan(timestamp, now, 1)) {
         this.logger.log('Data is too old');
         this.firebaseService.cleanDatabase(this.academicTerms);
         this.firebaseService.updateLastTimeUpdatedTimestamp();
@@ -417,6 +417,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         this.translateService.currentLang === 'pt-PT' ?
           this.alertService.showAlert('Atenção', 'Esta cadeira é lecionada num semestre diferente das cadeiras que já foram selecionadas.', 'warning') :
           this.alertService.showAlert('Attention', 'This course is taught in a different semester than the courses already added.', 'warning');
+        addBtn.attr('disabled', false);
         return;
       }
 
@@ -606,8 +607,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       const index = this.findCourseIndex(key, this.stateService.selectedCourses);
       this.stateService.selectedCourses[index].campus = this.campusPicked.get(key);
     }
-    console.log('CAMPUS UPDATED')
-    console.log(this.stateService.selectedCourses);
   }
 
   /* -----------------------------------------------------------

@@ -249,7 +249,6 @@ export class FenixService {
    *  - iterate through the weeks and count number of lessons
    *  - return lessons on a week with the highest number of lessons
    * (this is to account for holidays and off days)
-   * FIXME: não tem em consideração o campus
    * -------------------------------------------------------------------------------- */
   getShiftLessons(lessons: {start: string, end: string, room?: {name: string, topLevelSpace?: {name: string}}}[]): Lesson[] {
     let weekLessons: Lesson[] = [];
