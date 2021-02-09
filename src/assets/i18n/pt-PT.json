@@ -110,6 +110,10 @@
     }
   },
 
+  "about": {
+
+  },
+
   "errors": {
     "no-degrees-found": "Nenhum curso encontrado",
     "no-courses-found": "Nenhuma cadeira encontrada",

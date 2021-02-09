@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-about-modal',
@@ -7,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AboutModalComponent implements OnInit {
 
-  constructor() { }
+  constructor(public translateService: TranslateService) { }
 
   ngOnInit(): void {
   }

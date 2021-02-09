@@ -14,14 +14,34 @@
 
       <!-- Body -->
       <div class="modal-body">
-        <p class="text-danger">Brevemente</p>
-      </div>
 
-<!--      &lt;!&ndash; Footer &ndash;&gt;-->
-<!--      <div class="modal-footer">-->
-<!--        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
-<!--        <button type="button" class="btn btn-primary">Save changes</button>-->
-<!--      </div>-->
+        <div *ngIf="translateService.currentLang === 'pt-PT'">
+          <p class="text-muted">O <a href="http://web.ist.utl.pt/pedropramos/horarios/" target="_blank">gerador de
+            horários compactos</a> do Pedro Ramos tem sido até agora uma excelente ferramenta para planear o horário do
+            próximo semestre, no entanto tem as suas limitações (apenas permite gerar 100 horários e a interface
+            obriga-nos a ter os links das cadeiras a adicionar, por exemplo). E o mais importante, encontra-se
+            infelizmente em baixo.</p>
+
+          <p class="text-muted">Assim, surgiu o <b>Gerador de Horários | IST</b>! Com mais funcionalidades, melhor
+            interface e melhor UX.</p>
+
+          <h6 class="text-center"><b>Queres contribuir?</b><br> Dá uma vista de olhos no
+            <a href="https://github.com/joanasesinando/gerador-horarios-ist" target="_blank">repositório</a> do Github.</h6>
+        </div>
+
+        <div *ngIf="translateService.currentLang === 'en-GB'">
+          <p class="text-muted">The <a href="http://web.ist.utl.pt/pedropramos/horarios/" target="_blank">compact schedules
+            generator</a> from Pedro Ramos has been up until now an excellent tool to plan our schedule for the upcoming
+            semester. But it has its limitations (it only generates 100 schedules and you need to have the courses'
+            links to be able to use it, for instance). And most importantly, it's unfortunately currently down.</p>
+
+          <p class="text-muted">So the <b>Gerador de Horários | IST</b> was created! With more features, better interface
+            and better UX.</p>
+
+          <h6 class="text-center"><b>Want to contribute?</b><br> Take a look at our Github
+            <a href="https://github.com/joanasesinando/gerador-horarios-ist" target="_blank">repository</a>.</h6>
+        </div>
+      </div>
 
     </div>
 
