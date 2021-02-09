@@ -106,10 +106,6 @@ export class FenixService {
 
   /********************** HTTP REQUESTS **********************/
 
-  private getLanguage(): string {
-    return this.translateService.currentLang;
-  }
-
   public httpGet(path: string): Promise<Response> {
     return fetch(this.url + path, {
       method: 'GET'
@@ -125,7 +121,7 @@ export class FenixService {
   }
 
   getDegrees(academicTerm: string): Promise<Degree[]> {
-    return this.httpGet('degrees?academicTerm=' + academicTerm + '&lang=' + this.getLanguage())
+    return this.httpGet('degrees?academicTerm=' + academicTerm + '&lang=' + this.translateService.currentLang)
       .then(r => r.json())
       .then(degreesJson => {
         const degrees: Degree[] = [];
@@ -140,7 +136,7 @@ export class FenixService {
   }
 
   getCoursesBasicInfo(academicTerm: string, degreeId: number): Promise<Course[]> {
-    return this.httpGet('degrees/' + degreeId + '/courses?academicTerm=' + academicTerm + '&lang=' + this.getLanguage())
+    return this.httpGet('degrees/' + degreeId + '/courses?academicTerm=' + academicTerm + '&lang=' + this.translateService.currentLang)
       .then(r => r.json())
       .then(coursesJson => {
         const courses: Course[] = [];
@@ -159,7 +155,7 @@ export class FenixService {
   }
 
   getMissingCourseInfo(course: Course): Promise<Course> {
-    return this.httpGet('courses/' + course.id + '/schedule' + '?lang=' + this.getLanguage())
+    return this.httpGet('courses/' + course.id + '/schedule' + '?lang=' + this.translateService.currentLang)
       .then(r => r.json())
       .then(scheduleJson => {
         try {
@@ -253,6 +249,7 @@ export class FenixService {
    *  - iterate through the weeks and count number of lessons
    *  - return lessons on a week with the highest number of lessons
    * (this is to account for holidays and off days)
+   * FIXME: não tem em consideração o campus
    * -------------------------------------------------------------------------------- */
   getShiftLessons(lessons: {start: string, end: string, room?: {name: string, topLevelSpace?: {name: string}}}[]): Lesson[] {
     let weekLessons: Lesson[] = [];

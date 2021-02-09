@@ -41,22 +41,31 @@ export class SchedulesGenerationService {
     this.logger.log('generating...');
 
     // Combine shifts
+    this.logger.log('combining shifts...');
     const classesPerCourse: Class[][] = [];
     for (const course of courses) {
       const classes = this.combineShifts(course);
       classesPerCourse.push(classes);
     }
+    this.logger.log('combining shifts - DONE!', classesPerCourse);
 
     // Combine classes
+    this.logger.log('combining classes...');
     let schedules: Schedule[] = this.combineClasses(classesPerCourse);
+    this.logger.log('combining classes - DONE!', schedules);
 
     // Calculate relevant info
+    this.logger.log('calculating info...');
     this.calculateSchedulesInfo(schedules);
+    this.logger.log('calculating info - DONE!');
 
     // Sort by most compact
+    this.logger.log('sorting...');
     schedules = this.sortByMostCompact(schedules);
+    this.logger.log('sorting - DONE!');
 
     // Clean previous states
+    this.stateService.schedulesSortedByMostBalanced = null;
     this.stateService.schedulesSortedByMostFreeDays = null;
 
     this.logger.log('done');
