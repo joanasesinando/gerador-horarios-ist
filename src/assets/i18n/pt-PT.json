@@ -83,6 +83,33 @@
     }
   },
 
+  "help": {
+    "select-options": {
+      "title": "Escolher opções",
+      "text": "Escolhe o ano letivo, o curso e adiciona cadeiras. Podes também escolher o campus onde queres ter uma determinada cadeira e os tipos de turno."
+    },
+    "generate": {
+      "title": "Gerar horários",
+      "text": "Carrega no botão de 'Gerar horários' e após algum tempo ser-te-ão apresentados todos os horários possíveis com as opções que escolheste."
+    },
+    "sort": {
+      "title": "Ordenar horários",
+      "text": "Podes ordenar os horários por: mais compacto, mais equilibrado ou mais dias livres. Escolhe a opção no topo da página."
+    },
+    "pin": {
+      "title": "Fixar slots de aulas",
+      "text": "Podes fixar aulas para apenas te serem mostrados horários onde elas apareceçam. Basta clicares na aula que queres fixar."
+    },
+    "add": {
+      "title": "Escolher horários",
+      "text": "Quando encontrares um horário que gostes, podes adicioná-lo á lista de horários escolhidos. Se o quiseres remover clica no 'X'."
+    },
+    "save": {
+      "title": "Guardar horários",
+      "text": "Se quiseres imprimir os horários que escolheste clicando no botão de 'Guardar'."
+    }
+  },
+
   "errors": {
     "no-degrees-found": "Nenhum curso encontrado",
     "no-courses-found": "Nenhuma cadeira encontrada",

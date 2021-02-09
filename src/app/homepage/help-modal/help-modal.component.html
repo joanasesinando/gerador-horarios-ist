@@ -1,6 +1,6 @@
 <div class="modal fade" id="helpModal" tabindex="-1">
 
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
 
     <div class="modal-content">
 
@@ -14,7 +14,57 @@
 
       <!-- Body -->
       <div class="modal-body">
-        <p class="text-danger">Brevemente</p>
+
+        <!-- Tabs -->
+        <ul role="tablist" class="nav nav-tabs nav-pills flex-column flex-sm-row text-center bg-light border-0">
+          <li class="nav-item flex-sm-fill">
+            <a id="step1-tab" data-toggle="tab" href="#step1" role="tab" aria-controls="step1" aria-selected="true" class="nav-link border-0 text-uppercase font-weight-bold active">{{'help.select-options.title' | translate}}</a>
+          </li>
+          <li class="nav-item flex-sm-fill">
+            <a id="step2-tab" data-toggle="tab" href="#step2" role="tab" aria-controls="step2" aria-selected="false" class="nav-link border-0 text-uppercase font-weight-bold">{{'help.generate.title' | translate}}</a>
+          </li>
+          <li class="nav-item flex-sm-fill">
+            <a id="step3-tab" data-toggle="tab" href="#step3" role="tab" aria-controls="step3" aria-selected="false" class="nav-link border-0 text-uppercase font-weight-bold">{{'help.sort.title' | translate}}</a>
+          </li>
+          <li class="nav-item flex-sm-fill">
+            <a id="step4-tab" data-toggle="tab" href="#step4" role="tab" aria-controls="step4" aria-selected="false" class="nav-link border-0 text-uppercase font-weight-bold">{{'help.pin.title' | translate}}</a>
+          </li>
+          <li class="nav-item flex-sm-fill">
+            <a id="step5-tab" data-toggle="tab" href="#step5" role="tab" aria-controls="step5" aria-selected="false" class="nav-link border-0 text-uppercase font-weight-bold">{{'help.add.title' | translate}}</a>
+          </li>
+          <li class="nav-item flex-sm-fill">
+            <a id="step6-tab" data-toggle="tab" href="#step6" role="tab" aria-controls="step6" aria-selected="false" class="nav-link border-0 text-uppercase font-weight-bold">{{'help.save.title' | translate}}</a>
+          </li>
+        </ul>
+
+        <!-- Content -->
+        <div class="tab-content">
+          <div id="step1" role="tabpanel" aria-labelledby="step1-tab" class="tab-pane fade px-4 py-5 show active">
+            <p class="text-muted">{{'help.select-options.text' | translate}}</p>
+            <img class="w-100 shadow mt-2" src="assets/gifs/select-options.gif" alt="">
+          </div>
+          <div id="step2" role="tabpanel" aria-labelledby="step2-tab" class="tab-pane fade px-4 py-5">
+            <p class="text-muted">{{'help.generate.text' | translate}}</p>
+            <img class="w-100 shadow mt-2" src="assets/gifs/generate.gif" alt="">
+          </div>
+          <div id="step3" role="tabpanel" aria-labelledby="step3-tab" class="tab-pane fade px-4 py-5">
+            <p class="text-muted">{{'help.sort.text' | translate}}</p>
+            <img class="w-100 shadow mt-2" src="assets/readme/feature1.gif" alt="">
+          </div>
+          <div id="step4" role="tabpanel" aria-labelledby="step4-tab" class="tab-pane fade px-4 py-5">
+            <p class="text-muted">{{'help.pin.text' | translate}}</p>
+            <img class="w-100 shadow mt-2" src="assets/readme/feature2.gif" alt="">
+          </div>
+          <div id="step5" role="tabpanel" aria-labelledby="step5-tab" class="tab-pane fade px-4 py-5">
+            <p class="text-muted">{{'help.add.text' | translate}}</p>
+            <img class="w-100 shadow mt-2" src="assets/gifs/add.gif" alt="">
+          </div>
+          <div id="step6" role="tabpanel" aria-labelledby="step6-tab" class="tab-pane fade px-4 py-5">
+            <p class="text-muted">{{'help.save.text' | translate}}</p>
+            <img class="w-100 shadow mt-2" src="assets/gifs/save.gif" alt="">
+          </div>
+        </div>
+
       </div>
 
     </div>

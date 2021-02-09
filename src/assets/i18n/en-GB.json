@@ -83,6 +83,33 @@
     }
   },
 
+  "help": {
+    "select-options": {
+      "title": "Select options",
+      "text": "Select an academic term, a degree and add courses. You can also pick the campus you want to have a specific course and the types of classes."
+    },
+    "generate": {
+      "title": "Generate schedules",
+      "text": "Click on the 'Generate schedules' button and after a while you will get all the possible schedules for the options you picked."
+    },
+    "sort": {
+      "title": "Sort schedules",
+      "text": "You can sort schedules by: most compact, most balanced and more free days. Select the option on the top of the page."
+    },
+    "pin": {
+      "title": "Pin classes",
+      "text": "You can pin classes so that only schedules with those pinned classes will be shown. Simply click on a class to pin it."
+    },
+    "add": {
+      "title": "Add schedules",
+      "text": "When you've found a schedule you like, you can add it to the queue of selected schedules. If you'd like to remove an added schedule, simply click on the 'X'."
+    },
+    "save": {
+      "title": "Save schedules",
+      "text": "You can print the schedules you selected by clicking on the 'Save' button."
+    }
+  },
+
   "errors": {
     "no-degrees-found": "No degrees found",
     "no-courses-found": "No courses found",

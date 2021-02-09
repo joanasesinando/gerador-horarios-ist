@@ -1,0 +1,9 @@
+@import "src/styles/colors";
+
+.nav-tabs {
+  a:not(.active) {
+    &:hover {
+      color: $gh-blue;
+    }
+  }
+}

@@ -73,6 +73,11 @@ a { color: $gh-blue; }
   letter-spacing: 1px;
 }
 
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
+  background-color: $gh-blue;
+}
+
 
 
 /* ===================================================================
