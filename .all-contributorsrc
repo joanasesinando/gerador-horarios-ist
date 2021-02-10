@@ -27,6 +27,15 @@
         "infra",
         "ideas"
       ]
+    },
+    {
+      "login": "TigoDelgado",
+      "name": "Tigo",
+      "avatar_url": "https://avatars.githubusercontent.com/u/34168382?v=4",
+      "profile": "https://github.com/TigoDelgado",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
