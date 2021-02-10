@@ -33,5 +33,12 @@
   "projectOwner": "joanasesinando",
   "repoType": "github",
   "repoHost": "https://github.com",
+  "types": {
+    "custom": {
+      "symbol": "🦆",
+      "description": "Rubber Duck",
+      "link": ""
+    }
+  },
   "skipCi": true
 }
