@@ -9,6 +9,7 @@ export class Course {
     private _id: number,
     private _name: string,
     private _acronym: string,
+    private _credits: number,
     private _semester: number,
     private _types?: ClassType[],
     private _campus?: string[],
@@ -25,6 +26,9 @@ export class Course {
 
   get acronym(): string { return this._acronym; }
   set acronym(value: string) { this._acronym = value; }
+
+  get credits(): number { return this._credits; }
+  set credits(value: number) { this._credits = value; }
 
   get semester(): number { return this._semester; }
   set semester(value: number) { this._semester = value; }
@@ -67,6 +71,7 @@ export const courseConverter = {
       id: course.id,
       name: course.name,
       acronym: course.acronym,
+      credits: course.credits,
       semester: course.semester
     };
   },
@@ -83,9 +88,10 @@ export const courseConverter = {
         }
         shifts.push(new Shift(shift.name, shift.type, lessons, shift.campus));
       }
-      // tslint:disable-next-line:max-line-length
-      return new Course(parseInt(data.id, 10), data.name, data.acronym, parseInt(data.semester, 10), data.types, data.campus, shifts, data.courseLoads);
+      return new Course(parseInt(data.id, 10), data.name, data.acronym, parseFloat(data.credits),
+        parseInt(data.semester, 10), data.types, data.campus, shifts, data.courseLoads);
     }
-    return new Course(parseInt(data.id, 10), data.name, data.acronym, parseInt(data.semester, 10));
+    return new Course(parseInt(data.id, 10), data.name, data.acronym, parseFloat(data.credits),
+      parseInt(data.semester, 10));
   }
 };

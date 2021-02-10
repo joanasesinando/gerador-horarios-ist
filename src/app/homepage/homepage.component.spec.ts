@@ -44,7 +44,7 @@ describe('HomepageComponent', () => {
       new Degree(3, 'Degree #3', 'D3')
     ];
     courses = [
-      new Course(1, 'Course #1', 'C1', 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
+      new Course(1, 'Course #1', 'C1', 4.5, 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
         [
           new Shift('T01', ClassType.THEORY_PT, [
             new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda'),
@@ -54,14 +54,14 @@ describe('HomepageComponent', () => {
             new Lesson(new Date('2020-09-08 09:30'), new Date('2020-09-07 11:00'), 'R2', 'Alameda')
           ], 'Alameda')
         ], { TEORICA: 3, LABORATORIAL: 1.5 }),
-      new Course(2, 'Course #2', 'C2', 1, [ClassType.THEORY_PT], ['Taguspark'],
+      new Course(2, 'Course #2', 'C2', 4.5,  1, [ClassType.THEORY_PT], ['Taguspark'],
         [
           new Shift('T01', ClassType.THEORY_PT, [
             new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Taguspark'),
             new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Taguspark')
           ], 'Taguspark')
         ], { TEORICA: 3 }),
-      new Course(3, 'Course #3', 'C3', 1, [ClassType.THEORY_PT, ClassType.PROBLEMS_PT], ['Alameda'],
+      new Course(3, 'Course #3', 'C3', 4.5,  1, [ClassType.THEORY_PT, ClassType.PROBLEMS_PT], ['Alameda'],
         [
           new Shift('T01', ClassType.THEORY_PT, [
             new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda'),
@@ -180,6 +180,7 @@ describe('HomepageComponent', () => {
         expect(component.selectedCourses).toEqual([courseToAdd]);
         expect(component.selectedCoursesIDs.has(courseToAdd.id)).toBeTrue();
         expect(component.courses).toEqual(courses);
+        expect(component.totalCredits).toBe(4.5);
       });
 
       it('should add two courses in a row successfully', () => {
@@ -199,6 +200,7 @@ describe('HomepageComponent', () => {
         expect(component.selectedCoursesIDs.has(courseToAdd1.id)).toBeTrue();
         expect(component.selectedCoursesIDs.has(courseToAdd2.id)).toBeTrue();
         expect(component.courses).toEqual(courses);
+        expect(component.totalCredits).toBe(9);
       });
 
       it('should add all courses of a degree', () => {
@@ -213,6 +215,7 @@ describe('HomepageComponent', () => {
 
         expect(component.selectedCourses).toEqual(coursesToAdd);
         expect(component.courses).toEqual([]);
+        expect(component.totalCredits).toBe(13.5);
       });
 
 
@@ -237,6 +240,7 @@ describe('HomepageComponent', () => {
         expect(component.selectedCoursesIDs.has(courseToAdd1.id)).toBeTrue();
         expect(component.selectedCoursesIDs.has(courseToAdd2.id)).toBeTrue();
         expect(component.courses).toEqual(courses);
+        expect(component.totalCredits).toBe(9);
       });
 
       describe('Testing invalid inputs', () => {
@@ -254,12 +258,13 @@ describe('HomepageComponent', () => {
             expect(component.selectedCourses).toEqual([]);
             expect(component.selectedCoursesIDs.size).toBe(0);
             expect(component.courses).toEqual(courses);
+            expect(component.totalCredits).toBe(0);
           });
         });
 
         it('should NOT add a course that has no shifts', () => {
           courses.push(new Course(
-            4, 'Course #4', 'C4', 1, [ClassType.THEORY_PT], ['Alameda'],
+            4, 'Course #4', 'C4', 4.5,  1, [ClassType.THEORY_PT], ['Alameda'],
             [], { TEORICA: 2 }));
 
           try {
@@ -269,7 +274,18 @@ describe('HomepageComponent', () => {
             expect(component.selectedCourses).toEqual([]);
             expect(component.selectedCoursesIDs.size).toBe(0);
             expect(component.courses).toEqual(courses);
+            expect(component.totalCredits).toBe(0);
           }
+        });
+
+        it('should NOT add a course when not enough credits left', () => {
+          component.totalCredits = 42;
+          component.addCourse(1);
+
+          expect(component.selectedCourses).toEqual([]);
+          expect(component.selectedCoursesIDs.size).toBe(0);
+          expect(component.courses).toEqual(courses);
+          expect(component.totalCredits).toBe(42);
         });
       });
 
@@ -304,6 +320,7 @@ describe('HomepageComponent', () => {
         expect(component.courses).toEqual(courses);
         expect(component.selectedCourses).toEqual([course1]);
         expect(component.selectedCoursesIDs.has(courseToRemove.id)).toBeFalse();
+        expect(component.totalCredits).toBe(4.5);
       });
 
       it('should remove two courses in a row', () => {
@@ -323,6 +340,7 @@ describe('HomepageComponent', () => {
         expect(component.selectedCourses).toEqual([]);
         expect(component.selectedCoursesIDs.has(courseToRemove1.id)).toBeFalse();
         expect(component.selectedCoursesIDs.has(courseToRemove2.id)).toBeFalse();
+        expect(component.totalCredits).toBe(0);
       });
 
       it('should remove all courses selected', () => {
@@ -336,6 +354,7 @@ describe('HomepageComponent', () => {
 
         expect(component.courses).toEqual(courses);
         expect(component.selectedCourses).toEqual([]);
+        expect(component.totalCredits).toBe(0);
       });
 
       it('should remove a course from a degree not currently selected', () => {
@@ -348,6 +367,7 @@ describe('HomepageComponent', () => {
         expect(component.courses).toEqual(courses);
         expect(component.selectedCourses).toEqual([course1]);
         expect(component.selectedCoursesIDs.has(courseToRemove.id)).toBeFalse();
+        expect(component.totalCredits).toBe(4.5);
       });
 
       it('should NOT remove a course not selected', () => {
@@ -357,6 +377,7 @@ describe('HomepageComponent', () => {
         expect(component.courses).toEqual(courses);
         expect(component.selectedCourses).toEqual([course2, course1]);
         expect(component.selectedCoursesIDs.has(courseToRemove.id)).toBeFalse();
+        expect(component.totalCredits).toBe(9);
       });
 
     });
@@ -369,6 +390,7 @@ describe('HomepageComponent', () => {
           1,
           'Course #1',
           'C1',
+          4.5,
           1,
           [ClassType.THEORY_PT, ClassType.LAB_PT],
           ['Alameda', 'Taguspark'],
@@ -493,6 +515,7 @@ describe('HomepageComponent', () => {
           2,
           'Course #2',
           'C2',
+          4.5,
           1,
           [ClassType.THEORY_PT],
           ['Alameda'],

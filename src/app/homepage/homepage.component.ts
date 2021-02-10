@@ -36,7 +36,6 @@ declare let $;
 })
 export class HomepageComponent implements OnInit, AfterViewInit {
 
-  noShiftsFound = false;
   mobileView = false;
   featuresHorizontal = false;
 
@@ -50,6 +49,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   selectedCourses: Course[] = [];
   selectedCoursesIDs = new Map<number, boolean>();
+  totalCredits = 0;
+
   campusPicked = new Map<number, string[]>();
   typesOfClassesPicked = new Map<number, ClassType[]>();
 
@@ -139,8 +140,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
       // Save state
       this.saveAcademicTermsState(this.academicTerms);
-
-      this.spinners.academicTerm = false;
     });
     this.spinners.loadingPage = false;
 
@@ -168,17 +167,29 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.firebaseService.getLastTimeUpdatedTimestamp().then(timestamp => {
       const now = Date.now();
       if (isOlderThan(timestamp, now, 1)) {
+        const academicTerm = $('#inputAcademicTerm');
+        academicTerm.attr('disabled', true);
+        academicTerm.selectpicker('refresh');
+        this.spinners.academicTerm = true;
+
         this.logger.log('Data is too old');
         this.firebaseService.cleanDatabase(this.academicTerms);
         this.firebaseService.updateLastTimeUpdatedTimestamp();
         this.logger.log('Database successfully cleaned');
+
+        setTimeout(() => {
+          academicTerm.attr('disabled', false);
+          academicTerm.selectpicker('refresh');
+          this.spinners.academicTerm = false;
+        }, 1500);
+      } else {
+        this.spinners.academicTerm = false;
       }
     });
   }
 
   async changeLanguage(lang: string): Promise<void> {
     this.translateService.use(lang).subscribe(() => this.checkIfDatabaseIsOld());
-    this.noShiftsFound = false;
 
     // Reset
     this.selectedAcademicTerm = null;
@@ -421,6 +432,18 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         return;
       }
 
+      if (this.totalCredits + courseToAdd.credits > 42) {
+        this.translateService.currentLang === 'pt-PT' ?
+          this.alertService.showAlert('Atenção',
+            'Limite máximo de créditos por semestre atingido. Máximo: 42 ECTS, Atual: ' + this.totalCredits +
+            ' ECTS, ' + courseToAdd.name + ': ' + courseToAdd.credits + ' ECTS', 'warning') :
+          this.alertService.showAlert('Attention',
+            'Maximum limit of credits per semester reached. Maximum: 42 ECTS, Current: ' + this.totalCredits +
+            ' ECTS, ' + courseToAdd.name + ': ' + courseToAdd.credits + ' ECTS', 'warning');
+        addBtn.attr('disabled', false);
+        return;
+      }
+
       if (courseToAdd.hasFullInfo()) {
         this.addCourseHelper(courseToAdd, courseIndex, addBtn);
 
@@ -456,19 +479,17 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   addCourseHelper(course: Course, index: number, addBtn): void {
-    if (course && course.shifts && course.shifts.length > 0) {
-      // Update arrays
-      this.selectedCourses.unshift(course);
-      this.selectedCoursesIDs.set(course.id, true);
-      this.courses.splice(index, 1);
+    // Update arrays
+    this.selectedCourses.unshift(course);
+    this.selectedCoursesIDs.set(course.id, true);
+    this.courses.splice(index, 1);
 
-      // Update select
-      setTimeout(() => $('#inputCourse').selectpicker('refresh'), 0);
-      this.selectedCourse = null;
+    // Update total credits
+    this.totalCredits += course.credits;
 
-    } else {
-      this.noShiftsFound = true;
-    }
+    // Update select
+    setTimeout(() => $('#inputCourse').selectpicker('refresh'), 0);
+    this.selectedCourse = null;
 
     addBtn.attr('disabled', false);
     this.logger.log('selected courses', this.selectedCourses);
@@ -497,6 +518,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       setTimeout(() => $('#inputCourse').selectpicker('refresh'), 0);
     }
 
+    this.totalCredits -= this.selectedCourses[courseIndex].credits;
     remove(this.selectedCourses, this.selectedCoursesIDs, this.campusPicked, this.typesOfClassesPicked, this.logger);
 
     function remove(selectedCourses, selectedCoursesIDs, campusPicked, typesOfClassesPicked, logger): void {

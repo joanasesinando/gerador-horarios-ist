@@ -113,7 +113,7 @@ describe('SchedulesGenerationService', () => {
 
       beforeEach(() => {
         course = new Course(
-          1, 'Course #1', 'C1', 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
+          1, 'Course #1', 'C1', 4.5,  1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
           [
             new Shift('T01', ClassType.THEORY_PT, [
               new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda')
@@ -314,7 +314,7 @@ describe('SchedulesGenerationService', () => {
       beforeEach(() => {
         courses = [
           new Course(
-            1, 'Course #1', 'C1', 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
+            1, 'Course #1', 'C1', 4.5,  1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
             [
               new Shift('T01', ClassType.THEORY_PT, [
                 new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda')
@@ -327,7 +327,7 @@ describe('SchedulesGenerationService', () => {
               ], 'Alameda')
             ], { TEORICA: 1.5, LABORATORIAL: 1.5 }),
           new Course(
-            2, 'Course #2', 'C2', 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Taguspark'],
+            2, 'Course #2', 'C2', 4.5, 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Taguspark'],
             [
               new Shift('T01', ClassType.THEORY_PT, [
                 new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R3', 'Taguspark')
@@ -436,7 +436,7 @@ describe('SchedulesGenerationService', () => {
     describe('Calculate schedule info', () => {
       const courses = [
         new Course(
-          1, 'Course #1', 'C1', 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
+          1, 'Course #1', 'C1', 4.5, 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
           [
             new Shift('L01', ClassType.LAB_PT, [
               new Lesson(new Date('2020-09-07 12:00'), new Date('2020-09-07 13:30'), 'R2', 'Alameda')
@@ -447,14 +447,14 @@ describe('SchedulesGenerationService', () => {
             ], 'Alameda')
           ], { TEORICA: 1.5, LABORATORIAL: 1.5 }),
         new Course(
-          2, 'Course #2', 'C2', 1, [ClassType.THEORY_PT], ['Taguspark'],
+          2, 'Course #2', 'C2', 4.5, 1, [ClassType.THEORY_PT], ['Taguspark'],
           [
             new Shift('T01', ClassType.THEORY_PT, [
               new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R3', 'Taguspark')
             ], 'Taguspark')
           ], { TEORICA: 1.5 }),
         new Course(
-          3, 'Course #3', 'C3', 1, [ClassType.THEORY_PT], ['Alameda'],
+          3, 'Course #3', 'C3', 4.5, 1, [ClassType.THEORY_PT], ['Alameda'],
           [
             new Shift('T01', ClassType.THEORY_PT, [
               new Lesson(new Date('2020-09-09 11:00'), new Date('2020-09-09 12:30'), 'R3', 'Taguspark'),
@@ -563,7 +563,7 @@ describe('SchedulesGenerationService', () => {
     it('should generate schedules successfully: no overlaps', () => {
       const courses = [
         new Course(
-          1, 'Course #1', 'C1', 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
+          1, 'Course #1', 'C1', 4.5, 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
           [
             new Shift('T01', ClassType.THEORY_PT, [
               new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda')
@@ -582,7 +582,7 @@ describe('SchedulesGenerationService', () => {
             ], 'Alameda')
           ], { TEORICA: 1.5, LABORATORIAL: 1.5 }),
         new Course(
-          2, 'Course #2', 'C2', 1, [ClassType.THEORY_PT], ['Taguspark'],
+          2, 'Course #2', 'C2', 4.5, 1, [ClassType.THEORY_PT], ['Taguspark'],
           [
             new Shift('T01', ClassType.THEORY_PT, [
               new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R3', 'Taguspark')
@@ -603,7 +603,7 @@ describe('SchedulesGenerationService', () => {
     it('should generate schedules successfully: with overlaps', () => {
       const courses = [
         new Course(
-          1, 'Course #1', 'C1', 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
+          1, 'Course #1', 'C1', 4.5, 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
           [
             new Shift('T01', ClassType.THEORY_PT, [
               new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda')
@@ -622,7 +622,7 @@ describe('SchedulesGenerationService', () => {
             ], 'Alameda')
           ], { TEORICA: 1.5, LABORATORIAL: 1.5 }),
         new Course(
-          2, 'Course #2', 'C2', 1, [ClassType.THEORY_PT], ['Taguspark'],
+          2, 'Course #2', 'C2', 4.5, 1, [ClassType.THEORY_PT], ['Taguspark'],
           [
             new Shift('T01', ClassType.THEORY_PT, [
               new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R3', 'Taguspark')
@@ -643,7 +643,7 @@ describe('SchedulesGenerationService', () => {
     it('should generate schedules successfully: they all overlap', () => {
       const courses = [
         new Course(
-          1, 'Course #1', 'C1', 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
+          1, 'Course #1', 'C1', 4.5, 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
           [
             new Shift('T01', ClassType.THEORY_PT, [
               new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda')
@@ -662,7 +662,7 @@ describe('SchedulesGenerationService', () => {
             ], 'Alameda')
           ], { TEORICA: 1.5, LABORATORIAL: 1.5 }),
         new Course(
-          2, 'Course #2', 'C2', 1, [ClassType.THEORY_PT], ['Taguspark'],
+          2, 'Course #2', 'C2', 4.5, 1, [ClassType.THEORY_PT], ['Taguspark'],
           [
             new Shift('T01', ClassType.THEORY_PT, [
               new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R3', 'Taguspark')

@@ -107,14 +107,15 @@ describe('FenixService', () => {
     });
 
     it('should parse course basic info correctly', () => {
-      const course1 = service.parseCourseBasicInfo({id: 123, name: 'Course Name', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'});
-      const course2 = service.parseCourseBasicInfo({id: '123', name: 'Course Name', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'});
+      const course1 = service.parseCourseBasicInfo({id: 123, name: 'Course Name', acronym: 'CS01', credits: 4.5, academicTerm: '1º Semestre 2010/2011'});
+      const course2 = service.parseCourseBasicInfo({id: '123', name: 'Course Name', acronym: 'CS01', credits: '4.5', academicTerm: '1º Semestre 2010/2011'});
 
       for (const course of [course1, course2]) {
         expect(course).toBeTruthy();
         expect(course.id).toBe(123);
         expect(course.name).toBe('Course Name');
         expect(course.acronym).toBe('CS01');
+        expect(course.credits).toBe(4.5);
         expect(course.semester).toBe(1);
       }
     });
@@ -123,62 +124,77 @@ describe('FenixService', () => {
       const parameters = [
         {
           description: 'should parse course basic info: no ID',
-          input: {name: 'Course Name', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'},
+          input: {name: 'Course Name', acronym: 'CS01', credits: 4.5, academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No ID found for course')
         },
         {
           description: 'should parse course basic info: null ID',
-          input: {id: null, name: 'Course Name', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'},
+          input: {id: null, name: 'Course Name', acronym: 'CS01', credits: 4.5, academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No ID found for course')
         },
         {
           description: 'should parse course basic info: zero ID',
-          input: {id: 0, name: 'Course Name', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'},
+          input: {id: 0, name: 'Course Name', acronym: 'CS01', credits: 4.5, academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No ID found for course')
         },
         {
           description: 'should parse course basic info: no name',
-          input: {id: 123, acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'},
+          input: {id: 123, acronym: 'CS01', credits: 4.5, academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No name found for course 123')
         },
         {
           description: 'should parse course basic info: null name',
-          input: {id: 123, name: null, acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'},
+          input: {id: 123, name: null, acronym: 'CS01', credits: 4.5, academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No name found for course 123')
         },
         {
           description: 'should parse course basic info: empty name',
-          input: {id: 123, name: '', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'},
+          input: {id: 123, name: '', acronym: 'CS01', credits: 4.5, academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No name found for course 123')
         },
         {
           description: 'should parse course basic info: no acronym',
-          input: {id: 123, name: 'Course Name', academicTerm: '1º Semestre 2010/2011'},
+          input: {id: 123, name: 'Course Name', credits: 4.5, academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No acronym found for course 123')
         },
         {
           description: 'should parse course basic info: null acronym',
-          input: {id: 123, name: 'Course Name', acronym: null, academicTerm: '1º Semestre 2010/2011'},
+          input: {id: 123, name: 'Course Name', acronym: null, credits: 4.5, academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No acronym found for course 123')
         },
         {
           description: 'should parse course basic info: empty acronym',
-          input: {id: 123, name: 'Course Name', acronym: '', academicTerm: '1º Semestre 2010/2011'},
+          input: {id: 123, name: 'Course Name', acronym: '', credits: 4.5, academicTerm: '1º Semestre 2010/2011'},
           error: new Error('No acronym found for course 123')
         },
         {
+          description: 'should parse course basic info: no credits',
+          input: {id: 123, name: 'Course Name', acronym: 'CS01', academicTerm: '1º Semestre 2010/2011'},
+          error: new Error('No credits found for course 123')
+        },
+        {
+          description: 'should parse course basic info: null credits',
+          input: {id: 123, name: 'Course Name', acronym: 'CS01', credits: null, academicTerm: '1º Semestre 2010/2011'},
+          error: new Error('No credits found for course 123')
+        },
+        {
+          description: 'should parse course basic info: zero credits',
+          input: {id: 123, name: 'Course Name', acronym: 'CS01', credits: 0, academicTerm: '1º Semestre 2010/2011'},
+          error: new Error('No credits found for course 123')
+        },
+        {
           description: 'should parse course basic info: no academicTerm',
-          input: {id: 123, name: 'Course Name', acronym: 'CS01'},
+          input: {id: 123, name: 'Course Name', acronym: 'CS01', credits: 4.5},
           error: new Error('No academic term found for course 123')
         },
         {
           description: 'should parse course basic info: null academicTerm',
-          input: {id: 123, name: 'Course Name', acronym: 'CS01', academicTerm: null},
+          input: {id: 123, name: 'Course Name', acronym: 'CS01', credits: 4.5, academicTerm: null},
           error: new Error('No academic term found for course 123')
         },
         {
           description: 'should parse course basic info: empty academicTerm',
-          input: {id: 123, name: 'Course Name', acronym: 'CS01', academicTerm: ''},
+          input: {id: 123, name: 'Course Name', acronym: 'CS01', credits: 4.5, academicTerm: ''},
           error: new Error('No academic term found for course 123')
         },
       ];
@@ -341,17 +357,17 @@ describe('FenixService', () => {
       }
 
       it('should fill course missing info: no campus', () => {
-        const course = new Course(123, 'C1', 'C01', 1, [ClassType.THEORY_PT], [], [new MockShift()]);
+        const course = new Course(123, 'C1', 'C01', 4.5, 1, [ClassType.THEORY_PT], [], [new MockShift()]);
         expect(service.fillMissingInfo(course).campus).toBe(null);
       });
 
       it('should fill course missing info: no types', () => {
-        const course = new Course(123, 'C1', 'C01', 1, [], ['A'], [new MockShift()]);
+        const course = new Course(123, 'C1', 'C01', 4.5, 1, [], ['A'], [new MockShift()]);
         expect(service.fillMissingInfo(course).types).toEqual([ClassType.NONE]);
       });
 
       it('should throw an error if there are no shifts', () => {
-        const course = new Course(123, 'C1', 'C01', 1, [ClassType.THEORY_PT], ['A'], []);
+        const course = new Course(123, 'C1', 'C01', 4.5, 1, [ClassType.THEORY_PT], ['A'], []);
         expect(() => service.fillMissingInfo(course))
           .toThrow(new Error('No shifts found. Impossible to generate schedules for course: ' + course.name));
       });
@@ -406,6 +422,7 @@ describe('FenixService', () => {
         expect(course.id).toBeTruthy();
         expect(course.name).toBeTruthy();
         expect(course.acronym).toBeTruthy();
+        expect(course.credits).toBeTruthy();
         expect(course.semester).toBeTruthy();
         expect(course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9').toBeFalse();
 
@@ -424,6 +441,7 @@ describe('FenixService', () => {
         if (course.id === 846035542878562) {
           expect(course.name).toBe('Bases de Dados');
           expect(course.acronym).toBe('BD225179577');
+          expect(course.credits).toBe(6);
           expect(course.semester).toBe(1);
           break;
         }
@@ -486,6 +504,7 @@ describe('FenixService', () => {
     //       expect(course.id).toBeTruthy();
     //       expect(course.name).toBeTruthy();
     //       expect(course.acronym).toBeTruthy();
+    //       expect(course.credits).toBeTruthy();
     //       expect(course.semester).toBeTruthy();
     //       expect(course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9').toBeFalse();
     //

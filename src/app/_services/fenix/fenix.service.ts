@@ -37,9 +37,11 @@ export class FenixService {
     if (!course.id) throw new Error('No ID found for course');
     if (!course.name) throw new Error('No name found for course ' + course.id);
     if (!course.acronym) throw new Error('No acronym found for course ' + course.id);
+    if (!course.credits) throw new Error('No credits found for course ' + course.id);
     if (!course.academicTerm) throw new Error('No academic term found for course ' + course.id);
 
-    return new Course(parseInt(course.id, 10), course.name, course.acronym, parseInt(course.academicTerm[0], 10));
+    return new Course(parseInt(course.id, 10), course.name, course.acronym, parseFloat(course.credits),
+      parseInt(course.academicTerm[0], 10));
   }
 
   parseCourseMissingInfo(scheduleJson): void {
