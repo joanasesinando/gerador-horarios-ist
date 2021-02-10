@@ -362,7 +362,6 @@ describe('HomepageComponent', () => {
     });
 
     describe('Preparing courses to generate schedules for', () => {
-      // TODO: patch A / B more tests
       let course: Course;
 
       beforeEach(() => {

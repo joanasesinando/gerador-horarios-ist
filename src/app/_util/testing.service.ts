@@ -28,13 +28,6 @@ export class TestingService {
   constructor() { }
 
   /* --------------------------------------------------------------------------------
-   * Creates a Course focusing only on its shifts.
-   * -------------------------------------------------------------------------------- */
-  createShiftsOnlyCourse(shifts: Shift[]): Course { // FIXME: if not used remove
-    return new Course(this.COURSE_ID, this.COURSE_NAME, this.COURSE_ACRONYM, this.COURSE_SEMESTER, undefined, undefined, shifts);
-  }
-
-  /* --------------------------------------------------------------------------------
    * Creates a Shift focusing only on time it occurs.
    * --------------------------------------------------------------------------------
    * [Params' format]

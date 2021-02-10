@@ -194,7 +194,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.typesOfClassesPicked.clear();
 
     // Clean selected courses
-    for (const course of this.selectedCourses) { // FIXME: no need?
+    for (const course of this.selectedCourses) {
       this.removeCourse(course.id);
     }
 
@@ -227,7 +227,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.loadCoursesBasicInfo(academicTerm, degreeID);
 
     // Reset selected courses state
-    for (const course of this.stateService.selectedCourses) { // FIXME: no need?
+    for (const course of this.stateService.selectedCourses) {
       this.addCourse(course.id);
     }
 

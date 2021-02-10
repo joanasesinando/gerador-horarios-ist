@@ -23,8 +23,6 @@ export class FenixService {
 
   constructor(public translateService: TranslateService, public errorService: ErrorService) { }
 
-  // FIXME: degree in course??
-
   /********************** CORRECT STRUCTURE **********************/
 
   parseDegree(degreeJson): Degree {
