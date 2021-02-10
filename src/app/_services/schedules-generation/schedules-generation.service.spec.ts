@@ -29,6 +29,11 @@ describe('SchedulesGenerationService', () => {
     describe('Getting all combinations in an array', () => {
       const parameters = [
         {
+          description: 'should get all combinations: array = [ [[1, 4], [2, 4]], [5, 6] ]',
+          input: [ [[1, 4], [2, 4]], [5, 6] ],
+          result: [ [1, 4, 5], [2, 4, 5], [1, 4, 6], [2, 4, 6] ]
+        },
+        {
           description: 'should get all combinations: array = [ [1, 2, 3], [4], [5, 6] ]',
           input: [ [1, 2, 3], [4], [5, 6] ],
           result: [ [1, 4, 5], [2, 4, 5], [3, 4, 5], [1, 4, 6], [2, 4, 6], [3, 4, 6] ]

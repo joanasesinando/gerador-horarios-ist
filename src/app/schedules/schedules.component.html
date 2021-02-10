@@ -4,6 +4,7 @@
   <div *ngIf="spinners.loadingPage" class="loading-page text-center">
     <div class="spinner-border text-primary mb-4" role="status"></div>
     <h5>Generating . . .</h5>
+    <h1>{{this.generationService.getProgress()}}</h1>
   </div>
 
   <div *ngIf="!spinners.loadingPage" class="row no-gutter">

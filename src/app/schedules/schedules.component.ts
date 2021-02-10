@@ -44,7 +44,7 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     private logger: LoggerService,
     private router: Router,
     private alertService: AlertService,
-    private generationService: SchedulesGenerationService,
+    public generationService: SchedulesGenerationService,
     private stateService: StateService,
     private pdfService: PdfGenerationService,
     public translateService: TranslateService

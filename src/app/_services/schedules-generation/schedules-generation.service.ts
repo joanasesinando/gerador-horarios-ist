@@ -47,22 +47,18 @@ export class SchedulesGenerationService {
       const classes = this.combineShifts(course);
       classesPerCourse.push(classes);
     }
-    this.logger.log('combining shifts - DONE!', classesPerCourse);
 
     // Combine classes
     this.logger.log('combining classes...');
     let schedules: Schedule[] = this.combineClasses(classesPerCourse);
-    this.logger.log('combining classes - DONE!', schedules);
 
     // Calculate relevant info
     this.logger.log('calculating info...');
     this.calculateSchedulesInfo(schedules);
-    this.logger.log('calculating info - DONE!');
 
     // Sort by most compact
     this.logger.log('sorting...');
     schedules = this.sortByMostCompact(schedules);
-    this.logger.log('sorting - DONE!');
 
     // Clean previous states
     this.stateService.schedulesSortedByMostBalanced = null;
@@ -167,36 +163,49 @@ export class SchedulesGenerationService {
 
   combineShifts(course: Course): Class[] {
     const shiftsMap = new Map<string, Shift[]>();
-    const shiftsArray: Shift[][] = [];
 
     // Group shifts based on type of class
     for (const shift of course.shifts)
       shiftsMap.has(shift.type) ? shiftsMap.get(shift.type).push(shift) : shiftsMap.set(shift.type, [shift]);
 
-    // Get input ready for combination
-    for (const key of shiftsMap.keys())
-      shiftsArray.push(shiftsMap.get(key));
+    // Get combinations of shifts
+    let combinations: Shift[][] = [];
+    shiftsMap.forEach(shifts => {
+      const allCases = this.allPossibleCases([combinations, shifts]);
+      combinations = [];
+      for (const combination of allCases) {
+        // Check for overlaps and discard
+        if (this.checkForOverlapsOnShifts(combination)) continue;
+        combinations.push(combination);
+      }
+    });
 
-    // Get combinations of shifts & arrange into classes
+    // Arrange into classes
     const classes: Class[] = [];
-    for (const combination of this.allPossibleCases(shiftsArray)) {
-      // Check for overlaps and discard
-      if (this.checkForOverlapsOnShifts(combination)) continue;
+    for (const combination of combinations)
       classes.push(new Class(course, combination));
-    }
-
     return classes;
   }
 
   combineClasses(classes: Class[][]): Schedule[] {
     let id = 0;
-    // Get combinations of classes & arrange into schedules
-    const schedules: Schedule[] = [];
-    for (const combination of this.allPossibleCases(classes)) {
-      // Check for overlaps and discard
-      if (this.checkForOverlapsOnClasses(combination)) continue;
-      schedules.push(new Schedule(id++, combination));
+
+    // Get combinations of classes
+    let combinations: Class[][] = [];
+    for (const cls of classes) {
+      const allCases = this.allPossibleCases([combinations, cls]);
+      combinations = [];
+      for (const combination of allCases) {
+        // Check for overlaps and discard
+        if (this.checkForOverlapsOnClasses(combination)) continue;
+        combinations.push(combination);
+      }
     }
+
+    // Arrange into schedules
+    const schedules: Schedule[] = [];
+    for (const combination of combinations)
+      schedules.push(new Schedule(id++, combination));
     return schedules;
   }
 
@@ -215,10 +224,8 @@ export class SchedulesGenerationService {
    * -------------------------------------------------------------------------------- */
   allPossibleCases(array: any[][]): any[][] {
     // Clean array: if any is [] remove
-    for (let i = array.length - 1; i >= 0; i--) {
-      const arrayToCheck = array[i];
-      if (arrayToCheck.length === 0) array.splice(i, 1);
-    }
+    for (let i = array.length - 1; i >= 0; i--)
+      if (array[i].length === 0) array.splice(i, 1);
 
     // Nothing to combine
     if (array.length === 0) return [];
