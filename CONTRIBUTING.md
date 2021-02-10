@@ -20,7 +20,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://github.com/joanasesinando"><img src="https://avatars.githubusercontent.com/u/43472922?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Joana Sesinando</b></sub></a><br /><a href="https://github.com/joanasesinando/gerador-horarios-ist/commits?author=joanasesinando" title="Code">💻</a> <a href="#design-joanasesinando" title="Design">🎨</a> <a href="#translation-joanasesinando" title="Translation">🌍</a> <a href="https://github.com/joanasesinando/gerador-horarios-ist/commits?author=joanasesinando" title="Tests">⚠️</a></td>
-    <td align="center"><a href="https://github.com/bernardocmarques"><img src="https://avatars.githubusercontent.com/u/28487792?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Bernardo Marques</b></sub></a><br /><a href="#infra-bernardocmarques" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+    <td align="center"><a href="https://github.com/bernardocmarques"><img src="https://avatars.githubusercontent.com/u/28487792?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Bernardo Marques</b></sub></a><br /><a href="#infra-bernardocmarques" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#ideas-bernardocmarques" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
