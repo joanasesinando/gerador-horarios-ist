@@ -421,7 +421,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       const addBtn = $('#addBtn');
       addBtn.attr('disabled', true);
 
-      let courseToAdd = this.courses[courseIndex];
+      let courseToAdd = _.cloneDeep(this.courses[courseIndex]);
       courseToAdd.degree = this.degrees[degreeIndex];
 
       if (!this.isSameSemester(courseToAdd)) {
@@ -440,8 +440,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           this.alertService.showAlert('Attention',
             'Maximum limit of credits per semester reached. Maximum: 42 ECTS, Current: ' + this.totalCredits +
             ' ECTS, ' + courseToAdd.name + ': ' + courseToAdd.credits + ' ECTS', 'warning');
-        addBtn.attr('disabled', false);
-        return;
       }
 
       if (courseToAdd.hasFullInfo()) {
@@ -452,6 +450,11 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         // Load rest of info
         this.spinners.course = true;
         this.fenixService.getMissingCourseInfo(courseToAdd).then(course => {
+          if (!course) {
+            this.spinners.course = false;
+            addBtn.attr('disabled', false);
+            return;
+          }
           courseToAdd = course;
           this.spinners.course = false;
           this.addCourseHelper(courseToAdd, courseIndex, addBtn);
