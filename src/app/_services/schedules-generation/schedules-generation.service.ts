@@ -37,7 +37,7 @@ export class SchedulesGenerationService {
    *  - calculate relevant info for all types of sorting for all schedules
    *  - sort by most compact (default)
    * -------------------------------------------------------------------------------- */
-   generateSchedules(courses: Course[]): Schedule[] {
+   generateSchedules(courses: Course[], limit: number): Schedule[] {
     this.logger.log('generating...');
 
     // Combine shifts
@@ -50,7 +50,7 @@ export class SchedulesGenerationService {
 
     // Combine classes
     this.logger.log('combining classes...');
-    let schedules: Schedule[] = this.combineClasses(classesPerCourse);
+    let schedules: Schedule[] = this.combineClasses(classesPerCourse, limit);
 
     // Calculate relevant info
     this.logger.log('calculating info...');
@@ -187,7 +187,7 @@ export class SchedulesGenerationService {
     return classes;
   }
 
-  combineClasses(classes: Class[][]): Schedule[] {
+  combineClasses(classes: Class[][], limit: number): Schedule[] {
     let id = 0;
 
     // Get combinations of classes
@@ -199,7 +199,9 @@ export class SchedulesGenerationService {
         // Check for overlaps and discard
         if (this.checkForOverlapsOnClasses(combination)) continue;
         combinations.push(combination);
+        if (limit !== -1 && combinations.length >= limit) break;
       }
+      if (limit !== -1 && combinations.length >= limit) break;
     }
 
     // Arrange into schedules
