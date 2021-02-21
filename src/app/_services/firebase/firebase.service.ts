@@ -196,18 +196,16 @@ export class FirebaseService {
   }
 
   cleanDatabase(academicTerms: string[]): void {
-    academicTerms.forEach(academicTerm => {
-      this.hasDegrees(academicTerm).then(hasDegrees => {
+    academicTerms.forEach(async academicTerm => {
+      await this.hasDegrees(academicTerm).then(async hasDegrees => {
         if (hasDegrees) {
-
-          this.getDegrees(academicTerm).then(degrees => {
+          await this.getDegrees(academicTerm).then(degrees => {
             if (degrees) {
-              degrees.forEach(degree => {
+              degrees.forEach(async degree => {
 
-                this.hasCourses(academicTerm, degree.id).then(hasCourses => {
+                await this.hasCourses(academicTerm, degree.id).then(async hasCourses => {
                   if (hasCourses) {
-
-                    this.getCourses(academicTerm, degree.id).then(courses => {
+                    await this.getCourses(academicTerm, degree.id).then(courses => {
                       if (courses) {
                         courses.forEach(course => {
                           this.translateService.currentLang === 'pt-PT' ?

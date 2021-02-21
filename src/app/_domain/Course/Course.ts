@@ -55,6 +55,10 @@ export class Course {
       this.courseLoads !== undefined;
   }
 
+  formatAcronym(): string {
+    return this.acronym.replace(/[0-9]/g, '');
+  }
+
   convertShifts(): {name: string, type: string, lessons: {}[], campus: string}[] {
     const shifts: {name: string, type: string, lessons: {}[], campus: string}[] = [];
     this.shifts.forEach(shift => {

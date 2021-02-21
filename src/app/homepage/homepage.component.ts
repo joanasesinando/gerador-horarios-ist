@@ -61,6 +61,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     loadingPage: false
   };
 
+  databaseChecked = false;
+  noShiftsFound = false;
+
   // FontAwesome icons
   faGithub = faGithub;
   faCommentAlt = faCommentAlt;
@@ -163,28 +166,18 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
   }
 
-  checkIfDatabaseIsOld(): void {
-    this.firebaseService.getLastTimeUpdatedTimestamp().then(timestamp => {
-      const now = Date.now();
-      if (isOlderThan(timestamp, now, 1)) {
-        const academicTerm = $('#inputAcademicTerm');
-        academicTerm.attr('disabled', true);
-        academicTerm.selectpicker('refresh');
+  checkIfDatabaseIsOld(): Promise<void> {
+    return this.firebaseService.getLastTimeUpdatedTimestamp().then(timestamp => {
+      if (isOlderThan(timestamp, Date.now(), 1)) {
         this.spinners.academicTerm = true;
-
         this.logger.log('Data is too old');
         this.firebaseService.cleanDatabase(this.academicTerms);
         this.firebaseService.updateLastTimeUpdatedTimestamp();
         this.logger.log('Database successfully cleaned');
-
-        setTimeout(() => {
-          academicTerm.attr('disabled', false);
-          academicTerm.selectpicker('refresh');
-          this.spinners.academicTerm = false;
-        }, 1500);
-      } else {
-        this.spinners.academicTerm = false;
       }
+      this.spinners.academicTerm = false;
+      this.databaseChecked = true;
+      setTimeout(() => $('#inputAcademicTerm').selectpicker('refresh'), 0);
     });
   }
 
@@ -432,16 +425,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      if (this.totalCredits + courseToAdd.credits > 42) {
-        this.translateService.currentLang === 'pt-PT' ?
-          this.alertService.showAlert('Atenção',
-            'Limite máximo de créditos por semestre atingido. Máximo: 42 ECTS, Atual: ' + this.totalCredits +
-            ' ECTS, ' + courseToAdd.name + ': ' + courseToAdd.credits + ' ECTS', 'warning') :
-          this.alertService.showAlert('Attention',
-            'Maximum limit of credits per semester reached. Maximum: 42 ECTS, Current: ' + this.totalCredits +
-            ' ECTS, ' + courseToAdd.name + ': ' + courseToAdd.credits + ' ECTS', 'warning');
-      }
-
       if (courseToAdd.hasFullInfo()) {
         this.addCourseHelper(courseToAdd, courseIndex, addBtn);
 
@@ -453,6 +436,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           if (!course) {
             this.spinners.course = false;
             addBtn.attr('disabled', false);
+            this.noShiftsFound = true;
             return;
           }
           courseToAdd = course;
@@ -493,6 +477,15 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     // Update select
     setTimeout(() => $('#inputCourse').selectpicker('refresh'), 0);
     this.selectedCourse = null;
+
+    // Show warning for total credits
+    if (this.totalCredits > 42) {
+      this.translateService.currentLang === 'pt-PT' ?
+        this.alertService.showAlert('Atenção',
+          'Limite máximo de créditos por semestre atingido. Máximo: 42 ECTS, Atual: ' + this.totalCredits + ' ECTS', 'warning') :
+        this.alertService.showAlert('Attention',
+          'Maximum limit of credits per semester reached. Maximum: 42 ECTS, Current: ' + this.totalCredits + ' ECTS', 'warning');
+    }
 
     addBtn.attr('disabled', false);
     this.logger.log('selected courses', this.selectedCourses);

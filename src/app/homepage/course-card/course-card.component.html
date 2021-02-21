@@ -1,8 +1,9 @@
 <div class="card mt-3">
   <div class="card-body pr-5">
 
-    <!-- Course Name -->
-    <h5 class="card-title course-name mt-2">[{{course.acronym}}] {{course.name}}</h5>
+    <!-- Course Name & Credits -->
+    <h5 class="card-title course-name mt-2">[{{course.formatAcronym()}}] {{course.name}}
+      <span class="card-credits text-muted"><span class="mx-2">|</span> ECTS: {{this.course.credits}}</span></h5>
 
     <!-- Campus -->
     <div *ngIf="course.campus" class="d-flex flex-wrap">
