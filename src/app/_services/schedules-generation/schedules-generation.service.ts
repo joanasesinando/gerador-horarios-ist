@@ -37,7 +37,7 @@ export class SchedulesGenerationService {
    *  - calculate relevant info for all types of sorting for all schedules
    *  - sort by most compact (default)
    * -------------------------------------------------------------------------------- */
-   generateSchedules(courses: Course[], limit: number): Schedule[] {
+   generateSchedules(courses: Course[]): Schedule[] {
     this.logger.log('generating...');
 
     // Combine shifts
@@ -50,7 +50,7 @@ export class SchedulesGenerationService {
 
     // Combine classes
     this.logger.log('combining classes...');
-    let schedules: Schedule[] = this.combineClasses(classesPerCourse, limit);
+    let schedules: Schedule[] = this.combineClasses(classesPerCourse);
 
     // Calculate relevant info
     this.logger.log('calculating info...');
@@ -170,7 +170,8 @@ export class SchedulesGenerationService {
 
     // Get combinations of shifts
     let combinations: Shift[][] = [];
-    shiftsMap.forEach(shifts => {
+    for (const [key, value] of shiftsMap) {
+      const shifts = value;
       const allCases = this.allPossibleCases([combinations, shifts]);
       combinations = [];
       for (const combination of allCases) {
@@ -178,7 +179,8 @@ export class SchedulesGenerationService {
         if (this.checkForOverlapsOnShifts(combination)) continue;
         combinations.push(combination);
       }
-    });
+      if (combinations.length === 0) break;
+    }
 
     // Arrange into classes
     const classes: Class[] = [];
@@ -187,7 +189,7 @@ export class SchedulesGenerationService {
     return classes;
   }
 
-  combineClasses(classes: Class[][], limit: number): Schedule[] {
+  combineClasses(classes: Class[][]): Schedule[] {
     let id = 0;
 
     // Get combinations of classes
@@ -199,9 +201,8 @@ export class SchedulesGenerationService {
         // Check for overlaps and discard
         if (this.checkForOverlapsOnClasses(combination)) continue;
         combinations.push(combination);
-        if (limit !== -1 && combinations.length >= limit) break;
       }
-      if (limit !== -1 && combinations.length >= limit) break;
+      if (combinations.length === 0) break;
     }
 
     // Arrange into schedules

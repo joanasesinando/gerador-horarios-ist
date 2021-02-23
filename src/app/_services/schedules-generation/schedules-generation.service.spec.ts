@@ -431,6 +431,29 @@ describe('SchedulesGenerationService', () => {
         expect(schedules.length).toBe(0);
       });
 
+      it('should combine classes correctly: incompatible classes', () => {
+        courses.push(new Course(
+          3, 'Course #3', 'C3', 4.5, 1, [ClassType.THEORY_PT], ['Taguspark'],
+          [
+            new Shift('T01', ClassType.THEORY_PT, [
+              new Lesson(new Date('2020-09-07 10:00'), new Date('2020-09-09 11:30'), 'R3', 'Taguspark')
+            ], 'Taguspark'),
+            new Shift('T02', ClassType.THEORY_PT, [
+              new Lesson(new Date('2020-09-09 10:00'), new Date('2020-09-09 11:30'), 'R3', 'Taguspark')
+            ], 'Taguspark')
+          ], { TEORICA: 1.5 }),
+          new Course(
+            4, 'Course #4', 'C4', 4.5, 1, [ClassType.THEORY_PT], ['Taguspark'],
+            [
+              new Shift('T01', ClassType.THEORY_PT, [
+                new Lesson(new Date('2020-09-10 10:00'), new Date('2020-09-10 11:30'), 'R3', 'Taguspark')
+              ], 'Taguspark')
+            ], { TEORICA: 1.5 }));
+
+        const schedules = service.generateSchedules(courses);
+        expect(schedules.length).toBe(0);
+      });
+
     });
 
     describe('Calculate schedule info', () => {

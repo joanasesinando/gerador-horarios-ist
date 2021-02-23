@@ -25,7 +25,7 @@
 
   <a href="https://github.com/joanasesinando/gerador-horarios-ist/blob/master/LICENSE" target="_blank">
     <img alt="LICENSE" src="https://img.shields.io/github/license/joanasesinando/gerador-horarios-ist?style=flat-square&color=yellow">
-  <a/>
+  </a>
 
 </p>
 
@@ -57,9 +57,9 @@ A schedule generator for [IST](https://tecnico.ulisboa.pt/en/ )'s students to pl
 
 You can sort the generated schedules to favor a specific characteristic.
 There are 3 sorting options:
- - Most compact - favours schedules with fewer wholes and closer classes;
- - Most balanced - favours schedules that are more balanced through the week (avoid strenuous days);
- - More free days - favours schedules that have more free days.
+ - <strong>Most compact</strong> - favours schedules with fewer wholes and closer classes;
+ - <strong>Most balanced</strong> - favours schedules that are more balanced through the week (avoid strenuous days);
+ - <strong>More free days</strong> - favours schedules that have more free days.
 
 <p align="center">
   <img alt="Sort schedules" src="https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/src/assets/readme/feature1.gif">
