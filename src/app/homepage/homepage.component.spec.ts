@@ -277,16 +277,6 @@ describe('HomepageComponent', () => {
             expect(component.totalCredits).toBe(0);
           }
         });
-
-        it('should NOT add a course when not enough credits left', () => {
-          component.totalCredits = 42;
-          component.addCourse(1);
-
-          expect(component.selectedCourses).toEqual([]);
-          expect(component.selectedCoursesIDs.size).toBe(0);
-          expect(component.courses).toEqual(courses);
-          expect(component.totalCredits).toBe(42);
-        });
       });
 
     });

@@ -228,7 +228,7 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
 
   isTallEnough(start, end): boolean {
     const height = parseInt(this.getHeight(start, end).replace('px', ''), 10);
-    return height > this.SLOT_HEIGHT_DESKTOP * 2;
+    return this.mobileView ? height > this.SLOT_HEIGHT_MOBILE * 2 : height > this.SLOT_HEIGHT_DESKTOP * 2;
   }
 
   togglePin(event): void { // TODO: testing

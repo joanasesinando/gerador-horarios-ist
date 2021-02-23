@@ -57,6 +57,13 @@ describe('Shift', () => {
       shift.lessons.forEach(lesson => expect(lesson.equal).toHaveBeenCalled());
     });
 
+    it('should be equal: different name', () => {
+      other.name = 'SN02';
+      shift.lessons.forEach(lesson => spyOn(lesson, 'equal').and.returnValue(true));
+      expect(shift.equal(other)).toBeTrue();
+      shift.lessons.forEach(lesson => expect(lesson.equal).toHaveBeenCalled());
+    });
+
     it('should NOT be equal: different lessons', () => {
       shift.lessons.forEach(lesson => spyOn(lesson, 'equal').and.returnValue(false));
       expect(shift.equal(other)).toBeFalse();
@@ -65,12 +72,6 @@ describe('Shift', () => {
           expect(lesson.equal).toHaveBeenCalled() :
           expect(lesson.equal).not.toHaveBeenCalled();
       });
-    });
-
-    it('should NOT be equal: different name', () => {
-      shift.lessons.forEach(lesson => spyOn(lesson, 'equal').and.returnValue(true));
-      other.name = 'SN02';
-      expect(shift.equal(other)).toBeFalse();
     });
 
     it('should NOT be equal: different type', () => {

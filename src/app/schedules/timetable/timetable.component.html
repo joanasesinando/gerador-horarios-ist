@@ -40,7 +40,7 @@
               <div class="single-event-div">
                 <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                 <em class="event-name">{{ev.name}}</em>
-                <span *ngIf="isTallEnough(ev.start, ev.end)" class="event-place">{{ev.place}}</span>
+                <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
               </div>
               <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
             </li>
@@ -62,7 +62,7 @@
               <div class="single-event-div">
                 <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                 <em class="event-name">{{ev.name}}</em>
-                <span *ngIf="isTallEnough(ev.start, ev.end)" class="event-place">{{ev.place}}</span>
+                <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
               </div>
               <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
             </li>
@@ -84,7 +84,7 @@
               <div class="single-event-div">
                 <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                 <em class="event-name">{{ev.name}}</em>
-                <span *ngIf="isTallEnough(ev.start, ev.end)" class="event-place">{{ev.place}}</span>
+                <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
               </div>
               <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
             </li>
@@ -106,7 +106,7 @@
               <div class="single-event-div">
                 <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                 <em class="event-name">{{ev.name}}</em>
-                <span *ngIf="isTallEnough(ev.start, ev.end)" class="event-place">{{ev.place}}</span>
+                <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
               </div>
               <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
             </li>
@@ -128,7 +128,7 @@
               <div class="single-event-div">
                 <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                 <em class="event-name">{{ev.name}}</em>
-                <span *ngIf="isTallEnough(ev.start, ev.end)" class="event-place">{{ev.place}}</span>
+                <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
               </div>
               <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
             </li>

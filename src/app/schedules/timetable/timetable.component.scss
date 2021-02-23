@@ -292,6 +292,7 @@ $columns: 5;
     }
 
     .single-event-div {
+      position: relative;
       display: block;
       height: 100%;
       padding: .7em;
@@ -352,7 +353,17 @@ $columns: 5;
   display: block;
   font-size: .7rem;
   @media only screen and (max-width: 550px) { font-size: .6rem; }
-  margin-top: .2em
+  margin-top: .2em;
+
+  &.event-place-small {
+    position: absolute;
+    bottom: .7em;
+    right: .7em;
+    @media only screen and (max-width: 550px) {
+      bottom: .5em;
+      right: .5em;
+    }
+  }
 }
 
 

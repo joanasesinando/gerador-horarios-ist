@@ -570,7 +570,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   prepareCoursesToGenerate(): void {
     this.removeABDifferencesInShifts();
-    this.renameShiftsWhenSameName();
+    this.removeDuplicatedShifts();
     this.updateCampus();
     this.updateTypesOfClasses();
 
@@ -601,18 +601,25 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   /* -----------------------------------------------------------
-   * Rename shifts when some have the same name
+   * Remove shifts that are equal. Rename shifts when they only
+   * share the same name
    * ----------------------------------------------------------- */
-  renameShiftsWhenSameName(): void {
-    const tempMap: Map<string, number> = new Map(); // shift.name --> index
+  removeDuplicatedShifts(): void {
     for (let i = 0; i < this.stateService.selectedCourses.length; i++) {
       const course = this.stateService.selectedCourses[i];
 
-      for (let j = 0; j < course.shifts.length; j++) {
+      for (let j = 0; j <= course.shifts.length - 2; j++) {
         const shift = course.shifts[j];
 
-        if (tempMap.has(shift.name)) { shift.name = shift.name + '-' + i + j; }
-        else { tempMap.set(shift.name, j); }
+        for (let k = course.shifts.length - 1; k >= j + 1; k--) {
+          const otherShift = course.shifts[k];
+          if (shift.equal(otherShift)) {
+            course.shifts.splice(k, 1);
+          }
+
+          else if (shift.name === otherShift.name)
+            otherShift.name = shift.name + '-' + i + j;
+        }
       }
     }
   }

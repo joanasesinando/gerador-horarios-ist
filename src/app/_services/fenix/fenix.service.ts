@@ -305,7 +305,7 @@ export class FenixService {
       const shiftLessons = this.getShiftLessons(shift.lessons);
 
       // Get shift campus
-      const shiftCampus = shiftLessons[0].campus;
+      const shiftCampus = shiftLessons.length > 0 ? shiftLessons[0].campus : null;
 
       shifts.push(new Shift(shift.name, shiftType, shiftLessons, shiftCampus));
     }

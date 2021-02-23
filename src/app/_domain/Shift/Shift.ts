@@ -55,8 +55,7 @@ export class Shift {
       }
       if (!found) return false;
     }
-    return this.name === other.name &&
-      this.type === other.type &&
+    return this.type === other.type &&
       this.campus === other.campus;
   }
 }
