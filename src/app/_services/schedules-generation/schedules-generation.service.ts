@@ -194,7 +194,7 @@ export class SchedulesGenerationService {
 
   async combineClasses(classes: Class[][]): Promise<Schedule[]> {
     const optimalNumberWorkers = window.navigator.hardwareConcurrency;
-    const browserSupportsWebWorkers = typeof Worker !== 'undefined';
+    const browserSupportsWebWorkers = this.getBrowserSupportForWorkers();
 
     // Create workers
     const workers: Worker[] = [];
@@ -334,44 +334,11 @@ export class SchedulesGenerationService {
 
   calculateSchedulesInfo(schedules: Schedule[]): void {
     for (const schedule of schedules) {
-      const allLessons: Lesson[] = [];
-      const classesPerWeekday = new Map<number, {start: number, end: number}[]>();
-      let tag = 1;
-      const events: Event[] = [];
-
       // Get info
-      for (const cl of schedule.classes) {
-        const acronym = cl.course.acronym;
-
-        for (const shift of cl.shifts) {
-          const type = minifyClassType(shift.type);
-          const pinned = false;
-
-          for (const lesson of shift.lessons) {
-            // Get all lessons
-            allLessons.push(lesson);
-
-            // Get classes per weekday
-            const key = lesson.start.getDay();
-            const value = { start: getTimestamp(formatTime(lesson.start)), end: getTimestamp(formatTime(lesson.end)) };
-            classesPerWeekday.has(key) ? classesPerWeekday.get(key).push(value) : classesPerWeekday.set(key, [value]);
-
-            // Get events
-            const weekday = getWeekday(lesson.start.getDay());
-            const start = formatTime(lesson.start);
-            const end = formatTime(lesson.end);
-            const name = acronym.replace(/[0-9]/g, '') + ' (' + type + ')';
-            const place = lesson.room;
-            events.push(new Event(shift.name, tag, weekday, start, end, name, place, pinned));
-          }
-        }
-        tag++;
-      }
-
-      // Sort classes per weekday by start time
-      for (let i = 1; i <= 5; i++)
-        if (classesPerWeekday.has(i) && classesPerWeekday.get(i).length > 1)
-          classesPerWeekday.get(i).sort((a, b) => a.start - b.start);
+      const data = this.prepareData(1, schedule.classes);
+      const allLessons: Lesson[] = data.allLessons;
+      const classesPerWeekday: Map<number, {start: number, end: number}[]> = data.classesPerWeekday;
+      const events: Event[] = data.events;
 
       const proximity = this.calculateProximityLevel(schedule, allLessons);
       const holesInfo = this.countHoles(classesPerWeekday);
@@ -387,6 +354,47 @@ export class SchedulesGenerationService {
         events
       });
     }
+  }
+
+  prepareData(tag: number, classes: Class[]): { allLessons: Lesson[], classesPerWeekday: Map<number, {start: number, end: number}[]>, events: Event[] } {
+    const allLessons: Lesson[] = [];
+    const classesPerWeekday = new Map<number, {start: number, end: number}[]>();
+    const events: Event[] = [];
+
+    for (const cl of classes) {
+      const acronym = cl.course.acronym;
+
+      for (const shift of cl.shifts) {
+        const type = minifyClassType(shift.type);
+        const pinned = false;
+
+        for (const lesson of shift.lessons) {
+          // Get all lessons
+          allLessons.push(lesson);
+
+          // Get classes per weekday
+          const key = lesson.start.getDay();
+          const value = { start: getTimestamp(formatTime(lesson.start)), end: getTimestamp(formatTime(lesson.end)) };
+          classesPerWeekday.has(key) ? classesPerWeekday.get(key).push(value) : classesPerWeekday.set(key, [value]);
+
+          // Get events
+          const weekday = getWeekday(lesson.start.getDay());
+          const start = formatTime(lesson.start);
+          const end = formatTime(lesson.end);
+          const name = acronym.replace(/[0-9]/g, '') + ' (' + type + ')';
+          const place = lesson.room;
+          events.push(new Event(shift.name, tag, weekday, start, end, name, place, pinned));
+        }
+      }
+      tag++;
+    }
+
+    // Sort classes per weekday by start time
+    for (let i = 1; i <= 5; i++)
+      if (classesPerWeekday.has(i) && classesPerWeekday.get(i).length > 1)
+        classesPerWeekday.get(i).sort((a, b) => a.start - b.start);
+
+    return {allLessons, classesPerWeekday, events};
   }
 
   countHoles(classesPerWeekday: Map<number, {start: number, end: number}[]>): {nr_holes: number, total_duration: number} {
@@ -425,16 +433,6 @@ export class SchedulesGenerationService {
       }
     }
     return proximity;
-  }
-
-  getAllLessons(schedule: Schedule): Lesson[] {
-    const lessons: Lesson[] = [];
-    for (const cl of schedule.classes) {
-      for (const shift of cl.shifts)
-        for (const lesson of shift.lessons)
-          lessons.push(lesson);
-    }
-    return lessons;
   }
 
   calculateDeviation(classesPerWeekday: Map<number, {start: number, end: number}[]>): number {
@@ -498,5 +496,9 @@ export class SchedulesGenerationService {
       }
       return shifts;
     }
+  }
+
+  getBrowserSupportForWorkers(): boolean {
+    return typeof Worker !== 'undefined';
   }
 }

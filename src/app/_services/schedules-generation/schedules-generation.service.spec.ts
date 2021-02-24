@@ -26,6 +26,10 @@ describe('SchedulesGenerationService', () => {
 
   describe('Generating schedules', () => {
 
+    beforeEach(() => {
+      spyOn(service, 'getBrowserSupportForWorkers').and.returnValue(false);
+    });
+
     describe('Getting all combinations in an array', () => {
       const parameters = [
         {
@@ -339,7 +343,7 @@ describe('SchedulesGenerationService', () => {
         ];
       });
 
-      it('should combine classes correctly', () => {
+      it('should combine classes correctly', async () => {
         const classesPerCourse: Class[][] = [];
         courses.forEach(course => {
           classesPerCourse.push(service.combineShifts(course));
@@ -350,7 +354,7 @@ describe('SchedulesGenerationService', () => {
         const c2Class1 = classesPerCourse[1][0];
         const c2Class2 = classesPerCourse[1][1];
 
-        const schedules = service.combineClasses(classesPerCourse);
+        const schedules = await service.combineClasses(classesPerCourse);
         expect(schedules.length).toBe(4);
 
         schedules.forEach(schedule => {
@@ -363,7 +367,7 @@ describe('SchedulesGenerationService', () => {
         });
       });
 
-      it('should combine classes correctly: only one course', () => {
+      it('should combine classes correctly: only one course', async () => {
         courses.splice(1, 1);
 
         const classes = service.combineShifts(courses[0]);
@@ -371,7 +375,7 @@ describe('SchedulesGenerationService', () => {
         const class1 = classes[0];
         const class2 = classes[1];
 
-        const schedules = service.combineClasses([classes]);
+        const schedules = await service.combineClasses([classes]);
         expect(schedules.length).toBe(2);
 
         schedules.forEach(schedule => {
@@ -379,7 +383,7 @@ describe('SchedulesGenerationService', () => {
         });
       });
 
-      it('should combine classes correctly: classes overlap', () => {
+      it('should combine classes correctly: classes overlap', async () => {
         courses[1].shifts[1] = new Shift('T02', ClassType.THEORY_PT, [
           new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R3', 'Taguspark')
         ], 'Taguspark');
@@ -394,7 +398,7 @@ describe('SchedulesGenerationService', () => {
         const c2Class1 = classesPerCourse[1][0];
         const c2Class2 = classesPerCourse[1][1];
 
-        const schedules = service.combineClasses(classesPerCourse);
+        const schedules = await service.combineClasses(classesPerCourse);
         expect(schedules.length).toBe(3);
 
         schedules.forEach(schedule => {
@@ -407,31 +411,31 @@ describe('SchedulesGenerationService', () => {
         });
       });
 
-      it('should combine classes correctly: empty class', () => {
-        const schedules = service.combineClasses([ [] ]);
+      it('should combine classes correctly: empty class', async () => {
+        const schedules = await service.combineClasses([ [] ]);
         expect(schedules.length).toBe(0);
       });
 
-      it('should combine classes correctly: multiple empty classes', () => {
-        const schedules = service.combineClasses([ [], [] ]);
+      it('should combine classes correctly: multiple empty classes', async () => {
+        const schedules = await service.combineClasses([ [], [] ]);
         expect(schedules.length).toBe(0);
       });
 
-      it('should combine classes correctly: empty class & non-empty classes', () => {
+      it('should combine classes correctly: empty class & non-empty classes', async () => {
         const classesPerCourse: Class[][] = [];
         classesPerCourse.push(service.combineShifts(courses[0]));
         classesPerCourse.push([]);
 
-        const schedules = service.combineClasses(classesPerCourse);
-        expect(schedules.length).toBe(2);
-      });
-
-      it('should combine classes correctly: no classes', () => {
-        const schedules = service.combineClasses([ ]);
+        const schedules = await service.combineClasses(classesPerCourse);
         expect(schedules.length).toBe(0);
       });
 
-      it('should combine classes correctly: incompatible classes', () => {
+      it('should combine classes correctly: no classes', async () => {
+        const schedules = await service.combineClasses([ ]);
+        expect(schedules.length).toBe(0);
+      });
+
+      it('should combine classes correctly: incompatible classes', async () => {
         courses.push(new Course(
           3, 'Course #3', 'C3', 4.5, 1, [ClassType.THEORY_PT], ['Taguspark'],
           [
@@ -450,7 +454,7 @@ describe('SchedulesGenerationService', () => {
               ], 'Taguspark')
             ], { TEORICA: 1.5 }));
 
-        const schedules = service.generateSchedules(courses);
+        const schedules = await service.generateSchedules(courses);
         expect(schedules.length).toBe(0);
       });
 
@@ -496,13 +500,21 @@ describe('SchedulesGenerationService', () => {
         ]);
       });
 
-      it('should calculate proximity level for a schedule correctly', () => {
-        const proximity = service.calculateProximityLevel(schedule);
-        expect(proximity).toBe(2207);
-      });
+      it('should prepare schedule data correctly', () => {
+        const data = service.prepareData(1, schedule.classes);
+        const allLessons = data.allLessons;
+        const classesPerWeekday = data.classesPerWeekday;
+        const events = data.events;
 
-      it('should get classes per weekday for a schedule correctly', () => {
-        const classesPerWeekday = service.getClassesPerWeekday(schedule);
+        // Check lessons
+        const lessons: Lesson[] = [];
+        for (const cl of schedule.classes)
+          for (const shift of cl.shifts)
+            for (const lesson of shift.lessons)
+              lessons.push(lesson);
+        expect(allLessons).toEqual(lessons);
+
+        // Check classes per weekday
         expect(classesPerWeekday.size).toBe(3);
 
         expect(classesPerWeekday.has(1)).toBeTrue();
@@ -545,29 +557,51 @@ describe('SchedulesGenerationService', () => {
           end: getTimestamp(formatTime(course.shifts[0].lessons[1].end))
         }));
         expect(weekday[0].start < weekday[1].start && weekday[1].start < weekday[2].start).toBeTrue();
+
+        // Check events
+        expect(events.length).toBe(6);
+      });
+
+      it('should calculate proximity level for a schedule correctly', () => {
+        const lessons: Lesson[] = [];
+        for (const cl of schedule.classes) {
+          for (const shift of cl.shifts)
+            for (const lesson of shift.lessons)
+              lessons.push(lesson);
+        }
+        const proximity = service.calculateProximityLevel(schedule, lessons);
+        expect(proximity).toBe(2207);
+      });
+
+      it('should calculate schedule info correctly', () => {
+        service.calculateSchedulesInfo([schedule]);
+        const info = service.generatedSchedulesInfo.get(schedule.id);
+
+        expect(info.proximity).toBe(2207);
+        expect(info.nr_holes).toBe(2);
+        expect(info.total_duration).toBe(210);
+        expect(info.total_deviation).toBe(420);
+        expect(info.nr_free_days).toBe(2);
+        expect(info.events.length).toEqual(6);
       });
 
       it('should count holes for a schedule correctly', () => {
-        const classesPerWeekday = service.getClassesPerWeekday(schedule);
+        const classesPerWeekday = service.prepareData(1, schedule.classes).classesPerWeekday;
         const holesInfo = service.countHoles(classesPerWeekday);
 
         expect(holesInfo.nr_holes).toBe(2);
         expect(holesInfo.total_duration).toBe(210);
       });
 
+      it('should calculate deviation for a schedule correctly', () => {
+        // TODO
+      });
+
       it('should calculate number of free days correctly', () => {
-        const classesPerWeekday = service.getClassesPerWeekday(schedule);
+        const classesPerWeekday = service.prepareData(1, schedule.classes).classesPerWeekday;
         const freeDays = service.calculateNumberFreeDays(classesPerWeekday);
 
         expect(freeDays).toBe(2);
-      });
-
-      it('should calculate schedule info correctly', () => {
-        const classesPerWeekday = service.getClassesPerWeekday(schedule);
-        const scheduleHolesInfo = service.countHoles(classesPerWeekday);
-
-        expect(scheduleHolesInfo.nr_holes).toBe(2);
-        expect(scheduleHolesInfo.total_duration).toBe(210);
       });
     });
 
@@ -583,7 +617,7 @@ describe('SchedulesGenerationService', () => {
       // TODO
     });
 
-    it('should generate schedules successfully: no overlaps', () => {
+    it('should generate schedules successfully: no overlaps', async () => {
       const courses = [
         new Course(
           1, 'Course #1', 'C1', 4.5, 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
@@ -619,11 +653,11 @@ describe('SchedulesGenerationService', () => {
           ], { TEORICA: 1.5 })
       ];
 
-      const schedules = service.generateSchedules(courses);
+      const schedules = await service.generateSchedules(courses);
       expect(schedules.length).toBe(6 * 3);
     });
 
-    it('should generate schedules successfully: with overlaps', () => {
+    it('should generate schedules successfully: with overlaps', async () => {
       const courses = [
         new Course(
           1, 'Course #1', 'C1', 4.5, 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
@@ -659,11 +693,11 @@ describe('SchedulesGenerationService', () => {
           ], { TEORICA: 1.5 })
       ];
 
-      const schedules = service.generateSchedules(courses);
+      const schedules = await service.generateSchedules(courses);
       expect(schedules.length).toBe(6 * 3 - 2);
     });
 
-    it('should generate schedules successfully: they all overlap', () => {
+    it('should generate schedules successfully: they all overlap', async () => {
       const courses = [
         new Course(
           1, 'Course #1', 'C1', 4.5, 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
@@ -699,7 +733,7 @@ describe('SchedulesGenerationService', () => {
           ], { TEORICA: 1.5 })
       ];
 
-      const schedules = service.generateSchedules(courses);
+      const schedules = await service.generateSchedules(courses);
       expect(schedules.length).toBe(0);
     });
 

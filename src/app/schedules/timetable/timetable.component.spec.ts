@@ -101,13 +101,14 @@ describe('TimetableComponent', () => {
     .compileComponents(); // compiles template and css
   }));
 
-  beforeEach(() => {
+  beforeEach(async () => {
     fixture = TestBed.createComponent(TimetableComponent);
     component = fixture.componentInstance;
     de = fixture.debugElement;
 
     // Generate schedules
-    component.schedules = scheduleGenerationService.generateSchedules(COURSES);
+    spyOn(scheduleGenerationService, 'getBrowserSupportForWorkers').and.returnValue(false);
+    component.schedules = await scheduleGenerationService.generateSchedules(COURSES);
     component.schedulesToShow = component.schedules;
 
     component.keydownEvents = of('keydown');
