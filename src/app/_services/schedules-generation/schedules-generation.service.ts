@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+// tslint:disable:max-line-length
+import { EventEmitter, Injectable } from '@angular/core';
 
 import {LoggerService} from '../../_util/logger.service';
 import {StateService} from '../state/state.service';
@@ -11,6 +12,7 @@ import {Lesson} from '../../_domain/Lesson/Lesson';
 
 import {formatTime, getTimestamp} from '../../_util/Time';
 import _ from 'lodash';
+import {Event} from '../../_domain/Event/Event';
 
 @Injectable({
   providedIn: 'root'
@@ -22,8 +24,9 @@ export class SchedulesGenerationService {
     nr_holes: number,
     total_duration: number,
     total_deviation: number,
-    nr_free_days: number
-  }> = new Map<number, {proximity: number, nr_holes: number, total_duration: number, total_deviation: number, nr_free_days: number}>();
+    nr_free_days: number,
+    events: Event[]
+  }> = new Map<number, {proximity: number, nr_holes: number, total_duration: number, total_deviation: number, nr_free_days: number, events: Event[]}>();
 
   constructor(public logger: LoggerService, private stateService: StateService) { }
 
@@ -37,7 +40,7 @@ export class SchedulesGenerationService {
    *  - calculate relevant info for all types of sorting for all schedules
    *  - sort by most compact (default)
    * -------------------------------------------------------------------------------- */
-   generateSchedules(courses: Course[]): Schedule[] {
+   async generateSchedules(courses: Course[]): Promise<Schedule[]> {
     this.logger.log('generating...');
 
     // Combine shifts
@@ -50,7 +53,7 @@ export class SchedulesGenerationService {
 
     // Combine classes
     this.logger.log('combining classes...');
-    let schedules: Schedule[] = this.combineClasses(classesPerCourse);
+    let schedules: Schedule[] = await this.combineClasses(classesPerCourse);
 
     // Calculate relevant info
     this.logger.log('calculating info...');
@@ -94,10 +97,10 @@ export class SchedulesGenerationService {
     });
 
     // Save state
-    this.stateService.schedulesSortedByMostCompact = _.cloneDeep(schedules);
+    this.stateService.schedulesSortedByMostCompact = [...schedules];
 
     this.logger.log('Sorted by most compact', schedules);
-    return _.cloneDeep(schedules);
+    return schedules;
   }
 
   /* --------------------------------------------------------------------------------
@@ -189,23 +192,80 @@ export class SchedulesGenerationService {
     return classes;
   }
 
-  combineClasses(classes: Class[][]): Schedule[] {
-    let id = 0;
+  async combineClasses(classes: Class[][]): Promise<Schedule[]> {
+    const optimalNumberWorkers = window.navigator.hardwareConcurrency;
+    const browserSupportsWebWorkers = typeof Worker !== 'undefined';
+
+    // Create workers
+    const workers: Worker[] = [];
+    if (browserSupportsWebWorkers) {
+      for (let i = 0; i < optimalNumberWorkers; i++) {
+        const worker = new Worker('../../_workers/generation-worker.worker', { type: 'module' });
+        workers.push(worker);
+      }
+    }
+
+    // Sort classes by least
+    classes.sort(((a, b) => a.length - b.length));
 
     // Get combinations of classes
     let combinations: Class[][] = [];
     for (const cls of classes) {
-      const allCases = this.allPossibleCases([combinations, cls]);
-      combinations = [];
-      for (const combination of allCases) {
-        // Check for overlaps and discard
-        if (this.checkForOverlapsOnClasses(combination)) continue;
-        combinations.push(combination);
+
+      if (!browserSupportsWebWorkers) {
+        const allCases = this.allPossibleCases([combinations, cls]);
+        combinations = [];
+        for (const combination of allCases) {
+          // Check for overlaps and discard
+          if (this.checkForOverlapsOnClasses(combination)) continue;
+          combinations.push(combination);
+        }
+
+      } else {
+        const numberClasses = cls.length;
+        const classesPerWorker = Math.floor(numberClasses / optimalNumberWorkers);
+        let mod = numberClasses % optimalNumberWorkers;
+        let tempCombinations = [];
+
+        let workersUsed = 0;
+        const allWorkersFinished = new EventEmitter<void>();
+        const allFinished = new Promise((resolve) => allWorkersFinished.subscribe(() => resolve()));
+
+        let i = 0;
+        let workerIndex = 0;
+        while (i < numberClasses) {
+          workers[workerIndex].onmessage = ({ data }) => {
+            tempCombinations = tempCombinations.concat(this.parseData(data));
+            workersUsed--;
+            if (workersUsed === 0) allWorkersFinished.emit();
+          };
+
+          if (mod > 0) {
+            workers[workerIndex].postMessage({worker: workerIndex + 1, combinations, classes: cls.slice(i, i + classesPerWorker + 1)});
+            mod--;
+            i = i + classesPerWorker + 1;
+
+          } else {
+            workers[workerIndex].postMessage({worker: workerIndex + 1, combinations, classes: cls.slice(i, i + classesPerWorker)});
+            i = i + classesPerWorker;
+          }
+          workersUsed++;
+          workerIndex++;
+        }
+
+        await allFinished;
+        combinations = [...tempCombinations];
+        this.logger.log('all combinations with course ' + cls[0].course.formatAcronym() + ' finished', combinations);
       }
-      if (combinations.length === 0) break;
+      if (combinations.length === 0) return [];
     }
 
+    // Terminate workers
+    for (const worker of workers)
+      worker.terminate();
+
     // Arrange into schedules
+    let id = 0;
     const schedules: Schedule[] = [];
     for (const combination of combinations)
       schedules.push(new Schedule(id++, combination));
@@ -274,8 +334,27 @@ export class SchedulesGenerationService {
 
   calculateSchedulesInfo(schedules: Schedule[]): void {
     for (const schedule of schedules) {
-      const proximity = this.calculateProximityLevel(schedule);
-      const classesPerWeekday: Map<number, {start: number, end: number}[]> = this.getClassesPerWeekday(schedule);
+      const allLessons: Lesson[] = [];
+      const classesPerWeekday = new Map<number, {start: number, end: number}[]>();
+
+      // Get all lessons & classes per weekday
+      for (const cl of schedule.classes) {
+        for (const shift of cl.shifts) {
+          for (const lesson of shift.lessons) {
+            allLessons.push(lesson);
+            const key = lesson.start.getDay();
+            const value = { start: getTimestamp(formatTime(lesson.start)), end: getTimestamp(formatTime(lesson.end)) };
+            classesPerWeekday.has(key) ? classesPerWeekday.get(key).push(value) : classesPerWeekday.set(key, [value]);
+          }
+        }
+      }
+
+      // Sort classes per weekday by start time
+      for (let i = 1; i <= 5; i++)
+        if (classesPerWeekday.has(i) && classesPerWeekday.get(i).length > 1)
+          classesPerWeekday.get(i).sort((a, b) => a.start - b.start);
+
+      const proximity = this.calculateProximityLevel(schedule, allLessons);
       const holesInfo = this.countHoles(classesPerWeekday);
       const deviation = this.calculateDeviation(classesPerWeekday);
       const freeDays = this.calculateNumberFreeDays(classesPerWeekday);
@@ -285,7 +364,8 @@ export class SchedulesGenerationService {
         nr_holes: holesInfo.nr_holes,
         total_duration: holesInfo.total_duration,
         total_deviation: deviation,
-        nr_free_days: freeDays
+        nr_free_days: freeDays,
+        events: []
       });
     }
   }
@@ -312,28 +392,7 @@ export class SchedulesGenerationService {
     return {nr_holes: numberOfHoles, total_duration: totalDuration};
   }
 
-  getClassesPerWeekday(schedule: Schedule): Map<number, {start: number, end: number}[]> {
-    const classesPerWeekday = new Map<number, {start: number, end: number}[]>();
-
-    schedule.classes.forEach(cl => {
-      cl.shifts.forEach(shift => {
-        shift.lessons.forEach(lesson => {
-          const key = lesson.start.getDay();
-          const value = { start: getTimestamp(formatTime(lesson.start)), end: getTimestamp(formatTime(lesson.end)) };
-          classesPerWeekday.has(key) ? classesPerWeekday.get(key).push(value) : classesPerWeekday.set(key, [value]);
-        });
-      });
-    });
-
-    // Sort by start time
-    for (let i = 1; i <= 5; i++)
-      if (classesPerWeekday.has(i) && classesPerWeekday.get(i).length > 1)
-        classesPerWeekday.get(i).sort((a, b) => a.start - b.start);
-    return classesPerWeekday;
-  }
-
-  calculateProximityLevel(schedule: Schedule): number {
-    const allLessons: Lesson[] = this.getAllLessons(schedule);
+  calculateProximityLevel(schedule: Schedule, allLessons: Lesson[]): number {
     let proximity = 0;
 
     for (let i = 0; i < allLessons.length - 1; i++) {
@@ -351,13 +410,11 @@ export class SchedulesGenerationService {
 
   getAllLessons(schedule: Schedule): Lesson[] {
     const lessons: Lesson[] = [];
-    schedule.classes.forEach(cl => {
-      cl.shifts.forEach(shift => {
-        shift.lessons.forEach(lesson => {
+    for (const cl of schedule.classes) {
+      for (const shift of cl.shifts)
+        for (const lesson of shift.lessons)
           lessons.push(lesson);
-        });
-      });
-    });
+    }
     return lessons;
   }
 
@@ -391,5 +448,36 @@ export class SchedulesGenerationService {
     for (let i = 1; i <= 5; i++)
       if (!classesPerWeekday.has(i) || classesPerWeekday.get(i).length === 0) freeDays++;
     return freeDays;
+  }
+
+  parseData(data): Class[][] {
+    const final: Class[][] = [];
+    for (const item of data) {
+      const classes: Class[] = [];
+      for (const subItem of item) {
+        const course = getCourse(subItem._course._name, this.stateService.selectedCourses);
+        const shifts = getShifts(subItem._shifts);
+        classes.push(new Class(course, shifts));
+      }
+      final.push(classes);
+    }
+    return final;
+
+    function getCourse(name: string, courses: Course[]): Course {
+      for (const course of courses)
+        if (course.name === name) return course;
+      return null;
+    }
+
+    function getShifts(shs): Shift[] {
+      const shifts: Shift[] = [];
+      for (const shift of shs) {
+        const lessons: Lesson[] = [];
+        for (const lesson of shift._lessons)
+          lessons.push(new Lesson(new Date(lesson._start), new Date(lesson._end), lesson._room, lesson._campus));
+        shifts.push(new Shift(shift._name, shift._type, lessons, shift._campus));
+      }
+      return shifts;
+    }
   }
 }

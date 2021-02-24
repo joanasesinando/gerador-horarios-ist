@@ -1,145 +1,147 @@
-<h5 class="text-center d-block mt-5 mb-3">{{scheduleInViewIndex + 1}} / {{schedulesToShow.length}}</h5>
+<ng-container *ngIf="this.schedules && this.schedulesToShow">
+  <h5 class="text-center d-block mt-5 mb-3">{{scheduleInViewIndex + 1}} / {{schedulesToShow.length}}</h5>
 
-<div class="timetable d-flex justify-content-center align-items-center"
-  (swipeleft)="next()" (swiperight)="prev()">
+  <div class="timetable d-flex justify-content-center align-items-center"
+    (swipeleft)="next()" (swiperight)="prev()">
 
-  <p *ngIf="!mobileView" class="schedule-ID">{{'schedules.schedule' | translate}} ID: {{scheduleInViewID + 1}}</p>
-  <p *ngIf="mobileView" class="schedule-ID">ID: {{scheduleInViewID + 1}}</p>
+    <p *ngIf="!mobileView" class="schedule-ID">{{'schedules.schedule' | translate}} ID: {{scheduleInViewID + 1}}</p>
+    <p *ngIf="mobileView" class="schedule-ID">ID: {{scheduleInViewID + 1}}</p>
 
-  <!-- Previous btn -->
-  <fa-icon [icon]="faCaretLeft" class="prev mr-4" (click)="prev()"></fa-icon>
+    <!-- Previous btn -->
+    <fa-icon [icon]="faCaretLeft" class="prev mr-4" (click)="prev()"></fa-icon>
 
-  <div class="schedule">
+    <div class="schedule">
 
-    <!-- Timeline -->
-    <div class="timeline">
-      <ul>
-        <li *ngFor="let time of getTimelineHours(8, 20)">
-          <span>{{time}}</span>
-        </li>
-      </ul>
-    </div>
+      <!-- Timeline -->
+      <div class="timeline">
+        <ul>
+          <li *ngFor="let time of getTimelineHours(8, 20)">
+            <span>{{time}}</span>
+          </li>
+        </ul>
+      </div>
 
-    <!-- Events -->
-    <div class="events">
+      <!-- Events -->
+      <div class="events">
 
-      <ul class="wrap">
+        <ul class="wrap">
 
-        <!-- Monday -->
-        <li class="events-group">
-          <div class="top-info">
-            <span *ngIf="mobileView">{{'week-days.short.monday' | translate}}</span>
-            <span *ngIf="!mobileView">{{'week-days.full.monday' | translate}}</span>
-          </div>
-          <ul>
-            <li *ngFor="let ev of eventsPerWeekday.get('monday')"
-                [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
-                [ngClass]="{'pinned': ev.pinned}"
-                [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
-              <div class="single-event-div">
-                <span class="event-date">{{ev.start}} - {{ev.end}}</span>
-                <em class="event-name">{{ev.name}}</em>
-                <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
-              </div>
-              <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
-            </li>
-          </ul>
-        </li>
+          <!-- Monday -->
+          <li class="events-group">
+            <div class="top-info">
+              <span *ngIf="mobileView">{{'week-days.short.monday' | translate}}</span>
+              <span *ngIf="!mobileView">{{'week-days.full.monday' | translate}}</span>
+            </div>
+            <ul>
+              <li *ngFor="let ev of eventsPerWeekday.get('monday')"
+                  [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
+                  class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
+                  [ngClass]="{'pinned': ev.pinned}"
+                  [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+                <div class="single-event-div">
+                  <span class="event-date">{{ev.start}} - {{ev.end}}</span>
+                  <em class="event-name">{{ev.name}}</em>
+                  <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
+                </div>
+                <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
+              </li>
+            </ul>
+          </li>
 
-        <!-- Tuesday -->
-        <li class="events-group">
-          <div class="top-info">
-            <span *ngIf="mobileView">{{'week-days.short.tuesday' | translate}}</span>
-            <span *ngIf="!mobileView">{{'week-days.full.tuesday' | translate}}</span>
-          </div>
-          <ul>
-            <li *ngFor="let ev of eventsPerWeekday.get('tuesday')"
-                [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
-                [ngClass]="{'pinned': ev.pinned}"
-                [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
-              <div class="single-event-div">
-                <span class="event-date">{{ev.start}} - {{ev.end}}</span>
-                <em class="event-name">{{ev.name}}</em>
-                <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
-              </div>
-              <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
-            </li>
-          </ul>
-        </li>
+          <!-- Tuesday -->
+          <li class="events-group">
+            <div class="top-info">
+              <span *ngIf="mobileView">{{'week-days.short.tuesday' | translate}}</span>
+              <span *ngIf="!mobileView">{{'week-days.full.tuesday' | translate}}</span>
+            </div>
+            <ul>
+              <li *ngFor="let ev of eventsPerWeekday.get('tuesday')"
+                  [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
+                  class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
+                  [ngClass]="{'pinned': ev.pinned}"
+                  [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+                <div class="single-event-div">
+                  <span class="event-date">{{ev.start}} - {{ev.end}}</span>
+                  <em class="event-name">{{ev.name}}</em>
+                  <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
+                </div>
+                <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
+              </li>
+            </ul>
+          </li>
 
-        <!-- Wednesday -->
-        <li class="events-group">
-          <div class="top-info">
-            <span *ngIf="mobileView">{{'week-days.short.wednesday' | translate}}</span>
-            <span *ngIf="!mobileView">{{'week-days.full.wednesday' | translate}}</span>
-          </div>
-          <ul>
-            <li *ngFor="let ev of eventsPerWeekday.get('wednesday')"
-                [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
-                [ngClass]="{'pinned': ev.pinned}"
-                [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
-              <div class="single-event-div">
-                <span class="event-date">{{ev.start}} - {{ev.end}}</span>
-                <em class="event-name">{{ev.name}}</em>
-                <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
-              </div>
-              <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
-            </li>
-          </ul>
-        </li>
+          <!-- Wednesday -->
+          <li class="events-group">
+            <div class="top-info">
+              <span *ngIf="mobileView">{{'week-days.short.wednesday' | translate}}</span>
+              <span *ngIf="!mobileView">{{'week-days.full.wednesday' | translate}}</span>
+            </div>
+            <ul>
+              <li *ngFor="let ev of eventsPerWeekday.get('wednesday')"
+                  [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
+                  class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
+                  [ngClass]="{'pinned': ev.pinned}"
+                  [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+                <div class="single-event-div">
+                  <span class="event-date">{{ev.start}} - {{ev.end}}</span>
+                  <em class="event-name">{{ev.name}}</em>
+                  <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
+                </div>
+                <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
+              </li>
+            </ul>
+          </li>
 
-        <!-- Thursday -->
-        <li class="events-group">
-          <div class="top-info">
-            <span *ngIf="mobileView">{{'week-days.short.thursday' | translate}}</span>
-            <span *ngIf="!mobileView">{{'week-days.full.thursday' | translate}}</span>
-          </div>
-          <ul>
-            <li *ngFor="let ev of eventsPerWeekday.get('thursday')"
-                [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
-                [ngClass]="{'pinned': ev.pinned}"
-                [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
-              <div class="single-event-div">
-                <span class="event-date">{{ev.start}} - {{ev.end}}</span>
-                <em class="event-name">{{ev.name}}</em>
-                <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
-              </div>
-              <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
-            </li>
-          </ul>
-        </li>
+          <!-- Thursday -->
+          <li class="events-group">
+            <div class="top-info">
+              <span *ngIf="mobileView">{{'week-days.short.thursday' | translate}}</span>
+              <span *ngIf="!mobileView">{{'week-days.full.thursday' | translate}}</span>
+            </div>
+            <ul>
+              <li *ngFor="let ev of eventsPerWeekday.get('thursday')"
+                  [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
+                  class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
+                  [ngClass]="{'pinned': ev.pinned}"
+                  [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+                <div class="single-event-div">
+                  <span class="event-date">{{ev.start}} - {{ev.end}}</span>
+                  <em class="event-name">{{ev.name}}</em>
+                  <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
+                </div>
+                <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
+              </li>
+            </ul>
+          </li>
 
-        <!-- Friday -->
-        <li class="events-group">
-          <div class="top-info">
-            <span *ngIf="mobileView">{{'week-days.short.friday' | translate}}</span>
-            <span *ngIf="!mobileView">{{'week-days.full.friday' | translate}}</span>
-          </div>
-          <ul>
-            <li *ngFor="let ev of eventsPerWeekday.get('friday')"
-                [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
-                [ngClass]="{'pinned': ev.pinned}"
-                [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
-              <div class="single-event-div">
-                <span class="event-date">{{ev.start}} - {{ev.end}}</span>
-                <em class="event-name">{{ev.name}}</em>
-                <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
-              </div>
-              <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
-            </li>
-          </ul>
-        </li>
-      </ul>
+          <!-- Friday -->
+          <li class="events-group">
+            <div class="top-info">
+              <span *ngIf="mobileView">{{'week-days.short.friday' | translate}}</span>
+              <span *ngIf="!mobileView">{{'week-days.full.friday' | translate}}</span>
+            </div>
+            <ul>
+              <li *ngFor="let ev of eventsPerWeekday.get('friday')"
+                  [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
+                  class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
+                  [ngClass]="{'pinned': ev.pinned}"
+                  [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+                <div class="single-event-div">
+                  <span class="event-date">{{ev.start}} - {{ev.end}}</span>
+                  <em class="event-name">{{ev.name}}</em>
+                  <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
+                </div>
+                <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
+              </li>
+            </ul>
+          </li>
+        </ul>
 
-    </div>
+      </div>
 
-  </div> <!-- .schedule -->
+    </div> <!-- .schedule -->
 
-  <!-- Next btn -->
-  <fa-icon [icon]="faCaretRight" class="next ml-4" (click)="next()"></fa-icon>
-</div>
+    <!-- Next btn -->
+    <fa-icon [icon]="faCaretRight" class="next ml-4" (click)="next()"></fa-icon>
+  </div>
+</ng-container>

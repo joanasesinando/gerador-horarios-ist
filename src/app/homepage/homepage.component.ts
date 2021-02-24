@@ -25,6 +25,8 @@ import {
   faGlobeEurope,
   faBolt
 } from '@fortawesome/free-solid-svg-icons';
+import {Schedule} from '../_domain/Schedule/Schedule';
+import {Class} from '../_domain/Class/Class';
 
 declare let $;
 

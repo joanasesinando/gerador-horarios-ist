@@ -5,7 +5,6 @@ import {LoggerService} from '../../_util/logger.service';
 import {ErrorService} from '../../_util/error.service';
 import {AlertService} from '../../_util/alert.service';
 import {TranslateService} from '@ngx-translate/core';
-import _ from 'lodash';
 
 import { faCaretRight, faCaretLeft, faThumbtack } from '@fortawesome/free-solid-svg-icons';
 
@@ -87,7 +86,7 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
   ngOnInit(): void {
     this.scheduleInViewIndex = 0;
     this.scheduleInViewID = this.schedules[0].id;
-    this.schedulesToShow = _.cloneDeep(this.schedules);
+    this.schedulesToShow = [...this.schedules];
 
     if (this.schedulesToShow.length > 0) {
       this.createEvents(this.schedulesToShow);

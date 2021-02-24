@@ -7,6 +7,7 @@ import {Schedule} from '../../_domain/Schedule/Schedule';
 @Injectable({
   providedIn: 'root'
 })
+
 export class StateService {
 
   private _selectedLanguage = 'pt-PT';
