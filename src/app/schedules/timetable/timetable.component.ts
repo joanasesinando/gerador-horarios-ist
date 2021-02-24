@@ -5,13 +5,14 @@ import {LoggerService} from '../../_util/logger.service';
 import {ErrorService} from '../../_util/error.service';
 import {AlertService} from '../../_util/alert.service';
 import {TranslateService} from '@ngx-translate/core';
+import {SchedulesGenerationService} from '../../_services/schedules-generation/schedules-generation.service';
 
 import { faCaretRight, faCaretLeft, faThumbtack } from '@fortawesome/free-solid-svg-icons';
 
 import {Schedule} from '../../_domain/Schedule/Schedule';
 import {Event} from '../../_domain/Event/Event';
-import {minifyClassType} from '../../_domain/ClassType/ClassType';
-import {formatTime, getTimestamp, getWeekday} from '../../_util/Time';
+import {getTimestamp} from '../../_util/Time';
+import {numberWithCommas} from '../../_util/Number';
 
 
 @Component({
@@ -33,7 +34,6 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
 
   scheduleInViewIndex: number;
   scheduleInViewID: number;
-  eventsPerSchedule: Map<number, Event[]> = new Map(); // schedule.id --> events
   eventsPerWeekday: Map<string, Event[]> = new Map(); // weekday --> events
 
   schedulesToShow: Schedule[];
@@ -52,7 +52,8 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
     private logger: LoggerService,
     private errorService: ErrorService,
     private alertService: AlertService,
-    public translateService: TranslateService
+    public translateService: TranslateService,
+    private schedulesGenerationService: SchedulesGenerationService
   ) {
     setTimeout(() => {
       if (!this.pinActivated) {
@@ -88,10 +89,8 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
     this.scheduleInViewID = this.schedules[0].id;
     this.schedulesToShow = [...this.schedules];
 
-    if (this.schedulesToShow.length > 0) {
-      this.createEvents(this.schedulesToShow);
+    if (this.schedulesToShow.length > 0)
       this.organizeEventsPerWeekday(this.scheduleInViewID);
-    }
 
     this.onWindowResize();
 
@@ -148,39 +147,9 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
     return timeline;
   }
 
-  createEvents(schedules: Schedule[]): void { // TODO: testing
-    this.eventsPerSchedule.clear();
-    for (const schedule of schedules) {
-      let tag = 1;
-
-      schedule.classes.forEach(cl => {
-        const acronym = cl.course.acronym;
-
-        cl.shifts.forEach(shift => {
-          const type = minifyClassType(shift.type);
-          const pinned = this.pinnedShifts.includes(shift.name);
-
-          shift.lessons.forEach(lesson => {
-            const weekday = getWeekday(lesson.start.getDay());
-            const start = formatTime(lesson.start);
-            const end = formatTime(lesson.end);
-            const name = acronym.replace(/[0-9]/g, '') + ' (' + type + ')';
-            const place = lesson.room;
-            this.eventsPerSchedule.has(schedule.id) ?
-              this.eventsPerSchedule.get(schedule.id).push(new Event(shift.name, tag, weekday, start, end, name, place, pinned)) :
-              this.eventsPerSchedule.set(schedule.id, [new Event(shift.name, tag, weekday, start, end, name, place, pinned)]);
-          });
-        });
-
-        tag++;
-      });
-    }
-    this.logger.log('events per schedule', this.eventsPerSchedule);
-  }
-
   organizeEventsPerWeekday(scheduleID: number): void { // TODO: testing
     this.eventsPerWeekday.clear();
-    const events = this.eventsPerSchedule.get(scheduleID);
+    const events = this.schedulesGenerationService.generatedSchedulesInfo.get(scheduleID).events;
     events.forEach(ev => {
       this.eventsPerWeekday.has(ev.weekday) ?
         this.eventsPerWeekday.get(ev.weekday).push(ev) : this.eventsPerWeekday.set(ev.weekday, [ev]);
@@ -242,7 +211,6 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
 
     // Update timetable
     if (this.schedulesToShow.length > 0) {
-      this.createEvents(this.schedulesToShow);
       this.updateScheduleInViewIndex(this.schedulesToShow);
       this.organizeEventsPerWeekday(this.scheduleInViewID);
 
@@ -252,22 +220,30 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   filterSchedulesBasedOnPinnedShifts(): Schedule[] { // TODO: testing
-    let filteredSchedules = this.schedules;
+    const schedules: Schedule[] = [];
 
-    this.pinnedShifts.forEach(pinnedShift => {
-      const temp: Schedule[] = [];
+    for (const schedule of this.schedules) {
+      let hasAllPinnedShifts = true;
 
-      filteredSchedules.forEach(schedule => {
-        schedule.classes.forEach(cl => {
-          cl.shifts.forEach(shift => {
-            if (shift.name === pinnedShift) temp.push(schedule);
-          });
+      for (const pinnedShift of this.pinnedShifts) {
+        let found = false;
+        for (const cl of schedule.classes) {
+          for (const shift of cl.shifts) {
+            if (shift.name === pinnedShift) { found = true; break; }
+          }
+          if (found) break;
+        }
+        if (!found) { hasAllPinnedShifts = false; break; }
+      }
+
+      if (hasAllPinnedShifts) {
+        schedules.push(schedule);
+        this.schedulesGenerationService.generatedSchedulesInfo.get(schedule.id).events.forEach(ev => {
+          ev.pinned = this.pinnedShifts.includes(ev.shiftName);
         });
-      });
-
-      filteredSchedules = temp;
-    });
-    return filteredSchedules;
+      }
+    }
+    return schedules;
   }
 
   updateScheduleInViewIndex(schedules: Schedule[]): void {
@@ -282,6 +258,10 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
 
   schedulePicked(): void {
     this.scheduleSelected.emit(this.scheduleInViewID);
+  }
+
+  numberWithCommas(x: number): string {
+    return numberWithCommas(x);
   }
 
   @HostListener('window:resize', [])

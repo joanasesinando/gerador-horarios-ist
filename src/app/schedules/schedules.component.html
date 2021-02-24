@@ -25,7 +25,7 @@
               <h4 *ngIf="generatedSchedules.length == 1"
                   class="schedules-gen-heading mb-4">{{'schedules.heading.one' | translate}}</h4>
               <h4 *ngIf="generatedSchedules.length > 1" class="schedules-gen-heading mb-4">
-                {{'schedules.heading.more.left' | translate}} {{generatedSchedules.length}} {{'schedules.heading.more.right' | translate}}</h4>
+                {{'schedules.heading.more.left' | translate}} {{numberWithCommas(generatedSchedules.length)}} {{'schedules.heading.more.right' | translate}}</h4>
 
               <!-- Show options -->
               <div *ngIf="generatedSchedules.length > 1" class="show-options d-lg-flex">
@@ -98,8 +98,9 @@
 
       <div class="schedules-deck">
         <div class="d-sm-flex flex-wrap justify-content-start d-lg-block mr-lg-1">
-          <app-schedule-card *ngFor="let schedule of schedulesPicked"
+          <app-schedule-card *ngFor="let schedule of schedulesPicked; let i = index"
                              [schedule]="schedule"
+                             [scheduleIndex]="i + 1"
                              (removeBtn)="removeSchedule($event)"></app-schedule-card>
         </div>
       </div>

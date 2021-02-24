@@ -17,6 +17,7 @@ declare let $;
 export class ScheduleCardComponent implements OnInit {
 
   @Input() schedule: Schedule;
+  @Input() scheduleIndex: number;
   @Output() removeBtn = new EventEmitter<number>();
 
   faCaretDown = faCaretDown;

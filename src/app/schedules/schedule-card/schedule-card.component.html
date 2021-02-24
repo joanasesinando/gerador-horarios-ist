@@ -11,11 +11,11 @@
       <fa-icon [icon]="faTimes"></fa-icon>
     </button>
 
-    <h6 class="text-primary font-weight-bold mb-1 mt-lg-1">{{'schedules.schedule' | translate}} #{{schedule.id + 1}}</h6>
+    <h6 class="text-primary font-weight-bold mb-1 mt-lg-1">{{'schedules.schedule' | translate}} #{{scheduleIndex}}</h6>
 
     <div class="collapse show" id="schedulesClasses-{{schedule.id}}">
       <div *ngFor="let cl of schedule.classes" class="schedule-class text-left mt-3">
-        <p class="class-name font-weight-bold mb-2">[{{cl.course.acronym}}] {{cl.course.name}}</p>
+        <p class="class-name font-weight-bold mb-2">[{{cl.course.formatAcronym()}}] {{cl.course.name}}</p>
 
         <div *ngFor="let shift of cl.shifts">
 
@@ -29,12 +29,10 @@
       </div>
     </div>
 
-    <fa-icon *ngIf="!expanded" [icon]="faCaretDown" class="arrow"
-             data-toggle="collapse" [attr.data-target]="'#schedulesClasses-' + schedule.id"
-             aria-expanded="true" aria-controls="schedulesClasses" (click)="toggle()"></fa-icon>
-
-    <fa-icon *ngIf="expanded" [icon]="faCaretUp" class="arrow"
-             data-toggle="collapse" [attr.data-target]="'#schedulesClasses-' + schedule.id"
-             aria-expanded="true" aria-controls="schedulesClasses" (click)="toggle()"></fa-icon>
+    <div class="w-100">
+      <fa-icon [icon]="!expanded ? faCaretDown : faCaretUp" class="arrow"
+               data-toggle="collapse" [attr.data-target]="'#schedulesClasses-' + schedule.id"
+               aria-expanded="true" aria-controls="schedulesClasses"></fa-icon>
+    </div>
   </div>
 </div>

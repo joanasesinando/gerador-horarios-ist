@@ -12,6 +12,8 @@ import {Course} from '../_domain/Course/Course';
 import {Schedule} from '../_domain/Schedule/Schedule';
 import {TranslateService} from '@ngx-translate/core';
 
+import {numberWithCommas} from '../_util/Number';
+
 import {faQuestionCircle} from '@fortawesome/free-solid-svg-icons';
 
 declare let $;
@@ -115,13 +117,13 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     switch (option) {
       case 'balanced':
         this.generatedSchedules = this.stateService.hasSchedulesSortedByMostBalanced() ?
-          this.stateService.schedulesSortedByMostBalanced :
+          [...this.stateService.schedulesSortedByMostBalanced] :
           this.generationService.sortByMostBalanced(this.generatedSchedules);
         break;
 
       case 'free-days':
         this.generatedSchedules = this.stateService.hasSchedulesSortedByMostFreeDays() ?
-          this.stateService.schedulesSortedByMostFreeDays :
+          [...this.stateService.schedulesSortedByMostFreeDays] :
           this.generationService.sortByMostFreeDays(this.generatedSchedules);
 
         if (this.generationService.generatedSchedulesInfo.get(this.generatedSchedules[0].id).nr_free_days === 0) {
@@ -134,7 +136,7 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
       case 'compact':
       default:
         this.generatedSchedules = this.stateService.hasSchedulesSortedByMostCompact() ?
-          this.stateService.schedulesSortedByMostCompact :
+          [...this.stateService.schedulesSortedByMostCompact] :
           this.generationService.sortByMostCompact(this.generatedSchedules);
         break;
     }
@@ -191,6 +193,10 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
 
   capitalize(s: string): string {
     return s[0].toUpperCase() + s.substr(1);
+  }
+
+  numberWithCommas(x: number): string {
+    return numberWithCommas(x);
   }
 
   @HostListener('window:resize', [])

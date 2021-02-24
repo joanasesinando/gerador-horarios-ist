@@ -1,11 +1,8 @@
 <ng-container *ngIf="this.schedules && this.schedulesToShow">
-  <h5 class="text-center d-block mt-5 mb-3">{{scheduleInViewIndex + 1}} / {{schedulesToShow.length}}</h5>
+  <h5 class="text-center d-block mt-5 mb-3">{{numberWithCommas(scheduleInViewIndex + 1)}} / {{numberWithCommas(schedulesToShow.length)}}</h5>
 
   <div class="timetable d-flex justify-content-center align-items-center"
     (swipeleft)="next()" (swiperight)="prev()">
-
-    <p *ngIf="!mobileView" class="schedule-ID">{{'schedules.schedule' | translate}} ID: {{scheduleInViewID + 1}}</p>
-    <p *ngIf="mobileView" class="schedule-ID">ID: {{scheduleInViewID + 1}}</p>
 
     <!-- Previous btn -->
     <fa-icon [icon]="faCaretLeft" class="prev mr-4" (click)="prev()"></fa-icon>

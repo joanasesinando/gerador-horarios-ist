@@ -9,10 +9,10 @@ import {Class} from '../../_domain/Class/Class';
 import {Course} from '../../_domain/Course/Course';
 import {Shift} from '../../_domain/Shift/Shift';
 import {Lesson} from '../../_domain/Lesson/Lesson';
-
-import {formatTime, getTimestamp} from '../../_util/Time';
-import _ from 'lodash';
 import {Event} from '../../_domain/Event/Event';
+
+import {formatTime, getTimestamp, getWeekday} from '../../_util/Time';
+import {minifyClassType} from '../../_domain/ClassType/ClassType';
 
 @Injectable({
   providedIn: 'root'
@@ -100,7 +100,7 @@ export class SchedulesGenerationService {
     this.stateService.schedulesSortedByMostCompact = [...schedules];
 
     this.logger.log('Sorted by most compact', schedules);
-    return schedules;
+    return [...schedules];
   }
 
   /* --------------------------------------------------------------------------------
@@ -127,10 +127,10 @@ export class SchedulesGenerationService {
     });
 
     // Save state
-    this.stateService.schedulesSortedByMostBalanced = _.cloneDeep(schedules);
+    this.stateService.schedulesSortedByMostBalanced = [...schedules];
 
     this.logger.log('Sorted by most balanced', schedules);
-    return _.cloneDeep(schedules);
+    return [...schedules];
   }
 
   /* --------------------------------------------------------------------------------
@@ -158,10 +158,10 @@ export class SchedulesGenerationService {
     });
 
     // Save state
-    this.stateService.schedulesSortedByMostFreeDays = _.cloneDeep(schedules);
+    this.stateService.schedulesSortedByMostFreeDays = [...schedules];
 
     this.logger.log('Sorted by most free days', schedules);
-    return _.cloneDeep(schedules);
+    return [...schedules];
   }
 
   combineShifts(course: Course): Class[] {
@@ -336,17 +336,36 @@ export class SchedulesGenerationService {
     for (const schedule of schedules) {
       const allLessons: Lesson[] = [];
       const classesPerWeekday = new Map<number, {start: number, end: number}[]>();
+      let tag = 1;
+      const events: Event[] = [];
 
-      // Get all lessons & classes per weekday
+      // Get info
       for (const cl of schedule.classes) {
+        const acronym = cl.course.acronym;
+
         for (const shift of cl.shifts) {
+          const type = minifyClassType(shift.type);
+          const pinned = false;
+
           for (const lesson of shift.lessons) {
+            // Get all lessons
             allLessons.push(lesson);
+
+            // Get classes per weekday
             const key = lesson.start.getDay();
             const value = { start: getTimestamp(formatTime(lesson.start)), end: getTimestamp(formatTime(lesson.end)) };
             classesPerWeekday.has(key) ? classesPerWeekday.get(key).push(value) : classesPerWeekday.set(key, [value]);
+
+            // Get events
+            const weekday = getWeekday(lesson.start.getDay());
+            const start = formatTime(lesson.start);
+            const end = formatTime(lesson.end);
+            const name = acronym.replace(/[0-9]/g, '') + ' (' + type + ')';
+            const place = lesson.room;
+            events.push(new Event(shift.name, tag, weekday, start, end, name, place, pinned));
           }
         }
+        tag++;
       }
 
       // Sort classes per weekday by start time
@@ -365,7 +384,7 @@ export class SchedulesGenerationService {
         total_duration: holesInfo.total_duration,
         total_deviation: deviation,
         nr_free_days: freeDays,
-        events: []
+        events
       });
     }
   }
