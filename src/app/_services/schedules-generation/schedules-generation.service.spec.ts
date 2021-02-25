@@ -354,15 +354,15 @@ describe('SchedulesGenerationService', () => {
         const c2Class1 = classesPerCourse[1][0];
         const c2Class2 = classesPerCourse[1][1];
 
-        const schedules = await service.combineClasses(classesPerCourse);
-        expect(schedules.length).toBe(4);
+        const combinations = await service.combineClasses(classesPerCourse);
+        expect(combinations.length).toBe(4);
 
-        schedules.forEach(schedule => {
+        combinations.forEach(combination => {
           expect(
-            ( schedule.classes.includes(c1Class1) && schedule.classes.includes(c2Class1) ) ||
-            ( schedule.classes.includes(c1Class1) && schedule.classes.includes(c2Class2) ) ||
-            ( schedule.classes.includes(c1Class2) && schedule.classes.includes(c2Class1) ) ||
-            ( schedule.classes.includes(c1Class2) && schedule.classes.includes(c2Class2) )
+            ( combination.includes(c1Class1) && combination.includes(c2Class1) ) ||
+            ( combination.includes(c1Class1) && combination.includes(c2Class2) ) ||
+            ( combination.includes(c1Class2) && combination.includes(c2Class1) ) ||
+            ( combination.includes(c1Class2) && combination.includes(c2Class2) )
           ).toBeTrue();
         });
       });
@@ -375,11 +375,11 @@ describe('SchedulesGenerationService', () => {
         const class1 = classes[0];
         const class2 = classes[1];
 
-        const schedules = await service.combineClasses([classes]);
-        expect(schedules.length).toBe(2);
+        const combinations = await service.combineClasses([classes]);
+        expect(combinations.length).toBe(2);
 
-        schedules.forEach(schedule => {
-          expect(schedule.classes.includes(class1) || schedule.classes.includes(class2)).toBeTrue();
+        combinations.forEach(combination => {
+          expect(combination.includes(class1) || combination.includes(class2)).toBeTrue();
         });
       });
 
@@ -398,27 +398,27 @@ describe('SchedulesGenerationService', () => {
         const c2Class1 = classesPerCourse[1][0];
         const c2Class2 = classesPerCourse[1][1];
 
-        const schedules = await service.combineClasses(classesPerCourse);
-        expect(schedules.length).toBe(3);
+        const combinations = await service.combineClasses(classesPerCourse);
+        expect(combinations.length).toBe(3);
 
-        schedules.forEach(schedule => {
+        combinations.forEach(combination => {
           expect(
-            ( schedule.classes.includes(c1Class1) && schedule.classes.includes(c2Class1) ) ||
-            ( schedule.classes.includes(c1Class2) && schedule.classes.includes(c2Class1) ) ||
-            ( schedule.classes.includes(c1Class2) && schedule.classes.includes(c2Class2) )
+            ( combination.includes(c1Class1) && combination.includes(c2Class1) ) ||
+            ( combination.includes(c1Class2) && combination.includes(c2Class1) ) ||
+            ( combination.includes(c1Class2) && combination.includes(c2Class2) )
           ).toBeTrue();
-          expect(schedule.classes.includes(c1Class1) && schedule.classes.includes(c2Class2)).toBeFalse();
+          expect(combination.includes(c1Class1) && combination.includes(c2Class2)).toBeFalse();
         });
       });
 
       it('should combine classes correctly: empty class', async () => {
-        const schedules = await service.combineClasses([ [] ]);
-        expect(schedules.length).toBe(0);
+        const combinations = await service.combineClasses([ [] ]);
+        expect(combinations.length).toBe(0);
       });
 
       it('should combine classes correctly: multiple empty classes', async () => {
-        const schedules = await service.combineClasses([ [], [] ]);
-        expect(schedules.length).toBe(0);
+        const combinations = await service.combineClasses([ [], [] ]);
+        expect(combinations.length).toBe(0);
       });
 
       it('should combine classes correctly: empty class & non-empty classes', async () => {
@@ -426,13 +426,13 @@ describe('SchedulesGenerationService', () => {
         classesPerCourse.push(service.combineShifts(courses[0]));
         classesPerCourse.push([]);
 
-        const schedules = await service.combineClasses(classesPerCourse);
-        expect(schedules.length).toBe(0);
+        const combinations = await service.combineClasses(classesPerCourse);
+        expect(combinations.length).toBe(0);
       });
 
       it('should combine classes correctly: no classes', async () => {
-        const schedules = await service.combineClasses([ ]);
-        expect(schedules.length).toBe(0);
+        const combinations = await service.combineClasses([ ]);
+        expect(combinations.length).toBe(0);
       });
 
       it('should combine classes correctly: incompatible classes', async () => {
@@ -454,8 +454,8 @@ describe('SchedulesGenerationService', () => {
               ], 'Taguspark')
             ], { TEORICA: 1.5 }));
 
-        const schedules = await service.generateSchedules(courses);
-        expect(schedules.length).toBe(0);
+        const combinations = await service.generateSchedules(courses);
+        expect(combinations.length).toBe(0);
       });
 
     });
@@ -490,10 +490,10 @@ describe('SchedulesGenerationService', () => {
           ], { TEORICA: 1.5 })
       ];
 
-      let schedule;
+      let schedule: Schedule;
 
       beforeEach(() => {
-        schedule = new Schedule(1, [
+        schedule = new Schedule(0, [
           new Class(courses[0], courses[0].shifts),
           new Class(courses[1], courses[1].shifts),
           new Class(courses[2], courses[2].shifts),
@@ -573,8 +573,9 @@ describe('SchedulesGenerationService', () => {
         expect(proximity).toBe(2207);
       });
 
-      it('should calculate schedule info correctly', () => {
-        service.calculateSchedulesInfo([schedule]);
+      it('should calculate schedule info correctly', async () => {
+        const combinations = await service.combineClasses([[schedule.classes[0]], [schedule.classes[1]], [schedule.classes[2]]]);
+        service.calculateSchedulesInfo(combinations);
         const info = service.generatedSchedulesInfo.get(schedule.id);
 
         expect(info.proximity).toBe(2207);

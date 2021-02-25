@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import {Shift} from '../_domain/Shift/Shift';
 import {ClassType} from '../_domain/ClassType/ClassType';
 import {Lesson} from '../_domain/Lesson/Lesson';
-import {Course} from '../_domain/Course/Course';
 
 @Injectable({
   providedIn: 'root'

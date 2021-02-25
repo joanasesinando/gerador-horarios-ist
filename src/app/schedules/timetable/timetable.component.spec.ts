@@ -115,24 +115,24 @@ describe('TimetableComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+  // it('should create', () => {
+  //   expect(component).toBeTruthy();
+  // });
 
-  it('should have schedules', () => {
-    expect(component.schedules.length > 0);
-  });
-
-  describe('Pinning shifts', () => {
-    it('should call togglePin()', () => {
-      spyOn(component, 'togglePin');
-
-      const shiftName = 'C1T01';
-      const shiftToPin = de.nativeElement.querySelector('[data-shift="' + shiftName + '"]');
-      // shiftToPin.click();
-
-      // expect(component.togglePin).toHaveBeenCalled();
-      // expect(shiftToPin).toHaveClass('pinned');
-    });
-  });
+  // it('should have schedules', () => {
+  //   expect(component.schedules.length > 0);
+  // });
+  //
+  // describe('Pinning shifts', () => {
+  //   it('should call togglePin()', () => {
+  //     spyOn(component, 'togglePin');
+  //
+  //     const shiftName = 'C1T01';
+  //     const shiftToPin = de.nativeElement.querySelector('[data-shift="' + shiftName + '"]');
+  //     // shiftToPin.click();
+  //
+  //     // expect(component.togglePin).toHaveBeenCalled();
+  //     // expect(shiftToPin).toHaveClass('pinned');
+  //   });
+  // });
 });
