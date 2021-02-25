@@ -53,11 +53,11 @@ export class SchedulesGenerationService {
 
     // Combine classes
     this.logger.log('combining classes...');
-    let schedules: Schedule[] = await this.combineClasses(classesPerCourse);
+    const combinations: Class[][] = await this.combineClasses(classesPerCourse);
 
     // Calculate relevant info
     this.logger.log('calculating info...');
-    this.calculateSchedulesInfo(schedules);
+    let schedules: Schedule[] = this.calculateSchedulesInfo(combinations);
 
     // Sort by most compact
     this.logger.log('sorting...');
@@ -192,7 +192,7 @@ export class SchedulesGenerationService {
     return classes;
   }
 
-  async combineClasses(classes: Class[][]): Promise<Schedule[]> {
+  async combineClasses(classes: Class[][]): Promise<Class[][]> {
     const optimalNumberWorkers = window.navigator.hardwareConcurrency;
     const browserSupportsWebWorkers = this.getBrowserSupportForWorkers();
 
@@ -263,13 +263,7 @@ export class SchedulesGenerationService {
     // Terminate workers
     for (const worker of workers)
       worker.terminate();
-
-    // Arrange into schedules
-    let id = 0;
-    const schedules: Schedule[] = [];
-    for (const combination of combinations)
-      schedules.push(new Schedule(id++, combination));
-    return schedules;
+    return combinations;
   }
 
   /* --------------------------------------------------------------------------------
@@ -332,8 +326,15 @@ export class SchedulesGenerationService {
     return false;
   }
 
-  calculateSchedulesInfo(schedules: Schedule[]): void {
-    for (const schedule of schedules) {
+  calculateSchedulesInfo(combinations: Class[][]): Schedule[] {
+    let id = 0;
+    const schedules: Schedule[] = [];
+
+    for (const combination of combinations) {
+      // Arrange into schedules
+      const schedule = new Schedule(id++, combination);
+      schedules.push(schedule);
+
       // Get info
       const data = this.prepareData(1, schedule.classes);
       const allLessons: Lesson[] = data.allLessons;
@@ -354,6 +355,7 @@ export class SchedulesGenerationService {
         events
       });
     }
+    return schedules;
   }
 
   prepareData(tag: number, classes: Class[]): { allLessons: Lesson[], classesPerWeekday: Map<number, {start: number, end: number}[]>, events: Event[] } {
