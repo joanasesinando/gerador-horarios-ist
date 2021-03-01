@@ -85,3 +85,9 @@
   top: 17%;
   left: -1.4rem;
 }
+
+.loading-page {
+  .progress #bar{
+    background-color: $gh-blue;
+  }
+}
