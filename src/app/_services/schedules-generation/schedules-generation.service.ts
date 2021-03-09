@@ -26,9 +26,18 @@ export class SchedulesGenerationService {
     total_deviation: number,
     nr_free_days: number,
     events: Event[]
-  }> = new Map<number, {proximity: number, nr_holes: number, total_duration: number, total_deviation: number, nr_free_days: number, events: Event[]}>();
+  }> = new Map<number, { proximity: number, nr_holes: number, total_duration: number, total_deviation: number, nr_free_days: number, events: Event[] }>();
 
-  constructor(public logger: LoggerService, private stateService: StateService) { }
+  updateBar: any = () => console.log('updateBar not defined');
+  setBar: any = () => console.log('setBar not defined');
+
+  constructor(public logger: LoggerService, private stateService: StateService) {
+  }
+
+  setBarFunctions(updateBar: any, setBar: any): void {
+    this.updateBar = updateBar;
+    this.setBar = setBar;
+  }
 
   /* --------------------------------------------------------------------------------
    * Returns generated schedules based on user selected courses.
@@ -40,20 +49,20 @@ export class SchedulesGenerationService {
    *  - calculate relevant info for all types of sorting for all schedules
    *  - sort by most compact (default)
    * -------------------------------------------------------------------------------- */
-   async generateSchedules(courses: Course[]): Promise<Schedule[]> {
+  async generateSchedules(courses: Course[]): Promise<Schedule[]> {
     this.logger.log('generating...');
+    await this.setBar(0);
 
     // Combine shifts
-    this.logger.log('combining shifts...');
-    const classesPerCourse: Class[][] = [];
-    for (const course of courses) {
-      const classes = this.combineShifts(course);
-      classesPerCourse.push(classes);
-    }
+    const classesPerCourse: Class[][] = await this.combineShiftsMain(courses);
+
+    await this.setBar(10);
 
     // Combine classes
     this.logger.log('combining classes...');
     const combinations: Class[][] = await this.combineClasses(classesPerCourse);
+
+    await this.setBar(90);
 
     // Calculate relevant info
     this.logger.log('calculating info...');
@@ -63,12 +72,26 @@ export class SchedulesGenerationService {
     this.logger.log('sorting...');
     schedules = this.sortByMostCompact(schedules);
 
+    await this.setBar(100);
+
     // Clean previous states
     this.stateService.schedulesSortedByMostBalanced = null;
     this.stateService.schedulesSortedByMostFreeDays = null;
 
+    await new Promise(resolve => setTimeout(resolve, 500)); // sleep (To show 100%)
     this.logger.log('done');
     return schedules;
+  }
+
+  combineShiftsMain(courses: Course[]): Class[][] {
+    // Combine shifts
+    this.logger.log('combining shifts...');
+    const classesPerCourse: Class[][] = [];
+    for (const course of courses) {
+      const classes = this.combineShifts(course);
+      classesPerCourse.push(classes);
+    }
+    return classesPerCourse;
   }
 
   /* --------------------------------------------------------------------------------
@@ -196,11 +219,14 @@ export class SchedulesGenerationService {
     const optimalNumberWorkers = window.navigator.hardwareConcurrency;
     const browserSupportsWebWorkers = this.getBrowserSupportForWorkers();
 
+    const totalClasses = classes && classes.length !== 0 ? classes.map(val => val.length).reduce((total, val) => total + val) : 0;
+    const incBar = 80;
+
     // Create workers
     const workers: Worker[] = [];
     if (browserSupportsWebWorkers) {
       for (let i = 0; i < optimalNumberWorkers; i++) {
-        const worker = new Worker('../../_workers/generation-worker.worker', { type: 'module' });
+        const worker = new Worker('../../_workers/generation-worker.worker', {type: 'module'});
         workers.push(worker);
       }
     }
@@ -220,24 +246,28 @@ export class SchedulesGenerationService {
           if (this.checkForOverlapsOnClasses(combination)) continue;
           combinations.push(combination);
         }
-
       } else {
         const numberClasses = cls.length;
+        const fracOfClasses = numberClasses / totalClasses;
         const classesPerWorker = Math.floor(numberClasses / optimalNumberWorkers);
+
         let mod = numberClasses % optimalNumberWorkers;
         let tempCombinations = [];
 
         let workersUsed = 0;
+        let workersLeft = 0;
+
         const allWorkersFinished = new EventEmitter<void>();
         const allFinished = new Promise((resolve) => allWorkersFinished.subscribe(() => resolve()));
 
         let i = 0;
         let workerIndex = 0;
         while (i < numberClasses) {
-          workers[workerIndex].onmessage = ({ data }) => {
+          workers[workerIndex].onmessage = async ({data}) => {
             tempCombinations = tempCombinations.concat(this.parseData(data));
-            workersUsed--;
-            if (workersUsed === 0) allWorkersFinished.emit();
+            workersLeft--;
+            this.updateBar((incBar * fracOfClasses) / workersUsed);
+            if (workersLeft === 0) allWorkersFinished.emit();
           };
 
           if (mod > 0) {
@@ -250,6 +280,7 @@ export class SchedulesGenerationService {
             i = i + classesPerWorker;
           }
           workersUsed++;
+          workersLeft++;
           workerIndex++;
         }
 
@@ -338,7 +369,7 @@ export class SchedulesGenerationService {
       // Get info
       const data = this.prepareData(1, schedule.classes);
       const allLessons: Lesson[] = data.allLessons;
-      const classesPerWeekday: Map<number, {start: number, end: number}[]> = data.classesPerWeekday;
+      const classesPerWeekday: Map<number, { start: number, end: number }[]> = data.classesPerWeekday;
       const events: Event[] = data.events;
 
       const proximity = this.calculateProximityLevel(schedule, allLessons);
@@ -358,9 +389,9 @@ export class SchedulesGenerationService {
     return schedules;
   }
 
-  prepareData(tag: number, classes: Class[]): { allLessons: Lesson[], classesPerWeekday: Map<number, {start: number, end: number}[]>, events: Event[] } {
+  prepareData(tag: number, classes: Class[]): { allLessons: Lesson[], classesPerWeekday: Map<number, { start: number, end: number }[]>, events: Event[] } {
     const allLessons: Lesson[] = [];
-    const classesPerWeekday = new Map<number, {start: number, end: number}[]>();
+    const classesPerWeekday = new Map<number, { start: number, end: number }[]>();
     const events: Event[] = [];
 
     for (const cl of classes) {
@@ -376,7 +407,7 @@ export class SchedulesGenerationService {
 
           // Get classes per weekday
           const key = lesson.start.getDay();
-          const value = { start: getTimestamp(formatTime(lesson.start)), end: getTimestamp(formatTime(lesson.end)) };
+          const value = {start: getTimestamp(formatTime(lesson.start)), end: getTimestamp(formatTime(lesson.end))};
           classesPerWeekday.has(key) ? classesPerWeekday.get(key).push(value) : classesPerWeekday.set(key, [value]);
 
           // Get events
@@ -399,7 +430,7 @@ export class SchedulesGenerationService {
     return {allLessons, classesPerWeekday, events};
   }
 
-  countHoles(classesPerWeekday: Map<number, {start: number, end: number}[]>): {nr_holes: number, total_duration: number} {
+  countHoles(classesPerWeekday: Map<number, { start: number, end: number }[]>): { nr_holes: number, total_duration: number } {
     let numberOfHoles = 0;
     let totalDuration = 0;
 
@@ -437,7 +468,7 @@ export class SchedulesGenerationService {
     return proximity;
   }
 
-  calculateDeviation(classesPerWeekday: Map<number, {start: number, end: number}[]>): number {
+  calculateDeviation(classesPerWeekday: Map<number, { start: number, end: number }[]>): number {
     const hoursPerWeekDay: Map<number, number> = new Map();
     let totalHoursPerWeek = 0;
 
@@ -462,7 +493,7 @@ export class SchedulesGenerationService {
     return deviation;
   }
 
-  calculateNumberFreeDays(classesPerWeekday: Map<number, {start: number, end: number}[]>): number {
+  calculateNumberFreeDays(classesPerWeekday: Map<number, { start: number, end: number }[]>): number {
     let freeDays = 0;
     for (let i = 1; i <= 5; i++)
       if (!classesPerWeekday.has(i) || classesPerWeekday.get(i).length === 0) freeDays++;

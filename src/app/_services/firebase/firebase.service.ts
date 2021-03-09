@@ -183,53 +183,56 @@ export class FirebaseService {
       this.getCollection(academicTerm.replace('/', '-') + '[EN]', courseConverter, degreeID.toString(), 'courses');
   }
 
-  deleteDocument(collection: string, document: string, subCollection?: string, subDocument?: string): void {
+  deleteDocument(collection: string, document: string, subCollection?: string, subDocument?: string): Promise<void> {
     if (subCollection && subDocument) {
-      this.db.collection(collection).doc(document).collection(subCollection).doc(subDocument)
+      return this.db.collection(collection).doc(document).collection(subCollection).doc(subDocument)
         .delete()
         .catch(err => this.logger.log('Error deleting document:', err));
     } else {
-      this.db.collection(collection).doc(document)
+      return this.db.collection(collection).doc(document)
         .delete()
         .catch(err => this.logger.log('Error deleting document:', err));
     }
   }
 
-  cleanDatabase(academicTerms: string[]): void {
-    academicTerms.forEach(async academicTerm => {
+  async cleanDatabase(academicTerms: string[]): Promise<void> {
+    for (const academicTerm of academicTerms) {
       await this.hasDegrees(academicTerm).then(async hasDegrees => {
-        if (hasDegrees) {
-          await this.getDegrees(academicTerm).then(degrees => {
-            if (degrees) {
-              degrees.forEach(async degree => {
 
+        if (hasDegrees) {
+          await this.getDegrees(academicTerm).then(async degrees => {
+
+            if (degrees) {
+              for (const degree of degrees) {
                 await this.hasCourses(academicTerm, degree.id).then(async hasCourses => {
+
                   if (hasCourses) {
-                    await this.getCourses(academicTerm, degree.id).then(courses => {
+                    await this.getCourses(academicTerm, degree.id).then(async courses => {
                       if (courses) {
-                        courses.forEach(course => {
+                        for (const course of courses) {
                           this.translateService.currentLang === 'pt-PT' ?
-                            this.deleteDocument(academicTerm.replace('/', '-') + '[PT]', degree.id.toString(), 'courses', course.id.toString()) :
-                            this.deleteDocument(academicTerm.replace('/', '-') + '[EN]', degree.id.toString(), 'courses', course.id.toString());
-                        });
+                            await this.deleteDocument(academicTerm.replace('/', '-') + '[PT]', degree.id.toString(), 'courses', course.id.toString()) :
+                            await this.deleteDocument(academicTerm.replace('/', '-') + '[EN]', degree.id.toString(), 'courses', course.id.toString());
+                        }
                       }
                       this.translateService.currentLang === 'pt-PT' ?
-                        this.deleteDocument(academicTerm.replace('/', '-') + '[PT]', degree.id.toString()) :
-                        this.deleteDocument(academicTerm.replace('/', '-') + '[EN]', degree.id.toString());
+                        await this.deleteDocument(academicTerm.replace('/', '-') + '[PT]', degree.id.toString()) :
+                        await this.deleteDocument(academicTerm.replace('/', '-') + '[EN]', degree.id.toString());
                     });
 
                   } else {
                     this.translateService.currentLang === 'pt-PT' ?
-                      this.deleteDocument(academicTerm.replace('/', '-') + '[PT]', degree.id.toString()) :
-                      this.deleteDocument(academicTerm.replace('/', '-') + '[EN]', degree.id.toString());
+                      await this.deleteDocument(academicTerm.replace('/', '-') + '[PT]', degree.id.toString()) :
+                      await this.deleteDocument(academicTerm.replace('/', '-') + '[EN]', degree.id.toString());
                   }
                 });
-              });
+              }
             }
           });
 
         }
       });
-    });
+    }
+    this.logger.log('Database successfully cleaned');
   }
 }

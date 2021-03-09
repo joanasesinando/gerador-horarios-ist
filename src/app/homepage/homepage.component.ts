@@ -25,8 +25,6 @@ import {
   faGlobeEurope,
   faBolt
 } from '@fortawesome/free-solid-svg-icons';
-import {Schedule} from '../_domain/Schedule/Schedule';
-import {Class} from '../_domain/Class/Class';
 
 declare let $;
 
@@ -169,13 +167,12 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   checkIfDatabaseIsOld(): Promise<void> {
-    return this.firebaseService.getLastTimeUpdatedTimestamp().then(timestamp => {
+    return this.firebaseService.getLastTimeUpdatedTimestamp().then(async timestamp => {
       if (isOlderThan(timestamp, Date.now(), 1)) {
         this.spinners.academicTerm = true;
         this.logger.log('Data is too old');
-        this.firebaseService.cleanDatabase(this.academicTerms);
+        await this.firebaseService.cleanDatabase(this.academicTerms);
         this.firebaseService.updateLastTimeUpdatedTimestamp();
-        this.logger.log('Database successfully cleaned');
       }
       this.spinners.academicTerm = false;
       this.databaseChecked = true;

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, HostListener, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {Subject} from 'rxjs';
 
@@ -25,6 +25,8 @@ declare let $;
 })
 export class SchedulesComponent implements OnInit, AfterViewInit {
 
+  barValue = 0;
+
   generatedSchedules: Schedule[] = [];
   selectedCourses: Course[] = [];
 
@@ -50,7 +52,25 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     private stateService: StateService,
     private pdfService: PdfGenerationService,
     public translateService: TranslateService
-  ) { }
+  ) {}
+
+  async updateBar(value: number): Promise<void> {
+    if (value < -100 || value > 100) return;
+    this.barValue += value;
+    await this.setBar(this.barValue);
+  }
+
+  async setBar(value: number): Promise<void> {
+    if (value < 0 || value > 100) return;
+    this.barValue = value;
+    const bar: HTMLElement = document.getElementById('bar');
+
+    bar.style.width = value + '%';
+    bar.innerText = Math.ceil(value) + '%';
+    bar.setAttribute('aria-valuenow', value.toString());
+    await new Promise(resolve => setTimeout(resolve, 200)); // sleep (give time to render html)
+  }
+
 
   ngOnInit(): void {
     this.onWindowResize();
@@ -65,6 +85,7 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.generationService.setBarFunctions(this.updateBar, this.setBar);
     setTimeout(async () => {
       // Generate schedules
       const t0 = performance.now();
@@ -76,10 +97,16 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
       this.logger.log('generated schedules', this.generatedSchedules);
 
       if (this.generatedSchedules.length === 0) {
-        this.alertService.showAlert(
-          'Sem horários',
-          'Não existe nenhum horário possível com estas cadeiras. Remove alguma e tenta de novo.',
-          'warning');
+        this.translateService.currentLang === 'pt-PT' ?
+          this.alertService.showAlert(
+            'Sem horários',
+            'Não existe nenhum horário possível com estas cadeiras. Remove alguma e tenta de novo.',
+            'warning') :
+          this.alertService.showAlert(
+            'No schedules',
+            'There\'s no available schedules for the selected courses. Remove one and try again.',
+            'warning');
+
         this.goBack();
         return;
       }
