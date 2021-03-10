@@ -1,0 +1,35 @@
+name: Docker Image CI
+
+on:
+  push:
+    tags:
+    - 'v*.*.*'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set most recent tag
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      
+    - name: Validate Output
+      env:
+        RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+        
+    - uses: docker/login-action@v1
+    - name: Login to DockerHub
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        
+    - uses: docker/build-push-action@v2.3.0
+    - name: Build and Push the Docker Image
+      id: docker_build
+      with:
+        push: true
+        tags: edenbox/horarios:$RELEASE_VERSION
+    
+    - name: Docker Image Digest
+      run: echo ${{ steps.docker_build.outputs.digest }}
