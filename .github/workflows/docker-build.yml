@@ -17,6 +17,9 @@ jobs:
     - name: Validate Output
       env:
         RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+      run: |
+          echo $RELEASE_VERSION
+          echo ${{ steps.vars.outputs.tag }}
         
     - uses: docker/login-action@v1
     - name: Login to DockerHub
