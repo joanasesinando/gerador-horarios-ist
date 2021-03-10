@@ -1,7 +1,7 @@
 import {ClassType} from '../ClassType/ClassType';
 import {Lesson} from '../Lesson/Lesson';
 
-import * as firebase from 'firebase';
+import firebase from 'firebase/app';
 
 
 export class Shift {
