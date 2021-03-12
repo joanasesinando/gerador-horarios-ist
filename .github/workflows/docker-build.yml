@@ -29,3 +29,22 @@ jobs:
     
     - name: Docker Image Digest
       run: echo ${{ steps.docker_build.outputs.digest }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Deploy the app to the cluster
+      uses: steebchen/kubectl@master
+      env:
+        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+      with:
+        args: 'set image deployment/schedule-app-deploy schedule-app=edenbox/schedules:${{ steps.vars.outputs.tag }} --namespace=schedule-app'
+    - name: Verify deployment
+      uses: steebchen/kubectl@master
+      env:
+        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        KUBECTL_VERSION: "1.19"
+      with:
+        args: '"rollout status deployment/schedule-app-deploy --namespace=schedule-app"'
+    
