@@ -1,6 +1,5 @@
 import {ClassType} from '../ClassType/ClassType';
 import {Shift} from '../Shift/Shift';
-import {Lesson} from '../Lesson/Lesson';
 import {Degree} from '../Degree/Degree';
 
 
@@ -58,44 +57,4 @@ export class Course {
   formatAcronym(): string {
     return this.acronym.replace(/[0-9]/g, '');
   }
-
-  convertShifts(): {name: string, type: string, lessons: {}[], campus: string}[] {
-    const shifts: {name: string, type: string, lessons: {}[], campus: string}[] = [];
-    this.shifts.forEach(shift => {
-      shifts.push(shift.shiftConverter());
-    });
-    return shifts;
-  }
 }
-
-// Firestore data converter
-export const courseConverter = {
-  toFirestore: (course: Course) => {
-    return {
-      id: course.id,
-      name: course.name,
-      acronym: course.acronym,
-      credits: course.credits,
-      semester: course.semester
-    };
-  },
-  fromFirestore: (snapshot, options) => {
-    const data = snapshot.data(options);
-    if (data.types && data.campus && data.shifts && data.courseLoads) {
-      const shifts: Shift[] = [];
-      for (const shift of data.shifts) {
-        const lessons: Lesson[] = [];
-        for (const lesson of shift.lessons) {
-          const start = lesson.start.toDate();
-          const end = lesson.end.toDate();
-          lessons.push(new Lesson(start, end, lesson.room, lesson.campus));
-        }
-        shifts.push(new Shift(shift.name, shift.type, lessons, shift.campus));
-      }
-      return new Course(parseInt(data.id, 10), data.name, data.acronym, parseFloat(data.credits),
-        parseInt(data.semester, 10), data.types, data.campus, shifts, data.courseLoads);
-    }
-    return new Course(parseInt(data.id, 10), data.name, data.acronym, parseFloat(data.credits),
-      parseInt(data.semester, 10));
-  }
-};

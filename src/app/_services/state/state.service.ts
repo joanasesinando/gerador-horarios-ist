@@ -4,6 +4,9 @@ import {Course} from '../../_domain/Course/Course';
 import {Degree} from '../../_domain/Degree/Degree';
 import {Schedule} from '../../_domain/Schedule/Schedule';
 
+import _ from 'lodash';
+import {LoggerService} from '../../_util/logger.service';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -26,7 +29,7 @@ export class StateService {
   private _schedulesSortedByMostBalanced: Schedule[] = null;
   private _schedulesSortedByMostFreeDays: Schedule[] = null;
 
-  constructor() { }
+  constructor(private logger: LoggerService) { }
 
   get selectedLanguage(): string { return this._selectedLanguage; }
 
@@ -87,5 +90,22 @@ export class StateService {
 
   hasSchedulesSortedByMostFreeDays(): boolean {
     return this._schedulesSortedByMostFreeDays !== null;
+  }
+
+  saveAcademicTermsState(academicTerms: string[]): void {
+    this.academicTermsRepository = _.cloneDeep(academicTerms);
+    this.logger.log('saved academic terms state');
+  }
+
+  saveDegreesState(academicTerm: string, degrees: Degree[]): void {
+    this.degreesRepository.set(academicTerm, _.cloneDeep(degrees));
+    this.logger.log('saved degrees state');
+  }
+
+  saveCoursesState(academicTerm: string, degreeID: number, courses: Course[]): void {
+    this.coursesRepository.has(academicTerm) ?
+      this.coursesRepository.get(academicTerm).set(degreeID, _.cloneDeep(courses)) :
+      this.coursesRepository.set(academicTerm, new Map<number, Course[]>().set(degreeID, _.cloneDeep(courses)));
+    this.logger.log('saved courses state');
   }
 }

@@ -79,7 +79,7 @@ describe('TimetableComponent', () => {
   ];
 
   const logger: LoggerService = new LoggerService();
-  const stateService: StateService = new StateService();
+  const stateService: StateService = new StateService(logger);
   const scheduleGenerationService: SchedulesGenerationService = new SchedulesGenerationService(logger, stateService);
 
   beforeEach(async(() => {

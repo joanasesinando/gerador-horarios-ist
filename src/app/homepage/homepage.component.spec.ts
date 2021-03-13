@@ -14,7 +14,6 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import {FenixService} from '../_services/fenix/fenix.service';
-import {FirebaseService} from '../_services/firebase/firebase.service';
 import {StateService} from '../_services/state/state.service';
 
 import {Degree} from '../_domain/Degree/Degree';
@@ -30,7 +29,6 @@ describe('HomepageComponent', () => {
   let de: DebugElement;
 
   let fenixServiceStub: any;
-  let firebaseServiceStub: any;
 
   let academicTerms: string[];
   let degrees: Degree[];
@@ -74,15 +72,9 @@ describe('HomepageComponent', () => {
     ];
 
     fenixServiceStub = {
-      getAcademicTerms: () => of(academicTerms).toPromise()
-    };
-
-    firebaseServiceStub = {
-      getLastTimeUpdatedTimestamp: () => of(Date.now()).toPromise(),
-      hasDegrees: () => of(true).toPromise(),
-      getDegrees: () => of(degrees).toPromise(),
-      hasCourses: () => of(true).toPromise(),
-      getCourses: () => of(courses).toPromise()
+      getAcademicTerms: () => of(academicTerms).toPromise(),
+      getDegrees: (academicTerm) => of(degrees).toPromise(),
+      getCoursesBasicInfo: (academicTerm, degreeID) => of(courses).toPromise()
     };
 
     TestBed.configureTestingModule({
@@ -108,7 +100,6 @@ describe('HomepageComponent', () => {
       providers: [
         TranslateService,
         { provide: FenixService, useValue: fenixServiceStub },
-        { provide: FirebaseService, useValue: firebaseServiceStub },
         StateService
       ]
     })

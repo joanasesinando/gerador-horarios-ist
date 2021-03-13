@@ -7,10 +7,8 @@ import {LoggerService} from '../_util/logger.service';
 import {Course} from '../_domain/Course/Course';
 import {Degree} from '../_domain/Degree/Degree';
 import {ClassType} from '../_domain/ClassType/ClassType';
-import {isOlderThan} from '../_util/Time';
 
 import {FenixService} from '../_services/fenix/fenix.service';
-import {FirebaseService} from '../_services/firebase/firebase.service';
 import {AlertService} from '../_util/alert.service';
 import {StateService} from '../_services/state/state.service';
 
@@ -61,7 +59,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     loadingPage: false
   };
 
-  databaseChecked = false;
   noShiftsFound = false;
 
   // FontAwesome icons
@@ -79,7 +76,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     private logger: LoggerService,
     private fenixService: FenixService,
     public translateService: TranslateService,
-    public firebaseService: FirebaseService,
     private router: Router,
     private alertService: AlertService,
     public stateService: StateService) {
@@ -136,13 +132,11 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       this.academicTerms = academicTerms;
       setTimeout(() => $('#inputAcademicTerm').selectpicker('refresh'), 0);
       this.logger.log('academic terms', this.academicTerms);
+      this.spinners.academicTerm = false;
       tookToLong = false;
 
-      // Reset database if data is too old
-      this.checkIfDatabaseIsOld();
-
       // Save state
-      this.saveAcademicTermsState(this.academicTerms);
+      this.stateService.saveAcademicTermsState(this.academicTerms);
     });
     this.spinners.loadingPage = false;
 
@@ -166,22 +160,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     return this.mobileView && window.innerHeight > 590 && window.innerWidth <= 767;
   }
 
-  checkIfDatabaseIsOld(): Promise<void> {
-    return this.firebaseService.getLastTimeUpdatedTimestamp().then(async timestamp => {
-      if (isOlderThan(timestamp, Date.now(), 1)) {
-        this.spinners.academicTerm = true;
-        this.logger.log('Data is too old');
-        await this.firebaseService.cleanDatabase(this.academicTerms);
-        this.firebaseService.updateLastTimeUpdatedTimestamp();
-      }
-      this.spinners.academicTerm = false;
-      this.databaseChecked = true;
-      setTimeout(() => $('#inputAcademicTerm').selectpicker('refresh'), 0);
-    });
-  }
-
   async changeLanguage(lang: string): Promise<void> {
-    this.translateService.use(lang).subscribe(() => this.checkIfDatabaseIsOld());
+    this.translateService.use(lang);
 
     // Reset
     this.selectedAcademicTerm = null;
@@ -197,9 +177,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.typesOfClassesPicked.clear();
 
     // Clean selected courses
-    for (const course of this.selectedCourses) {
+    for (const course of this.selectedCourses)
       this.removeCourse(course.id);
-    }
 
     // Reset state
     this.stateService.academicTermSelected = null;
@@ -243,32 +222,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     }, 0);
   }
 
-  saveAcademicTermsState(academicTerms: string[]): void {
-    this.stateService.academicTermsRepository = _.cloneDeep(academicTerms);
-    this.logger.log('saved academic terms state');
-  }
-
-  saveDegreesState(academicTerm: string, degrees: Degree[]): void {
-    this.stateService.degreesRepository.set(academicTerm, _.cloneDeep(degrees));
-    this.logger.log('saved degrees state');
-  }
-
-  saveCoursesState(academicTerm: string, degreeID: number, courses: Course[]): void {
-    this.stateService.coursesRepository.has(academicTerm) ?
-      this.stateService.coursesRepository.get(academicTerm).set(degreeID, _.cloneDeep(courses)) :
-      this.stateService.coursesRepository.set(academicTerm, new Map<number, Course[]>().set(degreeID, _.cloneDeep(courses)));
-    this.logger.log('saved courses state');
-  }
-
-  updateCourseState(academicTerm: string, degreeID: number, course: Course): void {
-    const courses = this.stateService.coursesRepository.get(academicTerm).get(degreeID);
-    const index = this.findCourseIndex(course.id, courses);
-    courses[index] = course;
-    this.stateService.coursesRepository.get(academicTerm).set(degreeID, _.cloneDeep(courses));
-    this.logger.log('updated course state');
-  }
-
-  loadDegrees(academicTerm: string): Promise<void | Degree[]> | void {
+  async loadDegrees(academicTerm: string): Promise<void> {
     this.spinners.degree = true;
     this.selectedDegree = null;
     this.selectedCourse = null;
@@ -278,55 +232,19 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       this.logger.log('has degrees state saved');
       this.degrees = this.stateService.degreesRepository.get(academicTerm)
         .sort((a, b) => a.acronym.localeCompare(b.acronym));
-      setTimeout(() => $('#inputDegree').selectpicker('refresh'), 0);
-      this.spinners.degree = false;
-      this.logger.log('degrees', this.degrees);
-      return;
+
+    } else {
+      this.logger.log('no degrees state found');
+      this.degrees = await this.fenixService.getDegrees(academicTerm);
+      this.stateService.saveDegreesState(academicTerm, this.degrees);
     }
 
-    return this.firebaseService.hasDegrees(academicTerm).then(has => {
-      if (has) {
-        this.logger.log('has degrees saved');
-        this.firebaseService.getDegrees(academicTerm).then(degrees => {
-          this.degrees = degrees.sort((a, b) => a.acronym.localeCompare(b.acronym));
-          setTimeout(() => $('#inputDegree').selectpicker('refresh'), 0);
-          this.spinners.degree = false;
-          this.logger.log('degrees', this.degrees);
-
-          // Save state
-          this.saveDegreesState(academicTerm, this.degrees);
-        });
-
-      } else {
-        this.logger.log('no degrees found');
-        this.fenixService.getDegrees(academicTerm).then(degrees => {
-          this.degrees = degrees;
-          setTimeout(() => $('#inputDegree').selectpicker('refresh'), 0);
-          this.spinners.degree = false;
-          this.logger.log('degrees', this.degrees);
-
-          // Load to database
-          const error = {found: false, type: null};
-          for (const degree of this.degrees) {
-            this.firebaseService.loadDegree(academicTerm, degree)
-              .catch((err) => { error.found = true; error.type = err; });
-          }
-          if (error.found) {
-            this.logger.log('error saving degrees to database:', error.type);
-
-          } else {
-            this.logger.log('degrees successfully saved to database');
-
-            // Save state
-            this.saveDegreesState(academicTerm, this.degrees);
-          }
-        });
-      }
-    });
-
+    setTimeout(() => $('#inputDegree').selectpicker('refresh'), 0);
+    this.spinners.degree = false;
+    this.logger.log('degrees', this.degrees);
   }
 
-  loadCoursesBasicInfo(academicTerm: string, degreeID: number): Promise<void | Course[]> | void {
+  async loadCoursesBasicInfo(academicTerm: string, degreeID: number): Promise<void> {
     this.spinners.course = true;
     this.selectedCourse = null;
 
@@ -339,63 +257,17 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         .sort((a, b) => a.acronym.localeCompare(b.acronym))
         .filter((course) => !this.selectedCoursesIDs.has(course.id));
 
-      const select = $('#inputCourse');
-      select.selectpicker('destroy');
-      setTimeout(() => select.selectpicker(), 0);
-
-      this.spinners.course = false;
-      this.logger.log('courses', this.courses);
-      return;
+    } else {
+      this.logger.log('no courses found');
+      this.courses = (await this.fenixService.getCoursesBasicInfo(academicTerm, degreeID))
+        .filter((course) => !this.selectedCoursesIDs.has(course.id));
+      this.stateService.saveCoursesState(academicTerm, degreeID, this.courses);
     }
 
-    return this.firebaseService.hasCourses(academicTerm, degreeID).then(has => {
-      if (has) {
-        this.logger.log('has courses saved');
-        this.firebaseService.getCourses(academicTerm, degreeID).then(courses => {
-          this.courses = courses
-            .sort((a, b) => a.acronym.localeCompare(b.acronym))
-            .filter((course) => !this.selectedCoursesIDs.has(course.id));
+    setTimeout(() => $('#inputCourse').selectpicker('refresh'), 0);
 
-          const select = $('#inputCourse');
-          select.selectpicker('destroy');
-          setTimeout(() => select.selectpicker(), 0);
-
-          this.spinners.course = false;
-          this.logger.log('courses', this.courses);
-
-          // Save state
-          this.saveCoursesState(academicTerm, degreeID, this.courses);
-        });
-
-      } else {
-        this.logger.log('no courses found');
-        this.fenixService.getCoursesBasicInfo(academicTerm, degreeID).then(courses => {
-          this.courses = courses.filter((course) => !this.selectedCoursesIDs.has(course.id));
-
-          const select = $('#inputCourse');
-          select.selectpicker('destroy');
-          setTimeout(() => select.selectpicker(), 0);
-
-          this.spinners.course = false;
-          this.logger.log('courses', this.courses);
-
-          // Load to database
-          const error = {found: false, type: null};
-          for (const course of this.courses) {
-            this.firebaseService.loadCourse(academicTerm, degreeID, course)
-              .catch((err) => { error.found = true; error.type = err; });
-          }
-          if (error.found) {
-            this.logger.log('error saving courses to database:', error.type);
-          } else {
-            this.logger.log('courses successfully saved to database');
-
-            // Save state
-            this.saveCoursesState(academicTerm, degreeID, this.courses);
-          }
-        });
-      }
-    });
+    this.spinners.course = false;
+    this.logger.log('courses', this.courses);
   }
 
   getCoursesBySemester(semester: number): Course[] {
@@ -441,24 +313,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           courseToAdd = course;
           this.spinners.course = false;
           this.addCourseHelper(courseToAdd, courseIndex, addBtn);
-
-          const academicTerm = this.selectedAcademicTerm;
-          const degreeID = this.selectedDegree;
-
-          // Load to database
-          if (course) {
-            const error = {found: false, type: null};
-            this.firebaseService.updateCourse(academicTerm, degreeID, courseToAdd)
-              .catch((err) => { error.found = true; error.type = err; });
-            if (error.found) {
-              this.logger.log('error updating course in database:', error.type);
-            } else {
-              this.logger.log('course successfully updated in database');
-
-              // Update state
-              this.updateCourseState(academicTerm, degreeID, courseToAdd);
-            }
-          }
         });
       }
     }

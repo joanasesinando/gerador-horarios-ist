@@ -24,11 +24,6 @@
             "tsConfig": "tsconfig.app.json",
             "aot": true,
             "allowedCommonJsDependencies": [
-              "firebase/app",
-              "@firebase/app",
-              "@firebase/firestore",
-              "@firebase/component",
-              "@firebase/util",
               "hammerjs",
               "lodash",
               "raf",

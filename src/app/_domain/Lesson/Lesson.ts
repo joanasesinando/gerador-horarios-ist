@@ -1,6 +1,3 @@
-import * as firebase from 'firebase/app';
-import 'firebase/firestore';
-
 import {formatTime, getMinifiedWeekday, getTimestamp} from '../../_util/Time';
 
 
@@ -18,15 +15,6 @@ export class Lesson {
 
     get campus(): string { return this._campus; }
     set campus(value: string) { this._campus = value; }
-
-    lessonConverter(): {start: firebase.firestore.Timestamp, end: firebase.firestore.Timestamp, room: string, campus: string} {
-        return {
-            start: firebase.firestore.Timestamp.fromDate(this.start),
-            end: firebase.firestore.Timestamp.fromDate(this.end),
-            room: this.room,
-            campus: this.campus
-        };
-    }
 
     overlap(other: Lesson): boolean {
       const weekDay = this.start.getDay();

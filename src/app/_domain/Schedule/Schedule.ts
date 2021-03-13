@@ -1,6 +1,5 @@
 import {Class} from '../Class/Class';
 
-
 export class Schedule {
   constructor(private _id: number, private _classes: Class[]) {}
 

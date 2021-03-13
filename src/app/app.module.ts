@@ -6,10 +6,6 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
-
-import { AngularFireModule } from '@angular/fire';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
-import { environment } from '../environments/environment';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 export function HttpLoaderFactory(httpClient: HttpClient): TranslateHttpLoader {
@@ -31,8 +27,6 @@ export function HttpLoaderFactory(httpClient: HttpClient): TranslateHttpLoader {
         deps: [HttpClient]
       }
     }),
-    AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule,
     HammerModule,
     FontAwesomeModule
   ],
