@@ -24,15 +24,6 @@ export function getTimestamp(time: string): number {
 }
 
 /* ------------------------------------------------------------
-   * Checks if two timestamps (in milliseconds) are more than
-   * X days apart
-   * ---------------------------------------------------------- */
-export function isOlderThan(timestamp1: number, timestamp2: number, days: number): boolean {
-  const MILLISECONDS_IN_A_DAY = 24 * 60 * 60 * 1000;
-  return Math.abs(timestamp1 - timestamp2) > days * MILLISECONDS_IN_A_DAY;
-}
-
-/* ------------------------------------------------------------
    * Checks if two dates are on the same week
    * ---------------------------------------------------------- */
 export function isSameWeek(date1: Date, date2: Date): boolean {

@@ -123,7 +123,7 @@
                       <select id="inputAcademicTerm" class="selectpicker show-tick form-control" autofocus [(ngModel)]="selectedAcademicTerm"
                               title="{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.term' | translate).toLowerCase()}}..."
                               data-style="custom-select"
-                              [disabled]="academicTerms.length === 0 || !databaseChecked" (change)="loadDegrees(selectedAcademicTerm)">
+                              [disabled]="academicTerms.length === 0" (change)="loadDegrees(selectedAcademicTerm)">
                         <option *ngFor="let term of academicTerms" [value]="term">{{term}}</option>
                       </select>
                     </div>
