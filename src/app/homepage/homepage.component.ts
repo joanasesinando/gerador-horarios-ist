@@ -531,6 +531,10 @@ export class HomepageComponent implements OnInit, AfterViewInit {
             .replace(/ú/ig, 'u');
   }
 
+  isMEPPAcademicTerm(): boolean {
+    return parseInt(this.selectedAcademicTerm.split('/')[0], 10) >= 2021;
+  }
+
   @HostListener('window:resize', [])
   onWindowResize(): void {
     this.mobileView = window.innerWidth <= 991.98; // phones & tablets
