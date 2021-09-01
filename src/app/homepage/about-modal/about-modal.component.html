@@ -6,7 +6,8 @@
 
       <!-- Header -->
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Sobre o Gerador de Horários</h5>
+        <h5 class="modal-title" id="exampleModalLabel">
+          {{translateService.currentLang === 'pt-PT' ? 'Sobre o Gerador de Horários' : 'About Gerador de Horários'}}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -16,27 +17,31 @@
       <div class="modal-body">
 
         <div *ngIf="translateService.currentLang === 'pt-PT'">
-          <p class="text-muted">O <a href="http://web.ist.utl.pt/pedropramos/horarios/" target="_blank">gerador de
-            horários compactos</a> do Pedro Ramos tem sido até agora uma excelente ferramenta para planear o horário do
-            próximo semestre, no entanto tem as suas limitações (apenas permite gerar 100 horários e a interface
-            obriga-nos a ter os links das cadeiras a adicionar, por exemplo). E o mais importante, encontra-se
-            infelizmente em baixo.</p>
+          <p class="text-muted">
+            O <em>Gerador de Horários | IST</em> surgiu para que <b>planear o horário do próximo semestre não seja uma dor
+            de cabeça</b>!
+          </p>
 
-          <p class="text-muted">Assim, surgiu o <b>Gerador de Horários | IST</b>! Com mais funcionalidades, melhor
-            interface e melhor UX.</p>
+          <p class="text-muted">
+            Permite-te encontrar o melhor horário consoante as tuas necessidades e cadeiras, e guardá-lo em
+            formato PDF para o poderes consultar a qualquer altura. Podes, também, coordenar com os teus colegas turnos
+            específicos fixando slots.
+          </p>
 
           <h6 class="text-center"><b>Queres contribuir?</b><br> Dá uma vista de olhos no
             <a href="https://github.com/joanasesinando/gerador-horarios-ist" target="_blank">repositório</a> do Github.</h6>
         </div>
 
         <div *ngIf="translateService.currentLang === 'en-GB'">
-          <p class="text-muted">The <a href="http://web.ist.utl.pt/pedropramos/horarios/" target="_blank">compact schedules
-            generator</a> from Pedro Ramos has been up until now an excellent tool to plan our schedule for the upcoming
-            semester. But it has its limitations (it only generates 100 schedules and you need to have the courses'
-            links to be able to use it, for instance). And most importantly, it's unfortunately currently down.</p>
+          <p class="text-muted">
+            The <em>Gerador de Horários | IST</em> appeared so that <b>planning the next semester's schedule is a piece
+            of cake</b>!
+          </p>
 
-          <p class="text-muted">So the <b>Gerador de Horários | IST</b> was created! With more features, better interface
-            and better UX.</p>
+          <p class="text-muted">
+            It lets you find the best schedule based on your needs and courses, and save it in a PDF format so you can
+            check it out anytime. You can also coordinate shifts with your colleagues by pinning classes.
+          </p>
 
           <h6 class="text-center"><b>Want to contribute?</b><br> Take a look at our Github
             <a href="https://github.com/joanasesinando/gerador-horarios-ist" target="_blank">repository</a>.</h6>
