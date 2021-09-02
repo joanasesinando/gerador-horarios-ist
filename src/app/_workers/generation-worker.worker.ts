@@ -149,7 +149,7 @@ function getCourse(course): Course {
   const campus: string[] = [];
   for (const camp of course._campus)
     campus.push(camp);
-  return new Course(course._id, course._name, course._acronym, course._credits, course._semester, types, campus, shifts,
+  return new Course(course._id, course._name, course._acronym, course._credits, course._semester, course._period, types, campus, shifts,
     course._courseLoads, new Degree(course._degree._id, course._degree._name, course._degree._acronym));
 }
 

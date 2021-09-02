@@ -10,6 +10,9 @@ import {Lesson} from '../../_domain/Lesson/Lesson';
 import {Shift} from '../../_domain/Shift/Shift';
 import {ClassType, getClassTypeOrder} from '../../_domain/ClassType/ClassType';
 import {isSameWeek} from '../../_util/Time';
+import {StateService} from '../state/state.service';
+
+declare let $;
 
 const NO_ROOM_FOUND = 'NO ROOM FOUND';
 
@@ -18,10 +21,15 @@ const NO_ROOM_FOUND = 'NO ROOM FOUND';
 })
 export class FenixService {
 
-  url = 'https://ist-corsaway.herokuapp.com/https://fenix.tecnico.ulisboa.pt/api/fenix/v1/';
+  cors = 'https://ist-corsaway.herokuapp.com/';
+  api = 'https://fenix.tecnico.ulisboa.pt/api/fenix/v1/';
   currentAcademicTerm: string;
 
-  constructor(public translateService: TranslateService, public errorService: ErrorService) { }
+  constructor(
+    public translateService: TranslateService,
+    public errorService: ErrorService,
+    public stateService: StateService
+  ) { }
 
   /********************** CORRECT STRUCTURE **********************/
 
@@ -33,15 +41,30 @@ export class FenixService {
     return new Degree(parseInt(degreeJson.id, 10), degreeJson.name, degreeJson.acronym);
   }
 
-  parseCourseBasicInfo(course): Course {
+  parseCourseBasicInfo(academicTerm, course, htmlCurriculum): Course {
     if (!course.id) throw new Error('No ID found for course');
     if (!course.name) throw new Error('No name found for course ' + course.id);
     if (!course.acronym) throw new Error('No acronym found for course ' + course.id);
     if (!course.credits) throw new Error('No credits found for course ' + course.id);
     if (!course.academicTerm) throw new Error('No academic term found for course ' + course.id);
 
+    const period = this.parseCoursePeriod(academicTerm, htmlCurriculum, course.name);
+
     return new Course(parseInt(course.id, 10), course.name, course.acronym, parseFloat(course.credits),
-      parseInt(course.academicTerm[0], 10));
+      parseInt(course.academicTerm[0], 10), period);
+  }
+
+  parseCoursePeriod(academicTerm, htmlCurriculum: HTMLHtmlElement, courseName: string): string {
+    if (!this.isMEPPAcademicTerm(academicTerm)) return null;
+
+    const text = $('a:contains(\'' + courseName + '\') + div', htmlCurriculum)[0].innerText;
+    let period = text.split(',')[1].replace(/[ \t]/g, '');
+
+    // If course spans whole semester
+    if (period.startsWith('S') || period.startsWith('s'))
+      period = null;
+
+    return period;
   }
 
   parseCourseMissingInfo(scheduleJson): void {
@@ -65,6 +88,10 @@ export class FenixService {
         if (this.translateService.currentLang === 'pt-PT') return ClassType.THEORY_PT;
         return ClassType.THEORY_EN;
 
+      case 'PRATICA':
+        if (this.translateService.currentLang === 'pt-PT') return ClassType.PRACTICE_PT;
+        return ClassType.PRACTICE_EN;
+
       case 'LABORATORIAL':
         if (this.translateService.currentLang === 'pt-PT') return ClassType.LAB_PT;
         return ClassType.LAB_EN;
@@ -72,6 +99,10 @@ export class FenixService {
       case 'PROBLEMS':
         if (this.translateService.currentLang === 'pt-PT') return ClassType.PROBLEMS_PT;
         return ClassType.PROBLEMS_EN;
+
+      case 'TEORICO_PRATICA':
+        if (this.translateService.currentLang === 'pt-PT') return ClassType.TP_PT;
+        return ClassType.TP_EN;
 
       case 'SEMINARY':
         if (this.translateService.currentLang === 'pt-PT') return ClassType.SEMINARY_PT;
@@ -106,8 +137,8 @@ export class FenixService {
 
   /********************** HTTP REQUESTS **********************/
 
-  public httpGet(path: string): Promise<Response> {
-    return fetch(this.url + path, {
+  public httpGet(path: string, api = true): Promise<Response> {
+    return fetch(this.cors + (api ? this.api : '') + path, {
       method: 'GET'
     });
   }
@@ -135,20 +166,37 @@ export class FenixService {
       });
   }
 
+  getDegreeCurriculum(academicTerm: string, degreeId): Promise<HTMLHtmlElement> {
+    const acronym = this.stateService.degreesRepository.get(academicTerm)
+      .find(degree => degree.id === parseInt(degreeId, 10)).acronym.toLowerCase();
+
+    return this.httpGet('https://fenix.tecnico.ulisboa.pt/cursos/' + acronym + '/curriculo', false)
+      .then(r => r.text())
+      .then(html => {
+        const el = document.createElement( 'html' );
+        el.innerHTML = html;
+        return el;
+      });
+  }
+
   getCoursesBasicInfo(academicTerm: string, degreeId: number): Promise<Course[]> {
     return this.httpGet('degrees/' + degreeId + '/courses?academicTerm=' + academicTerm + '&lang=' + this.translateService.currentLang)
       .then(r => r.json())
-      .then(coursesJson => {
+      .then(async coursesJson => {
+        const htmlCurriculum = await this.getDegreeCurriculum(academicTerm, degreeId);
+
         const courses: Course[] = [];
         for (let course of coursesJson) {
           try {
-            course = this.parseCourseBasicInfo(course);
+            course = this.parseCourseBasicInfo(academicTerm, course, htmlCurriculum);
 
             // Remove optional courses (example acronym: O32)
             if (course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9') continue;
 
             courses.push(course);
-          } catch (error) { this.errorService.showError(error); }
+          } catch (error) {
+            this.errorService.showError(error);
+          }
         }
         return courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
       });
@@ -205,6 +253,10 @@ export class FenixService {
   async getAcademicTerms(): Promise<string[]> {
     this.currentAcademicTerm = await this.getCurrentAcademicTerm();
     return [this.currentAcademicTerm, this.getNextAcademicTerm(this.currentAcademicTerm)];
+  }
+
+  isMEPPAcademicTerm(academicTerm: string): boolean {
+    return parseInt(academicTerm.split('/')[0], 10) >= 2021;
   }
 
 
