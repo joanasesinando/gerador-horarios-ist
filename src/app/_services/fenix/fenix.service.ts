@@ -152,14 +152,16 @@ export class FenixService {
   }
 
   getDegrees(academicTerm: string): Promise<Degree[]> {
-    return this.httpGet('degrees?academicTerm=' + academicTerm + '&lang=' + this.translateService.currentLang)
+    return this.httpGet('degrees/all?lang=' + this.translateService.currentLang)
       .then(r => r.json())
       .then(degreesJson => {
         const degrees: Degree[] = [];
         for (let degree of degreesJson) {
           try {
-            degree = this.parseDegree(degree);
-            degrees.push(degree);
+            if (degree.academicTerms.includes(academicTerm)) {
+              degree = this.parseDegree(degree);
+              degrees.push(degree);
+            }
           } catch (error) { this.errorService.showError(error); }
         }
         return degrees.sort((a, b) => a.acronym.localeCompare(b.acronym));
