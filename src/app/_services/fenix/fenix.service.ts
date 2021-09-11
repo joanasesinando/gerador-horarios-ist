@@ -11,6 +11,7 @@ import {Shift} from '../../_domain/Shift/Shift';
 import {ClassType, getClassTypeOrder} from '../../_domain/ClassType/ClassType';
 import {isSameWeek} from '../../_util/Time';
 import {StateService} from '../state/state.service';
+import {AlertService} from '../../_util/alert.service';
 
 declare let $;
 
@@ -28,7 +29,8 @@ export class FenixService {
   constructor(
     public translateService: TranslateService,
     public errorService: ErrorService,
-    public stateService: StateService
+    public stateService: StateService,
+    private alertService: AlertService
   ) { }
 
   /********************** CORRECT STRUCTURE **********************/
@@ -130,7 +132,7 @@ export class FenixService {
     if (course.campus.length === 0) course.campus = null;
     if (course.types.length === 0) course.types = [ClassType.NONE];
     if (course.shifts.length === 0)
-      throw new Error('No shifts found. Impossible to generate schedules for course: ' + course.name);
+      throw new Error('No shifts found');
     return course;
   }
 
@@ -239,7 +241,15 @@ export class FenixService {
 
           return this.fillMissingInfo(course);
 
-        } catch (error) { this.errorService.showError(error); }
+        } catch (error) {
+          if (error.message === 'No shifts found') {
+            if (this.translateService.currentLang === 'pt-PT')
+              this.alertService.showAlert('Sem horário', 'Sem horário disponível para a cadeira \'' + course.name + '\'', 'danger');
+            else
+              this.alertService.showAlert('No schedule', 'No schedule yet available for course \'' + course.name + '\'', 'danger');
+
+          } else this.errorService.showError(error);
+        }
       });
   }
 
