@@ -134,6 +134,12 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
       if (direction === 'right') this.next();
       if (direction === 'left') this.prev();
     });
+
+    $('#excludeTimeframeModal').on('hide.bs.modal', (event) => {
+      this.selectedWeekday = undefined;
+      this.selectedStartTime = undefined;
+      this.selectedEndTime = undefined;
+    });
   }
 
   ngOnDestroy(): void {

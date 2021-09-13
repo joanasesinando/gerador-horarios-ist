@@ -219,7 +219,7 @@
                 <div class="form-group">
                   <label for="weekday" class="d-block">{{'weekday' | translate}}</label>
                   <select id="weekday" name="weekday" class="selectpicker show-tick form-control" autofocus [(ngModel)]="selectedWeekday"
-                          title="{{'main-content.labels.placeholder' | translate}} {{'weekday' | translate}}..." data-style="custom-select"
+                          title="{{'main-content.labels.placeholder' | translate}} {{('weekday' | translate).toLowerCase()}}..." data-style="custom-select"
                           [required]="true">
                     <option *ngFor="let day of weekdays; let i = index" [value]="i">{{day}}</option>
                   </select>

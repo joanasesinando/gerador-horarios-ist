@@ -99,9 +99,8 @@
                 <p class=""><b>{{'schedules.excludedTimeframes' | translate}}</b></p>
                 <div class="d-flex flex-wrap align-items-center">
                   <app-pill *ngFor="let timeframe of excludedTimeframes; let last = last"
-                            [label]="getMinifiedWeekday(timeframe.start.getDay())  + ' ' +
-                            timeframe.start.toLocaleTimeString().substring(0, 5) + ' -> ' + timeframe.end.toLocaleTimeString().substring(0, 4)"
-                            [marginRight]="!last" (deleteClicked)="removeExcludedTimeframe(timeframe)">
+                            [label]="getTimeframeLabel(timeframe)" [marginRight]="!last"
+                            (deleteClicked)="removeExcludedTimeframe(timeframe)">
                   </app-pill>
                 </div>
               </div>

@@ -16,7 +16,7 @@ import {numberWithCommas} from '../_util/Number';
 
 import {faQuestionCircle} from '@fortawesome/free-solid-svg-icons';
 import {Lesson} from '../_domain/Lesson/Lesson';
-import { getMinifiedWeekday } from '../_util/Time';
+import { getMinifiedWeekday, formatTime } from '../_util/Time';
 
 declare let $;
 
@@ -242,8 +242,9 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     return numberWithCommas(x);
   }
 
-  getMinifiedWeekday(day: number): string {
-    return getMinifiedWeekday(day, this.translateService.currentLang);
+  getTimeframeLabel(timeframe: Lesson): string {
+    return getMinifiedWeekday(timeframe.start.getDay(), this.translateService.currentLang) + ' ' +
+      formatTime(timeframe.start) + ' -> ' + formatTime(timeframe.end);
   }
 
   @HostListener('window:resize', [])
