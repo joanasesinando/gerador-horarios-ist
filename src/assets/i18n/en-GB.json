@@ -53,6 +53,16 @@
       "most-balanced": "Most balanced",
       "more-free-days": "More free days"
     },
+    "features": {
+      "excludeTimeframe": "Exclude timeframe"
+    },
+    "eventOptions": {
+      "pin": "Pin shift",
+      "unpin": "Unpin shift",
+      "exclude": "Exclude shift"
+    },
+    "excludedShifts": "Excluded shifts",
+    "excludedTimeframes": "Excluded timeframes",
     "schedule": "Schedule",
     "addSchedule": "Add Schedule",
     "see": "See",
@@ -114,5 +124,11 @@
     "no-degrees-found": "No degrees found",
     "no-courses-found": "No courses found",
     "no-shifts-found": "Course with not enough info"
-  }
+  },
+
+  "cancel": "Cancel",
+  "exclude": "Exclude",
+  "weekday": "Weekday",
+  "beginTime": "Start",
+  "endTime": "End"
 }

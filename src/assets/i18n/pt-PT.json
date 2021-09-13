@@ -53,6 +53,16 @@
       "most-balanced": "Mais equilibrado",
       "more-free-days": "Mais dias livres"
     },
+    "features": {
+      "excludeTimeframe": "Excluir período de tempo"
+    },
+    "eventOptions": {
+      "pin": "Fixar turno",
+      "unpin": "Desafixar turno",
+      "exclude": "Excluir turno"
+    },
+    "excludedShifts": "Turnos excluídos",
+    "excludedTimeframes": "Períodos de tempo excluídos",
     "schedule": "Horário",
     "addSchedule": "Adicionar Horário",
     "see": "Ver",
@@ -82,7 +92,6 @@
       "saturday": "Sábado"
     }
   },
-
   "help": {
     "select-options": {
       "title": "Escolher opções",
@@ -110,13 +119,15 @@
     }
   },
 
-  "about": {
-
-  },
-
   "errors": {
     "no-degrees-found": "Nenhum curso encontrado",
     "no-courses-found": "Nenhuma cadeira encontrada",
     "no-shifts-found": "Cadeira sem informação suficiente"
-  }
+  },
+
+  "cancel": "Cancelar",
+  "exclude": "Excluir",
+  "weekday": "Dia da semana",
+  "beginTime": "Início",
+  "endTime": "Fim"
 }

@@ -1,0 +1,8 @@
+<span class="badge badge-pill badge-light text-grey medium mb-1
+            d-flex align-items-center justify-content-between"
+      [ngClass]="{'mr-2': marginRight}" (click)="deleteClicked.emit(label)">
+
+  {{label}}
+  <fa-icon [icon]="faTimesCircle" class="delete ml-1" (click)="deleteClicked.emit(label)"></fa-icon>
+
+</span>

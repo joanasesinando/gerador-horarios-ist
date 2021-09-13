@@ -1,5 +1,6 @@
-import {Component, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {Observable, Subscription} from 'rxjs';
+import {NgForm} from '@angular/forms';
 
 import {LoggerService} from '../../_util/logger.service';
 import {ErrorService} from '../../_util/error.service';
@@ -7,12 +8,16 @@ import {AlertService} from '../../_util/alert.service';
 import {TranslateService} from '@ngx-translate/core';
 import {SchedulesGenerationService} from '../../_services/schedules-generation/schedules-generation.service';
 
-import { faCaretRight, faCaretLeft, faThumbtack } from '@fortawesome/free-solid-svg-icons';
+import {faCaretRight, faCaretLeft, faThumbtack, faEllipsisV, faTimes} from '@fortawesome/free-solid-svg-icons';
 
 import {Schedule} from '../../_domain/Schedule/Schedule';
 import {Event} from '../../_domain/Event/Event';
-import {getTimestamp} from '../../_util/Time';
+import {Lesson} from '../../_domain/Lesson/Lesson';
+
+import {getDateFromTimeAndDay, getTimestamp, getWeekday} from '../../_util/Time';
 import {numberWithCommas} from '../../_util/Number';
+
+declare let $;
 
 
 @Component({
@@ -30,7 +35,12 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() schedules: Schedule[];
   @Input() keydownEvents: Observable<string>;
+  @Input() onExcludedShiftsChanged: Observable<string[]>;
+  @Input() onExcludedTimeframesChanged: Observable<Lesson[]>;
+
   @Output() scheduleSelected = new EventEmitter<number>();
+  @Output() excludedShiftsChanged = new EventEmitter<string[]>();
+  @Output() excludedTimeframesChanged = new EventEmitter<Lesson[]>();
 
   scheduleInViewIndex: number;
   scheduleInViewID: number;
@@ -38,6 +48,17 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
 
   schedulesToShow: Schedule[];
   pinnedShifts: string[] = [];
+  excludedShifts: string[] = [];
+  excludedTimeframes: Lesson[] = []; // use special null Lesson for simplicity
+
+  @ViewChild('f', { static: false }) f: NgForm;
+
+  // For excluding timeframes
+  weekdays: string[];
+  selectedWeekday: number;
+  selectedStartTime: string;
+  selectedEndTime: string;
+  saving = false;
 
   mobileView = false;
   pinActivated = false;
@@ -47,6 +68,8 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
   faCaretRight = faCaretRight;
   faCaretLeft = faCaretLeft;
   faThumbtack = faThumbtack;
+  faTimes = faTimes;
+  faEllipsisV = faEllipsisV;
 
   constructor(
     private logger: LoggerService,
@@ -55,8 +78,21 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
     public translateService: TranslateService,
     private schedulesGenerationService: SchedulesGenerationService
   ) {
+
+    // Get weekdays strings
+    switch (this.translateService.currentLang) {
+      case 'pt-PT':
+        this.weekdays = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
+        break;
+
+      case 'en-GB':
+      default:
+        this.weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        break;
+    }
+
     setTimeout(() => {
-      if (!this.pinActivated) {
+      if (!this.pinActivated) { // FIXME: use cookies & random dicas
         this.translateService.currentLang === 'pt-PT' ?
           this.alertService.showAlert(
             '💬 Dica',
@@ -116,7 +152,7 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
       }
       this.schedules = temp;
 
-      this.schedulesToShow = this.filterSchedulesBasedOnPinnedShifts();
+      this.schedulesToShow = this.filterSchedules();
       this.scheduleInViewIndex = 0;
       this.scheduleInViewID = this.schedulesToShow[0].id;
 
@@ -149,11 +185,13 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
 
   organizeEventsPerWeekday(scheduleID: number): void { // TODO: testing
     this.eventsPerWeekday.clear();
-    const events = this.schedulesGenerationService.generatedSchedulesInfo.get(scheduleID).events;
-    events.forEach(ev => {
-      this.eventsPerWeekday.has(ev.weekday) ?
-        this.eventsPerWeekday.get(ev.weekday).push(ev) : this.eventsPerWeekday.set(ev.weekday, [ev]);
-    });
+    if (scheduleID !== -1) {
+      const events = this.schedulesGenerationService.generatedSchedulesInfo.get(scheduleID).events;
+      events.forEach(ev => {
+        this.eventsPerWeekday.has(ev.weekday) ?
+          this.eventsPerWeekday.get(ev.weekday).push(ev) : this.eventsPerWeekday.set(ev.weekday, [ev]);
+      });
+    }
     this.logger.log('events per weekday', this.eventsPerWeekday);
   }
 
@@ -199,15 +237,35 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
     return this.mobileView ? height > this.SLOT_HEIGHT_MOBILE * 2 : height > this.SLOT_HEIGHT_DESKTOP * 2;
   }
 
-  togglePin(event): void { // TODO: testing
+  closeOptions(): void {
+    $('.options.open').removeClass('open');
+  }
+
+  toggleOptions(target, pinned: boolean): void {
+    const optionsMenu = $(target.closest('.single-event').children[1]);
+    if (!optionsMenu.hasClass('open')) this.closeOptions();
+    optionsMenu.toggleClass('open');
+
+    // Show tooltip
+    const pinOption = optionsMenu.children().eq(0);
+    pinOption.attr('title', this.translateService.instant('schedules.eventOptions.' + (pinned ? 'unpin' : 'pin')));
+    pinOption.tooltip('dispose');
+    pinOption.tooltip();
+
+    const excludeOption = optionsMenu.children().eq(1);
+    excludeOption.attr('title', this.translateService.instant('schedules.eventOptions.exclude'));
+    excludeOption.tooltip('dispose');
+    excludeOption.tooltip();
+  }
+
+  togglePin(shiftName: string): void { // TODO: testing
     this.pinActivated = true;
-    const shiftName = event.getAttribute('data-shift');
     this.pinnedShifts.includes(shiftName) ?
       this.pinnedShifts.splice(this.pinnedShifts.indexOf(shiftName), 1) :
       this.pinnedShifts.push(shiftName);
 
     // Select which schedules to show
-    this.schedulesToShow = this.filterSchedulesBasedOnPinnedShifts();
+    this.schedulesToShow = this.filterSchedules();
 
     // Update timetable
     if (this.schedulesToShow.length > 0) {
@@ -219,31 +277,96 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
     this.logger.log('Pinned shift ' + shiftName);
   }
 
-  filterSchedulesBasedOnPinnedShifts(): Schedule[] { // TODO: testing
+  filterSchedules(): Schedule[] { // TODO: testing
     const schedules: Schedule[] = [];
 
     for (const schedule of this.schedules) {
-      let hasAllPinnedShifts = true;
 
-      for (const pinnedShift of this.pinnedShifts) {
-        let found = false;
-        for (const cl of schedule.classes) {
-          for (const shift of cl.shifts) {
-            if (shift.name === pinnedShift) { found = true; break; }
-          }
-          if (found) break;
+      const shiftNames: string[] = [];
+      for (const cl of schedule.classes) {
+        for (const shift of cl.shifts) {
+          shiftNames.push(shift.name);
         }
-        if (!found) { hasAllPinnedShifts = false; break; }
+      }
+
+      let hasAllPinnedShifts = true;
+      for (const pinnedShift of this.pinnedShifts) {
+        if (!shiftNames.includes(pinnedShift)) {
+          hasAllPinnedShifts = false;
+          break;
+        }
       }
 
       if (hasAllPinnedShifts) {
-        schedules.push(schedule);
-        this.schedulesGenerationService.generatedSchedulesInfo.get(schedule.id).events.forEach(ev => {
-          ev.pinned = this.pinnedShifts.includes(ev.shiftName);
-        });
+        let hasAnExcludedShift = false;
+
+        for (const excludedShift of this.excludedShifts) {
+          if (shiftNames.includes(excludedShift)) {
+            hasAnExcludedShift = true;
+            break;
+          }
+        }
+
+        if (!hasAnExcludedShift) {
+          let overlapsWithExcludedTimeframe = false;
+
+          for (const cl of schedule.classes) {
+            for (const shift of cl.shifts) {
+              for (const lesson of shift.lessons) {
+                for (const excluded of this.excludedTimeframes) {
+                  if (lesson.overlap(excluded)) {
+                    overlapsWithExcludedTimeframe = true;
+                    break;
+                  }
+                }
+                if (overlapsWithExcludedTimeframe) break;
+              }
+              if (overlapsWithExcludedTimeframe) break;
+            }
+            if (overlapsWithExcludedTimeframe) break;
+          }
+
+          if (!overlapsWithExcludedTimeframe) {
+            schedules.push(schedule);
+            this.schedulesGenerationService.generatedSchedulesInfo.get(schedule.id).events.forEach(ev => {
+              ev.pinned = this.pinnedShifts.includes(ev.shiftName);
+            });
+          }
+        }
       }
     }
     return schedules;
+  }
+
+  toggleExcludeShift(shiftName): void {
+    this.onExcludedShiftsChanged.subscribe(excludedShifts => {
+      this.excludedShifts = excludedShifts;
+      this.toggleExcludeShift(null);
+    });
+
+    if (shiftName) {
+      this.excludedShifts.includes(shiftName) ?
+        this.excludedShifts.splice(this.excludedShifts.indexOf(shiftName), 1) :
+        this.excludedShifts.push(shiftName);
+    }
+
+    // Select which schedules to show
+    this.schedulesToShow = this.filterSchedules();
+
+    // Update timetable
+    this.scheduleInViewIndex = this.schedulesToShow.length > 0 ? 0 : -1;
+    this.scheduleInViewID = this.schedulesToShow.length > 0 ? this.schedulesToShow[0].id : -1;
+    this.organizeEventsPerWeekday(this.scheduleInViewID);
+    if (this.schedulesToShow.length === 0) {
+      this.translateService.currentLang === 'pt-PT' ?
+        this.alertService.showAlert('Sem horários', 'Não existe nenhum horário com as opções escolhidas.', 'warning') :
+        this.alertService.showAlert('No schedules', 'No schedules with your options.', 'warning');
+    }
+
+    this.excludedShiftsChanged.emit(this.excludedShifts);
+    $('.tooltip').remove();
+
+    this.logger.log('Excluded shift ' + shiftName);
   }
 
   updateScheduleInViewIndex(schedules: Schedule[]): void {
@@ -262,6 +385,58 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
 
   numberWithCommas(x: number): string {
     return numberWithCommas(x);
+  }
+
+  manageExcludedTimeframes(timeframe: Lesson): void {
+    if (timeframe) {
+      const index = this.excludedTimeframes.findIndex(el => el.equal(timeframe));
+      index !== -1 ? this.excludedTimeframes.splice(index, 1) : this.excludedTimeframes.push(timeframe);
+    }
+
+    // Select which schedules to show
+    this.schedulesToShow = this.filterSchedules();
+
+    // Update timetable
+    this.scheduleInViewIndex = this.schedulesToShow.length > 0 ? 0 : -1;
+    this.scheduleInViewID = this.schedulesToShow.length > 0 ? this.schedulesToShow[0].id : -1;
+    this.organizeEventsPerWeekday(this.scheduleInViewID);
+    if (this.schedulesToShow.length === 0) {
+      this.translateService.currentLang === 'pt-PT' ?
+        this.alertService.showAlert('Sem horários', 'Não existe nenhum horário com as opções escolhidas.', 'warning') :
+        this.alertService.showAlert('No schedules', 'No schedules with your options.', 'warning');
+    }
+
+    this.excludedTimeframesChanged.emit(this.excludedTimeframes);
+
+    // tslint:disable-next-line:max-line-length
+    this.logger.log('Excluded timeframe: ' + getWeekday(this.selectedWeekday) + ' ' + this.selectedStartTime + '->' + this.selectedEndTime);
+  }
+
+  onSubmit(): void {
+    if (this.f.form.valid) {
+      this.saving = true;
+      const nullLesson = new Lesson(
+        getDateFromTimeAndDay(this.selectedStartTime, parseInt(this.selectedWeekday as any, 10)),
+        getDateFromTimeAndDay(this.selectedEndTime, parseInt(this.selectedWeekday as any, 10)),
+        null, null);
+
+      this.manageExcludedTimeframes(nullLesson);
+
+      this.saving = false;
+      $('#excludeTimeframeModal').modal('hide');
+
+      this.selectedWeekday = null;
+      this.selectedStartTime = null;
+      this.selectedEndTime = null;
+
+      this.onExcludedTimeframesChanged.subscribe(excludedTimeframes => {
+        this.excludedTimeframes = excludedTimeframes;
+        this.manageExcludedTimeframes(null);
+      });
+
+    } else {
+      this.alertService.showAlert('Form invalid', 'Please fill in all fields', 'danger');
+    }
   }
 
   @HostListener('window:resize', [])

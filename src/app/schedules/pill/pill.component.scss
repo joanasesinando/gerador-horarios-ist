@@ -1,0 +1,17 @@
+@import "src/styles/colors";
+
+.badge-light {
+  color: white;
+  background-color: $gh-red;
+  font-size: 85%;
+  padding: .3rem .5rem .3rem 1rem;
+
+  &:hover {
+    fa-icon {
+      &:hover {
+        color: darken(white, 5);
+        cursor: pointer;
+      }
+    }
+  }
+}

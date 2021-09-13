@@ -24,6 +24,16 @@ export function getTimestamp(time: string): number {
 }
 
 /* ------------------------------------------------------------
+   * Converts time and weekday to Date. Accepts HH:mm format.
+   * HH:mm, weekday -> Date
+   * weekday: 0: mon, 1: tue, 2: wed, ...
+   * ---------------------------------------------------------- */
+export function getDateFromTimeAndDay(time: string, weekday: number): Date {
+  const date = new Date('2021-09-13 ' + time); // a Monday
+  return addDays(date, weekday);
+}
+
+/* ------------------------------------------------------------
    * Checks if two dates are on the same week
    * ---------------------------------------------------------- */
 export function isSameWeek(date1: Date, date2: Date): boolean {
@@ -34,6 +44,16 @@ export function isSameWeek(date1: Date, date2: Date): boolean {
   const maxWeekday = maxDate.getDay();
 
   return !(maxDate.getTime() - minDate.getTime() >= MILLISECONDS_IN_A_WEEK || minWeekday > maxWeekday);
+}
+
+/* ------------------------------------------------------------
+   * Adds days to a date.
+   * Date, days to add -> Date
+   * ---------------------------------------------------------- */
+export function addDays(d: Date, daysToAdd: number): Date {
+  const date = new Date(d.getTime());
+  date.setDate(date.getDate() + daysToAdd);
+  return date;
 }
 
 /* ------------------------------------------------------------

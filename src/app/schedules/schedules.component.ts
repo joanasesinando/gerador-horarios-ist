@@ -15,6 +15,8 @@ import {TranslateService} from '@ngx-translate/core';
 import {numberWithCommas} from '../_util/Number';
 
 import {faQuestionCircle} from '@fortawesome/free-solid-svg-icons';
+import {Lesson} from '../_domain/Lesson/Lesson';
+import { getMinifiedWeekday } from '../_util/Time';
 
 declare let $;
 
@@ -32,6 +34,12 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
 
   scheduleInViewID: number;
   schedulesPicked: Schedule[] = [];
+
+  excludedShifts: string[] = [];
+  excludedShiftsSubject: Subject<string[]> = new Subject<string[]>();
+
+  excludedTimeframes: Lesson[] = [];
+  excludedTimeframesSubject: Subject<Lesson[]> = new Subject<Lesson[]>();
 
   spinners = {
     loadingPage: true,
@@ -52,7 +60,7 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     private stateService: StateService,
     private pdfService: PdfGenerationService,
     public translateService: TranslateService
-  ) {}
+  ) { }
 
   async updateBar(value: number): Promise<void> {
     if (value < -100 || value > 100) return;
@@ -171,6 +179,14 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
     this.logger.log('Changed view to ' + option);
   }
 
+  removeExcludedShift(shiftName: string): void {
+    this.excludedShiftsSubject.next(this.excludedShifts.filter(name => name !== shiftName));
+  }
+
+  removeExcludedTimeframe(timeframe: Lesson): void {
+    this.excludedTimeframesSubject.next(this.excludedTimeframes.filter(tf => !tf.equal(timeframe)));
+  }
+
   addSchedule(scheduleID: number): void {
     const scheduleIndex = this.findScheduleIndex(scheduleID, this.generatedSchedules);
     const scheduleToAdd = this.generatedSchedules[scheduleIndex];
@@ -224,6 +240,10 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
 
   numberWithCommas(x: number): string {
     return numberWithCommas(x);
+  }
+
+  getMinifiedWeekday(day: number): string {
+    return getMinifiedWeekday(day, this.translateService.currentLang);
   }
 
   @HostListener('window:resize', [])

@@ -1,5 +1,16 @@
 <ng-container *ngIf="this.schedules && this.schedulesToShow">
-  <h5 class="text-center d-block mt-5 mb-3">{{numberWithCommas(scheduleInViewIndex + 1)}} / {{numberWithCommas(schedulesToShow.length)}}</h5>
+  <div class="position-relative">
+    <h5 class="text-center d-block mt-5 mb-3">{{numberWithCommas(scheduleInViewIndex + 1)}} / {{numberWithCommas(schedulesToShow.length)}}</h5>
+
+    <div class="btn-options">
+      <fa-icon [icon]="faEllipsisV" class="fa-lg dropdown-toggle" type="button" data-toggle="dropdown"></fa-icon>
+      <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" data-toggle="modal" data-target="#excludeTimeframeModal">
+          {{'schedules.features.excludeTimeframe' | translate}}
+        </a>
+      </div>
+    </div>
+  </div>
 
   <div class="timetable d-flex justify-content-center align-items-center"
     (swipeleft)="next()" (swiperight)="prev()">
@@ -34,12 +45,20 @@
                   [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
                   class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
                   [ngClass]="{'pinned': ev.pinned}"
-                  [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+                  [attr.data-shift]="ev.shiftName" (click)="toggleOptions($event.target, ev.pinned)">
                 <div class="single-event-div">
                   <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                   <em class="event-name">{{ev.name}}</em>
                   <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
                 </div>
+                <ul class="options">
+                  <li data-toggle="tooltip" data-placement="top" (click)="togglePin(ev.shiftName)">
+                    <fa-icon [icon]="faThumbtack"></fa-icon>
+                  </li>
+                  <li data-toggle="tooltip" data-placement="top" (click)="toggleExcludeShift(ev.shiftName)">
+                    <fa-icon [icon]="faTimes"></fa-icon>
+                  </li>
+                </ul>
                 <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
               </li>
             </ul>
@@ -56,12 +75,20 @@
                   [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
                   class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
                   [ngClass]="{'pinned': ev.pinned}"
-                  [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+                  [attr.data-shift]="ev.shiftName" (click)="toggleOptions($event.target, ev.pinned)">
                 <div class="single-event-div">
                   <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                   <em class="event-name">{{ev.name}}</em>
                   <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
                 </div>
+                <ul class="options">
+                  <li data-toggle="tooltip" data-placement="top" (click)="togglePin(ev.shiftName)">
+                    <fa-icon [icon]="faThumbtack"></fa-icon>
+                  </li>
+                  <li data-toggle="tooltip" data-placement="top" (click)="toggleExcludeShift(ev.shiftName)">
+                    <fa-icon [icon]="faTimes"></fa-icon>
+                  </li>
+                </ul>
                 <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
               </li>
             </ul>
@@ -78,12 +105,20 @@
                   [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
                   class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
                   [ngClass]="{'pinned': ev.pinned}"
-                  [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+                  [attr.data-shift]="ev.shiftName" (click)="toggleOptions($event.target, ev.pinned)">
                 <div class="single-event-div">
                   <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                   <em class="event-name">{{ev.name}}</em>
                   <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
                 </div>
+                <ul class="options">
+                  <li data-toggle="tooltip" data-placement="top" (click)="togglePin(ev.shiftName)">
+                    <fa-icon [icon]="faThumbtack"></fa-icon>
+                  </li>
+                  <li data-toggle="tooltip" data-placement="top" (click)="toggleExcludeShift(ev.shiftName)">
+                    <fa-icon [icon]="faTimes"></fa-icon>
+                  </li>
+                </ul>
                 <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
               </li>
             </ul>
@@ -100,12 +135,20 @@
                   [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
                   class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
                   [ngClass]="{'pinned': ev.pinned}"
-                  [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+                  [attr.data-shift]="ev.shiftName" (click)="toggleOptions($event.target, ev.pinned)">
                 <div class="single-event-div">
                   <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                   <em class="event-name">{{ev.name}}</em>
                   <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
                 </div>
+                <ul class="options">
+                  <li data-toggle="tooltip" data-placement="top" (click)="togglePin(ev.shiftName)">
+                    <fa-icon [icon]="faThumbtack"></fa-icon>
+                  </li>
+                  <li data-toggle="tooltip" data-placement="top" (click)="toggleExcludeShift(ev.shiftName)">
+                    <fa-icon [icon]="faTimes"></fa-icon>
+                  </li>
+                </ul>
                 <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
               </li>
             </ul>
@@ -122,12 +165,20 @@
                   [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
                   class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
                   [ngClass]="{'pinned': ev.pinned}"
-                  [attr.data-shift]="ev.shiftName" (click)="togglePin($event.currentTarget)">
+                  [attr.data-shift]="ev.shiftName" (click)="toggleOptions($event.target, ev.pinned)">
                 <div class="single-event-div">
                   <span class="event-date">{{ev.start}} - {{ev.end}}</span>
                   <em class="event-name">{{ev.name}}</em>
                   <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
                 </div>
+                <ul class="options">
+                  <li data-toggle="tooltip" data-placement="top" (click)="togglePin(ev.shiftName)">
+                    <fa-icon [icon]="faThumbtack"></fa-icon>
+                  </li>
+                  <li data-toggle="tooltip" data-placement="top" (click)="toggleExcludeShift(ev.shiftName)">
+                    <fa-icon [icon]="faTimes"></fa-icon>
+                  </li>
+                </ul>
                 <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
               </li>
             </ul>
@@ -142,3 +193,65 @@
     <fa-icon [icon]="faCaretRight" class="next ml-4" (click)="next()"></fa-icon>
   </div>
 </ng-container>
+
+
+<!-- Exclude Timeframe Modal -->
+<div class="modal fade" id="excludeTimeframeModal" tabindex="-1" aria-labelledby="excludeTimeframeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="excludeTimeframeModalLabel">{{'schedules.features.excludeTimeframe' | translate}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form #f="ngForm" (submit)="onSubmit()">
+
+        <!-- Body -->
+        <div class="modal-body">
+            <div class="row">
+
+              <!-- Weekday -->
+              <div class="col-12 col-md-6">
+                <div class="form-group">
+                  <label for="weekday" class="d-block">{{'weekday' | translate}}</label>
+                  <select id="weekday" name="weekday" class="selectpicker show-tick form-control" autofocus [(ngModel)]="selectedWeekday"
+                          title="{{'main-content.labels.placeholder' | translate}} {{'weekday' | translate}}..." data-style="custom-select"
+                          [required]="true">
+                    <option *ngFor="let day of weekdays; let i = index" [value]="i">{{day}}</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Begin time -->
+              <div class="col-6 col-md-3">
+                <div class="form-group">
+                  <label for="begin" class="d-block">{{'beginTime' | translate}}</label>
+                  <input type="time" id="begin" name="begin" class="form-control" [(ngModel)]="selectedStartTime" [required]="true">
+                </div>
+              </div>
+
+              <!-- End time -->
+              <div class="col-6 col-md-3">
+                <div class="form-group">
+                  <label for="end" class="d-block">{{'endTime' | translate}}</label>
+                  <input type="time" id="end" name="end" class="form-control" [(ngModel)]="selectedEndTime" [required]="true">
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{'cancel' | translate}}</button>
+          <button type="submit" class="btn btn-danger">{{'exclude' | translate}}
+            <span *ngIf="saving" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
