@@ -43,21 +43,27 @@ export class FenixService {
     return new Degree(parseInt(degreeJson.id, 10), degreeJson.name, degreeJson.acronym);
   }
 
-  parseCourseBasicInfo(academicTerm, course, htmlCurriculum): Course {
+  async parseCourseBasicInfo(academicTerm, course, htmlCurriculum): Promise<Course> {
     if (!course.id) throw new Error('No ID found for course');
     if (!course.name) throw new Error('No name found for course ' + course.id);
     if (!course.acronym) throw new Error('No acronym found for course ' + course.id);
     if (!course.credits) throw new Error('No credits found for course ' + course.id);
     if (!course.academicTerm) throw new Error('No academic term found for course ' + course.id);
 
-    const period = this.parseCoursePeriod(academicTerm, htmlCurriculum, course.name);
+    const isLangPT = this.translateService.currentLang === 'pt-PT';
+    const period = await this.parseCoursePeriod(academicTerm, htmlCurriculum, isLangPT ? course.name : null, !isLangPT ? course.id : null);
 
     return new Course(parseInt(course.id, 10), course.name, course.acronym, parseFloat(course.credits),
       parseInt(course.academicTerm[0], 10), period);
   }
 
-  parseCoursePeriod(academicTerm, htmlCurriculum: HTMLHtmlElement, courseName: string): string {
+  async parseCoursePeriod(academicTerm, htmlCurriculum: HTMLHtmlElement, courseName, courseID): Promise<string> {
     if (!this.isMEPPAcademicTerm(academicTerm)) return null;
+
+    if (!courseName)
+      await this.httpGet('courses/' + courseID)
+        .then(r => r.json())
+        .then(course => courseName = course.name);
 
     const text = $('a:contains(\'' + courseName + '\') + div', htmlCurriculum)[0].innerText;
     let period = text.split(',')[1].replace(/[ \t]/g, '');
@@ -192,7 +198,7 @@ export class FenixService {
         const courses: Course[] = [];
         for (let course of coursesJson) {
           try {
-            course = this.parseCourseBasicInfo(academicTerm, course, htmlCurriculum);
+            course = await this.parseCourseBasicInfo(academicTerm, course, htmlCurriculum);
 
             // Remove optional courses (example acronym: O32)
             if (course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9') continue;
