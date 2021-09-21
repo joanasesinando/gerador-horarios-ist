@@ -107,7 +107,15 @@
     },
     "pin": {
       "title": "Fixar slots de aulas",
-      "text": "Podes fixar aulas para apenas te serem mostrados horários onde elas apareceçam. Basta clicares na aula que queres fixar."
+      "text": "Podes fixar aulas para apenas te serem mostrados horários onde elas apareçam. Basta clicares na aula que queres fixar e escolher 'Fixar turno'."
+    },
+    "exclude-shift": {
+      "title": "Excluir slots de aulas",
+      "text": "Podes excluir aulas para apenas te serem mostrados horários onde elas não apareçam. Basta clicares na aula que queres excluir e escolher 'Excluir turno'."
+    },
+    "exclude-timeframe": {
+      "title": "Excluir período de tempo",
+      "text": "Para excluir um período de tempo, clica no icon no canto superior direito, preenche todos os campos, e clica em 'Excluir'."
     },
     "add": {
       "title": "Escolher horários",

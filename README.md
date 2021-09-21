@@ -34,7 +34,7 @@
 
 A schedule generator for [IST](https://tecnico.ulisboa.pt/en/ )'s students to plan their student schedule for the upcoming semester.
 
-*This application makes use of the IST [API](https://fenixedu.org/dev/api/ ) to get information about academic terms, degrees, courses and respective timetables.*
+*This application makes use of the [FenixEdu API](https://fenixedu.org/dev/api/ ) to get information about academic terms, degrees, courses and respective timetables.*
 
 <p align="center">
   <img alt='logo' src='./src/assets/readme/logo.png'>
@@ -73,12 +73,25 @@ Once you've found a class you like you can pin it. This way only schedules with 
   <img alt="Pin classes" src="https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/src/assets/readme/feature2.gif">
 </p>
 
+### Exclude classes & timeframes
+
+If you don't want a certain class on your schedule, or are busy on a particular day and timeframe you can exclude them.
+Only schedules in those conditions will be shown.
+
+<p align="center">
+  <img alt="Pin classes" src="https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/src/assets/readme/feature3.gif">
+</p>
+
+<p align="center">
+  <img alt="Pin classes" src="https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/src/assets/readme/feature4.gif">
+</p>
+
 ### Save for later
 
 You can add schedules you like to the queue and when you're done print them to a PDF file.
 
 <p align="center">
-  <img alt="Save for later" src="https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/src/assets/readme/feature3.gif">
+  <img alt="Save for later" src="https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/src/assets/readme/feature5.gif">
 </p>
 
 # Development
@@ -159,4 +172,4 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind are welcome!
 
 # License
-[MIT](https://github.com/joanasesinando/gerador-horarios-ist/edit/master/README.md)
+[MIT](https://github.com/joanasesinando/gerador-horarios-ist/blob/master/LICENSE)

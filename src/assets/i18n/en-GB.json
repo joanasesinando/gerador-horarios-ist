@@ -108,7 +108,15 @@
     },
     "pin": {
       "title": "Pin classes",
-      "text": "You can pin classes so that only schedules with those pinned classes will be shown. Simply click on a class to pin it."
+      "text": "You can pin classes so that only schedules with those pinned classes will be shown. Simply click on a class and pick 'Pin shift' to pin it."
+    },
+    "exclude-shift": {
+      "title": "Exclude classes",
+      "text": "You can exclude classes so that only schedules without those excluded classes will be shown. Simply click on a class and pick 'Exclude shift' to exclude it."
+    },
+    "exclude-timeframe": {
+      "title": "Exclude timeframe",
+      "text": "To exclude a timeframe click on the upper-right icon in the corner, fill in all the fields and click 'Exclude'."
     },
     "add": {
       "title": "Add schedules",
