@@ -41,26 +41,10 @@
               <span *ngIf="!mobileView">{{'week-days.full.monday' | translate}}</span>
             </div>
             <ul>
-              <li *ngFor="let ev of eventsPerWeekday.get('monday')"
-                  [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                  class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
-                  [ngClass]="{'pinned': ev.pinned}"
-                  [attr.data-shift]="ev.shiftName" (click)="toggleOptions($event.target, ev.pinned)">
-                <div class="single-event-div">
-                  <span class="event-date">{{ev.start}} - {{ev.end}}</span>
-                  <em class="event-name">{{ev.name}}</em>
-                  <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
-                </div>
-                <ul class="options">
-                  <li data-toggle="tooltip" data-placement="top" (click)="togglePin(ev.shiftName)">
-                    <fa-icon [icon]="faThumbtack"></fa-icon>
-                  </li>
-                  <li data-toggle="tooltip" data-placement="top" (click)="toggleExcludeShift(ev.shiftName)">
-                    <fa-icon [icon]="faTimes"></fa-icon>
-                  </li>
-                </ul>
-                <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
-              </li>
+              <ng-container *ngFor="let ev of eventsPerWeekday.get('monday')"
+                [ngTemplateOutlet]="event"
+                [ngTemplateOutletContext]="{event: ev}">
+              </ng-container>
             </ul>
           </li>
 
@@ -71,26 +55,10 @@
               <span *ngIf="!mobileView">{{'week-days.full.tuesday' | translate}}</span>
             </div>
             <ul>
-              <li *ngFor="let ev of eventsPerWeekday.get('tuesday')"
-                  [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                  class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
-                  [ngClass]="{'pinned': ev.pinned}"
-                  [attr.data-shift]="ev.shiftName" (click)="toggleOptions($event.target, ev.pinned)">
-                <div class="single-event-div">
-                  <span class="event-date">{{ev.start}} - {{ev.end}}</span>
-                  <em class="event-name">{{ev.name}}</em>
-                  <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
-                </div>
-                <ul class="options">
-                  <li data-toggle="tooltip" data-placement="top" (click)="togglePin(ev.shiftName)">
-                    <fa-icon [icon]="faThumbtack"></fa-icon>
-                  </li>
-                  <li data-toggle="tooltip" data-placement="top" (click)="toggleExcludeShift(ev.shiftName)">
-                    <fa-icon [icon]="faTimes"></fa-icon>
-                  </li>
-                </ul>
-                <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
-              </li>
+              <ng-container *ngFor="let ev of eventsPerWeekday.get('tuesday')"
+                [ngTemplateOutlet]="event"
+                [ngTemplateOutletContext]="{event: ev}">
+              </ng-container>
             </ul>
           </li>
 
@@ -101,26 +69,10 @@
               <span *ngIf="!mobileView">{{'week-days.full.wednesday' | translate}}</span>
             </div>
             <ul>
-              <li *ngFor="let ev of eventsPerWeekday.get('wednesday')"
-                  [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                  class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
-                  [ngClass]="{'pinned': ev.pinned}"
-                  [attr.data-shift]="ev.shiftName" (click)="toggleOptions($event.target, ev.pinned)">
-                <div class="single-event-div">
-                  <span class="event-date">{{ev.start}} - {{ev.end}}</span>
-                  <em class="event-name">{{ev.name}}</em>
-                  <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
-                </div>
-                <ul class="options">
-                  <li data-toggle="tooltip" data-placement="top" (click)="togglePin(ev.shiftName)">
-                    <fa-icon [icon]="faThumbtack"></fa-icon>
-                  </li>
-                  <li data-toggle="tooltip" data-placement="top" (click)="toggleExcludeShift(ev.shiftName)">
-                    <fa-icon [icon]="faTimes"></fa-icon>
-                  </li>
-                </ul>
-                <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
-              </li>
+              <ng-container *ngFor="let ev of eventsPerWeekday.get('wednesday')"
+                [ngTemplateOutlet]="event"
+                [ngTemplateOutletContext]="{event: ev}">
+              </ng-container>
             </ul>
           </li>
 
@@ -131,26 +83,10 @@
               <span *ngIf="!mobileView">{{'week-days.full.thursday' | translate}}</span>
             </div>
             <ul>
-              <li *ngFor="let ev of eventsPerWeekday.get('thursday')"
-                  [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                  class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
-                  [ngClass]="{'pinned': ev.pinned}"
-                  [attr.data-shift]="ev.shiftName" (click)="toggleOptions($event.target, ev.pinned)">
-                <div class="single-event-div">
-                  <span class="event-date">{{ev.start}} - {{ev.end}}</span>
-                  <em class="event-name">{{ev.name}}</em>
-                  <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
-                </div>
-                <ul class="options">
-                  <li data-toggle="tooltip" data-placement="top" (click)="togglePin(ev.shiftName)">
-                    <fa-icon [icon]="faThumbtack"></fa-icon>
-                  </li>
-                  <li data-toggle="tooltip" data-placement="top" (click)="toggleExcludeShift(ev.shiftName)">
-                    <fa-icon [icon]="faTimes"></fa-icon>
-                  </li>
-                </ul>
-                <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
-              </li>
+              <ng-container *ngFor="let ev of eventsPerWeekday.get('thursday')"
+                [ngTemplateOutlet]="event"
+                [ngTemplateOutletContext]="{event: ev}">
+              </ng-container>
             </ul>
           </li>
 
@@ -161,26 +97,10 @@
               <span *ngIf="!mobileView">{{'week-days.full.friday' | translate}}</span>
             </div>
             <ul>
-              <li *ngFor="let ev of eventsPerWeekday.get('friday')"
-                  [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-                  class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
-                  [ngClass]="{'pinned': ev.pinned}"
-                  [attr.data-shift]="ev.shiftName" (click)="toggleOptions($event.target, ev.pinned)">
-                <div class="single-event-div">
-                  <span class="event-date">{{ev.start}} - {{ev.end}}</span>
-                  <em class="event-name">{{ev.name}}</em>
-                  <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
-                </div>
-                <ul class="options">
-                  <li data-toggle="tooltip" data-placement="top" (click)="togglePin(ev.shiftName)">
-                    <fa-icon [icon]="faThumbtack"></fa-icon>
-                  </li>
-                  <li data-toggle="tooltip" data-placement="top" (click)="toggleExcludeShift(ev.shiftName)">
-                    <fa-icon [icon]="faTimes"></fa-icon>
-                  </li>
-                </ul>
-                <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
-              </li>
+              <ng-container *ngFor="let ev of eventsPerWeekday.get('friday')"
+                [ngTemplateOutlet]="event"
+                [ngTemplateOutletContext]="{event: ev}">
+              </ng-container>
             </ul>
           </li>
         </ul>
@@ -197,7 +117,7 @@
 
 <!-- Exclude Timeframe Modal -->
 <div class="modal fade" id="excludeTimeframeModal" tabindex="-1" aria-labelledby="excludeTimeframeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog">
     <div class="modal-content">
 
       <!-- Header -->
@@ -215,7 +135,7 @@
             <div class="row">
 
               <!-- Weekday -->
-              <div class="col-12 col-md-6">
+              <div class="col-12 col-md-4">
                 <div class="form-group">
                   <label for="weekday" class="d-block">{{'weekday' | translate}}</label>
                   <select id="weekday" name="weekday" class="selectpicker show-tick form-control" autofocus [(ngModel)]="selectedWeekday"
@@ -227,7 +147,7 @@
               </div>
 
               <!-- Begin time -->
-              <div class="col-6 col-md-3">
+              <div class="col-6 col-md-4">
                 <div class="form-group">
                   <label for="begin" class="d-block">{{'beginTime' | translate}}</label>
                   <input type="time" id="begin" name="begin" class="form-control" [(ngModel)]="selectedStartTime" [required]="true">
@@ -235,7 +155,7 @@
               </div>
 
               <!-- End time -->
-              <div class="col-6 col-md-3">
+              <div class="col-6 col-md-4">
                 <div class="form-group">
                   <label for="end" class="d-block">{{'endTime' | translate}}</label>
                   <input type="time" id="end" name="end" class="form-control" [(ngModel)]="selectedEndTime" [required]="true">
@@ -255,3 +175,29 @@
     </div>
   </div>
 </div>
+
+
+<!-- Event Template -->
+<ng-template #event let-ev='event'>
+  <li [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
+      class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
+      [ngClass]="{'pinned': ev.pinned}"
+      [attr.data-shift]="ev.shiftName" (click)="toggleOptions($event.target, ev.pinned)"
+      clickedOutside (clickedOutside)="closeOptions($event)">
+    <div class="single-event-div">
+      <span class="event-date">{{ev.start}} - {{ev.end}}</span>
+      <em class="event-name">{{ev.name}}</em>
+      <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
+    </div>
+    <ul class="options">
+      <li data-toggle="tooltip" data-placement="top" (click)="togglePin(ev.shiftName)">
+        <fa-icon [icon]="faThumbtack"></fa-icon>
+      </li>
+      <li data-toggle="tooltip" data-placement="top" (click)="toggleExcludeShift(ev.shiftName)">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </li>
+    </ul>
+    <fa-icon [icon]="faCog" class="options-icon"></fa-icon>
+    <fa-icon [icon]="faThumbtack" class="pin"></fa-icon>
+  </li>
+</ng-template>

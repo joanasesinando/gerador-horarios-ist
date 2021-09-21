@@ -1,4 +1,16 @@
-import {Component, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import {Observable, Subscription} from 'rxjs';
 import {NgForm} from '@angular/forms';
 
@@ -8,7 +20,7 @@ import {AlertService} from '../../_util/alert.service';
 import {TranslateService} from '@ngx-translate/core';
 import {SchedulesGenerationService} from '../../_services/schedules-generation/schedules-generation.service';
 
-import {faCaretRight, faCaretLeft, faThumbtack, faEllipsisV, faTimes} from '@fortawesome/free-solid-svg-icons';
+import {faCaretRight, faCaretLeft, faThumbtack, faEllipsisV, faTimes, faCog} from '@fortawesome/free-solid-svg-icons';
 
 import {Schedule} from '../../_domain/Schedule/Schedule';
 import {Event} from '../../_domain/Event/Event';
@@ -70,6 +82,7 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
   faThumbtack = faThumbtack;
   faTimes = faTimes;
   faEllipsisV = faEllipsisV;
+  faCog = faCog;
 
   constructor(
     private logger: LoggerService,
@@ -243,8 +256,14 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
     return this.mobileView ? height > this.SLOT_HEIGHT_MOBILE * 2 : height > this.SLOT_HEIGHT_DESKTOP * 2;
   }
 
-  closeOptions(): void {
-    $('.options.open').removeClass('open');
+  closeOptions(target?: ElementRef): void {
+    if (!target) { // close all
+      $('.options.open').removeClass('open');
+
+    } else { // close selected
+      const optionsMenu = $(target.nativeElement.closest('.single-event').children[1]);
+      optionsMenu.removeClass('open');
+    }
   }
 
   toggleOptions(target, pinned: boolean): void {

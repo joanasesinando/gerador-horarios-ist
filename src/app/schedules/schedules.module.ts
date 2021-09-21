@@ -9,10 +9,11 @@ import { ScheduleCardComponent } from './schedule-card/schedule-card.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import { PillComponent } from './pill/pill.component';
 import {FormsModule} from '@angular/forms';
+import {ClickedOutsideDirective} from '../_directives/clicked-outside.directive';
 
 
 @NgModule({
-  declarations: [SchedulesComponent, TimetableComponent, ScheduleCardComponent, PillComponent],
+  declarations: [SchedulesComponent, TimetableComponent, ScheduleCardComponent, PillComponent, ClickedOutsideDirective],
   exports: [
     TimetableComponent,
     SchedulesComponent

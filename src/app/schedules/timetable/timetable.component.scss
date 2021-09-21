@@ -296,7 +296,7 @@ $columns: 5;
   .single-event {
     position: absolute;
     float: left;
-    -webkit-transition: opacity .2s, background .2s;
+    -webkit-transition: all .2s;
     transition: all .2s;
     /* top position and height will be set using js */
     width: calc(100% + 2px);
@@ -320,7 +320,7 @@ $columns: 5;
       }
     }
 
-    .pin {
+    .pin, .options-icon {
       display: none;
       position: absolute;
       top: .3rem;
@@ -364,12 +364,10 @@ $columns: 5;
 
         li {
           bottom: 0;
-          &:nth-child(1) {
-            transform: translateX(0);
-          }
-          &:nth-child(2) {
-            transform: translateX(-2rem);
-          }
+
+          &:nth-child(1) { transform: translateX(0); }
+          &:nth-child(2) { transform: translateX(-2rem); }
+
           &:hover {
             fa-icon { color: $gh-blue; }
           }
@@ -380,6 +378,7 @@ $columns: 5;
     &:hover, &:focus {
       cursor: pointer;
       box-shadow: $selected-shadow;
+      &:not(.pinned) .options:not(.open) + .options-icon { display: block; }
     }
   }
 }
