@@ -175,6 +175,7 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
           this.generationService.sortByMostCompact(this.generatedSchedules);
         break;
     }
+    if (this.generatedSchedules[0]) this.scheduleInViewID = this.generatedSchedules[0].id;
     this.spinners.sorting = false;
     this.logger.log('Changed view to ' + option);
   }
