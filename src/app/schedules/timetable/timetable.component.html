@@ -180,9 +180,9 @@
 <!-- Event Template -->
 <ng-template #event let-ev='event'>
   <li [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-      class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end"
+      class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end" [attr.data-day]="ev.weekday"
       [ngClass]="{'pinned': ev.pinned}"
-      [attr.data-shift]="ev.shiftName" (click)="toggleOptions($event.target, ev.pinned)"
+      [attr.data-shift]="ev.shiftName" (click)="toggleOptions(ev, ev.pinned)"
       clickedOutside (clickedOutside)="closeOptions($event)">
     <div class="single-event-div">
       <span class="event-date">{{ev.start}} - {{ev.end}}</span>
@@ -191,10 +191,16 @@
     </div>
     <ul class="options">
       <li data-toggle="tooltip" data-placement="top" (click)="togglePin(ev.shiftName)">
-        <fa-icon [icon]="faThumbtack"></fa-icon>
+        <fa-icon *ngIf="!ev.pinned" [icon]="faThumbtack"></fa-icon>
+        <div class="unpin-icon-wrapper">
+          <svg *ngIf="ev.pinned" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
+            <path class="unpin-thumbtack" d="M171.014 107.133L164.896 48H186C192.628 48 198 42.6275 198 36V12C198 5.3725 192.628 0 186 0H50C43.3725 0 38 5.3725 38 12V36C38 42.6275 43.3725 48 50 48H71.1035L64.986 107.133C40.7325 118.41 22 138.631 22 164C22 170.628 27.3725 176 34 176H102V228.003C102 228.624 102.145 229.237 102.423 229.792L114.423 253.792C115.893 256.733 120.105 256.739 121.578 253.792L133.578 229.792C133.856 229.237 134 228.625 134.001 228.003V176H202.001C208.628 176 214.001 170.628 214.001 164C214 138.409 195.009 118.29 171.014 107.133V107.133Z"/>
+            <path class="unpin-slash" d="M61.8291 234.113L236.956 63.5348C245.015 55.6854 245.015 42.9588 236.956 35.103L222.361 20.8871C214.302 13.0376 201.236 13.0376 193.171 20.8871L18.0441 191.465C9.98531 199.315 9.98531 212.041 18.0441 219.897L32.6391 234.113C40.6978 241.962 53.7703 241.962 61.8291 234.113Z"/>
+          </svg>
+        </div>
       </li>
       <li data-toggle="tooltip" data-placement="top" (click)="toggleExcludeShift(ev.shiftName)">
-        <fa-icon [icon]="faTimes"></fa-icon>
+        <fa-icon class="exclude" [icon]="faTimes"></fa-icon>
       </li>
     </ul>
     <fa-icon [icon]="faCog" class="options-icon"></fa-icon>

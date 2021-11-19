@@ -266,8 +266,9 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  toggleOptions(target, pinned: boolean): void {
-    const optionsMenu = $(target.closest('.single-event').children[1]);
+  toggleOptions(ev: Event, pinned: boolean): void {
+    const eventSlot = $('.single-event[data-shift=\'' + ev.shiftName + '\'][data-day=\'' + ev.weekday + '\'][data-start=\'' + ev.start + '\'][data-end=\'' + ev.end + '\']');
+    const optionsMenu = eventSlot.children('.options');
     if (!optionsMenu.hasClass('open')) this.closeOptions();
     optionsMenu.toggleClass('open');
 
@@ -299,7 +300,7 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
 
     } else { this.errorService.showError('Something went wrong while pinning shifts.'); }
 
-    this.logger.log('Pinned shift ' + shiftName);
+    this.logger.log((this.pinnedShifts.includes(shiftName) ? 'Pinned' : 'Unpinned') + ' shift ' + shiftName);
   }
 
   filterSchedules(): Schedule[] { // TODO: testing
@@ -391,7 +392,7 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
     this.excludedShiftsChanged.emit(this.excludedShifts);
     $('.tooltip').remove();
 
-    this.logger.log('Excluded shift ' + shiftName);
+    this.logger.log((shiftName ? 'Excluded' : 'Included') + ' shift ' + (shiftName || ''));
   }
 
   updateScheduleInViewIndex(schedules: Schedule[]): void {
