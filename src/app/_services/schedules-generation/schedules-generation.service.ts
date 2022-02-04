@@ -226,7 +226,7 @@ export class SchedulesGenerationService {
     const workers: Worker[] = [];
     if (browserSupportsWebWorkers) {
       for (let i = 0; i < optimalNumberWorkers; i++) {
-        const worker = new Worker('../../_workers/generation-worker.worker', {type: 'module'});
+        const worker = new Worker(new URL('../../_workers/generation-worker.worker', import.meta.url), {type: 'module'});
         workers.push(worker);
       }
     }
