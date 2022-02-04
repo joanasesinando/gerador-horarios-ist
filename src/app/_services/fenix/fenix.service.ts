@@ -43,7 +43,7 @@ export class FenixService {
     return new Degree(parseInt(degreeJson.id, 10), degreeJson.name, degreeJson.acronym);
   }
 
-  async parseCourseBasicInfo(academicTerm, course, htmlCurriculum): Promise<Course> {
+  async parseCourseBasicInfo(academicTerm: string, course, htmlCurriculum: HTMLHtmlElement): Promise<Course> {
     if (!course.id) throw new Error('No ID found for course');
     if (!course.name) throw new Error('No name found for course ' + course.id);
     if (!course.acronym) throw new Error('No acronym found for course ' + course.id);

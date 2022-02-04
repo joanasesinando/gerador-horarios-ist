@@ -1,13 +1,13 @@
 {
   "name": "gerador-horarios-ist",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "build:prod": "ng build --configuration production",
     "postbuild:prod": "python scripts/preload_fonts.py",
-    "test": "ng test --watch=false --code-coverage",
+    "test": "ng test --no-watch --code-coverage",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },

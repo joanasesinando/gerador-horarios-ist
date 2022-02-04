@@ -42,7 +42,7 @@ describe('HomepageComponent', () => {
       new Degree(3, 'Degree #3', 'D3')
     ];
     courses = [
-      new Course(1, 'Course #1', 'C1', 4.5, 1, [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
+      new Course(1, 'Course #1', 'C1', 4.5, 1, 'P1', [ClassType.THEORY_PT, ClassType.LAB_PT], ['Alameda'],
         [
           new Shift('T01', ClassType.THEORY_PT, [
             new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda'),
@@ -52,14 +52,14 @@ describe('HomepageComponent', () => {
             new Lesson(new Date('2020-09-08 09:30'), new Date('2020-09-07 11:00'), 'R2', 'Alameda')
           ], 'Alameda')
         ], { TEORICA: 3, LABORATORIAL: 1.5 }),
-      new Course(2, 'Course #2', 'C2', 4.5,  1, [ClassType.THEORY_PT], ['Taguspark'],
+      new Course(2, 'Course #2', 'C2', 4.5,  1, 'P1', [ClassType.THEORY_PT], ['Taguspark'],
         [
           new Shift('T01', ClassType.THEORY_PT, [
             new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Taguspark'),
             new Lesson(new Date('2020-09-09 09:30'), new Date('2020-09-09 11:00'), 'R1', 'Taguspark')
           ], 'Taguspark')
         ], { TEORICA: 3 }),
-      new Course(3, 'Course #3', 'C3', 4.5,  1, [ClassType.THEORY_PT, ClassType.PROBLEMS_PT], ['Alameda'],
+      new Course(3, 'Course #3', 'C3', 4.5,  1, 'P1', [ClassType.THEORY_PT, ClassType.PROBLEMS_PT], ['Alameda'],
         [
           new Shift('T01', ClassType.THEORY_PT, [
             new Lesson(new Date('2020-09-07 09:30'), new Date('2020-09-07 11:00'), 'R1', 'Alameda'),
@@ -255,7 +255,7 @@ describe('HomepageComponent', () => {
 
         it('should NOT add a course that has no shifts', () => {
           courses.push(new Course(
-            4, 'Course #4', 'C4', 4.5,  1, [ClassType.THEORY_PT], ['Alameda'],
+            4, 'Course #4', 'C4', 4.5,  1, 'P1', [ClassType.THEORY_PT], ['Alameda'],
             [], { TEORICA: 2 }));
 
           try {
@@ -373,6 +373,7 @@ describe('HomepageComponent', () => {
           'C1',
           4.5,
           1,
+          'P1',
           [ClassType.THEORY_PT, ClassType.LAB_PT],
           ['Alameda', 'Taguspark'],
           [
@@ -498,6 +499,7 @@ describe('HomepageComponent', () => {
           'C2',
           4.5,
           1,
+          'P1',
           [ClassType.THEORY_PT],
           ['Alameda'],
           [

@@ -357,19 +357,19 @@ describe('FenixService', () => {
       }
 
       it('should fill course missing info: no campus', () => {
-        const course = new Course(123, 'C1', 'C01', 4.5, 1, [ClassType.THEORY_PT], [], [new MockShift()]);
+        const course = new Course(123, 'C1', 'C01', 4.5, 1, 'P1', [ClassType.THEORY_PT], [], [new MockShift()]);
         expect(service.fillMissingInfo(course).campus).toBe(null);
       });
 
       it('should fill course missing info: no types', () => {
-        const course = new Course(123, 'C1', 'C01', 4.5, 1, [], ['A'], [new MockShift()]);
+        const course = new Course(123, 'C1', 'C01', 4.5, 1, 'P1', [], ['A'], [new MockShift()]);
         expect(service.fillMissingInfo(course).types).toEqual([ClassType.NONE]);
       });
 
       it('should throw an error if there are no shifts', () => {
-        const course = new Course(123, 'C1', 'C01', 4.5, 1, [ClassType.THEORY_PT], ['A'], []);
+        const course = new Course(123, 'C1', 'C01', 4.5, 1, 'P1', [ClassType.THEORY_PT], ['A'], []);
         expect(() => service.fillMissingInfo(course))
-          .toThrow(new Error('No shifts found. Impossible to generate schedules for course: ' + course.name));
+          .toThrow(new Error('No shifts found'));
       });
     });
   });
