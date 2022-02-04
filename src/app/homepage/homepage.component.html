@@ -157,20 +157,29 @@
                   <div class="input-group w-100">
                     <select id="inputCourse" class="selectpicker show-tick form-control" [(ngModel)]="selectedCourse"
                             title="{{'main-content.labels.placeholder' | translate}} {{('main-content.labels.course' | translate).toLowerCase()}}..."
-                            data-style="custom-select" data-size="10"
+                            data-style="custom-select" data-size="10" data-show-subtext="true"
                             data-live-search="true" data-live-search-placeholder="Search..."
                             [disabled]="this.courses.length === 0" (change)="noShiftsFound = false">
                       <optgroup label="{{'main-content.labels.first-semester' | translate}}">
                         <option *ngFor="let course of getCoursesBySemester(1)" value="{{course.id}}"
-                                [attr.data-tokens]="removePortugueseCharacters(course.name)">[{{course.formatAcronym()}}] {{course.name}}</option>
+                                [attr.data-subtext]="isMEPPAcademicTerm() ? course.period ? course.period : 'Sem' : ''"
+                                [attr.data-tokens]="removePortugueseCharacters(course.name)">[{{course.formatAcronym()}}]
+                          {{course.name}}
+                        </option>
                       </optgroup>
                       <optgroup label="{{'main-content.labels.second-semester' | translate}}">
                         <option *ngFor="let course of getCoursesBySemester(2)" value="{{course.id}}"
-                                [attr.data-tokens]="removePortugueseCharacters(course.name)">[{{course.formatAcronym()}}] {{course.name}}</option>
+                                [attr.data-subtext]="isMEPPAcademicTerm() ? course.period ? course.period : 'Sem' : ''"
+                                [attr.data-tokens]="removePortugueseCharacters(course.name)">[{{course.formatAcronym()}}]
+                          {{course.name}}
+                        </option>
                       </optgroup>
                       <optgroup label="{{'main-content.labels.not-found' | translate}}">
                         <option *ngFor="let course of getCoursesBySemester(0)" value="{{course.id}}"
-                                [attr.data-tokens]="removePortugueseCharacters(course.name)">[{{course.formatAcronym()}}] {{course.name}}</option>
+                                [attr.data-subtext]="isMEPPAcademicTerm() ? course.period ? course.period : 'Sem' : ''"
+                                [attr.data-tokens]="removePortugueseCharacters(course.name)">[{{course.formatAcronym()}}]
+                          {{course.name}}
+                        </option>
                       </optgroup>
                     </select>
                     <div class="input-group-append">
@@ -194,12 +203,6 @@
               <h3 class="pick-courses-heading mb-4">{{'main-content.headers.selected-courses' | translate}}
                 <span *ngIf="this.selectedCourses.length > 0" class="ml-2 mt-1">{{this.selectedCourses.length}}</span>
               </h3>
-              <p *ngIf="this.selectedCourses.length > 0 && isMEPPAcademicTerm()" class="text-warning">
-                {{translateService.currentLang === 'pt-PT' ?
-                '⚠️ Os ECTS mostrados poderão ainda não refletir o novo ' :
-                '⚠️ The ECTS displayed might not reflect the new '}}
-                <a href="https://mepp.tecnico.ulisboa.pt/" target="_blank" class="text-warning" style="text-decoration: underline">MEPP</a>.
-              </p>
               <p *ngIf="this.selectedCourses.length > 0" class="text-muted">Total ECTS: {{this.totalCredits}}</p>
               <p *ngIf="selectedCourses.length === 0"><em>{{'main-content.no-course-selected' | translate}}</em></p>
               <app-course-banner

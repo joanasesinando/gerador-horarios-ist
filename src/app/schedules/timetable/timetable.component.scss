@@ -11,45 +11,47 @@
    License: none (public domain)
 */
 
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed,
-figure, figcaption, footer, header, hgroup,
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  vertical-align: baseline;
-}
-/* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section, main {
-  display: block;
-}
-body {
-  line-height: 1;
-}
-ol, ul {
-  list-style: none;
-}
-blockquote, q {
-  quotes: none;
-}
-blockquote:before, blockquote:after,
-q:before, q:after {
-  content: none;
-}
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
+.timetable {
+  html, body, div, span, applet, object, iframe,
+  h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+  a, abbr, acronym, address, big, cite, code,
+  del, dfn, em, img, ins, kbd, q, s, samp,
+  small, strike, strong, sub, sup, tt, var,
+  b, u, i, center,
+  dl, dt, dd, ol, ul, li,
+  fieldset, form, label, legend,
+  table, caption, tbody, tfoot, thead, tr, th, td,
+  article, aside, canvas, details, embed,
+  figure, figcaption, footer, header, hgroup,
+  menu, nav, output, ruby, section, summary,
+  time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: baseline;
+  }
+  /* HTML5 display-role reset for older browsers */
+  article, aside, details, figcaption, figure,
+  footer, header, hgroup, menu, nav, section, main {
+    display: block;
+  }
+  body {
+    line-height: 1;
+  }
+  ol, ul {
+    list-style: none;
+  }
+  blockquote, q {
+    quotes: none;
+  }
+  blockquote:before, blockquote:after,
+  q:before, q:after {
+    content: none;
+  }
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
 }
 
 
@@ -99,6 +101,24 @@ fa-icon {
   &:hover {
     cursor: pointer;
     color: lighten($gh-darkGray, 10%);
+  }
+}
+
+.btn-options {
+  position: absolute;
+  top: .2rem;
+  right: .7rem;
+
+  fa-icon { font-size: initial; color: $gh-gray; }
+  .dropdown-toggle::after { content: none; }
+
+  .dropdown-menu {
+    min-width: unset;
+
+    .dropdown-item {
+      padding: .25rem 1rem;
+      &:hover { cursor: pointer; }
+    }
   }
 }
 
@@ -276,9 +296,8 @@ $columns: 5;
   .single-event {
     position: absolute;
     float: left;
-    -webkit-transition: opacity .2s, background .2s;
-    transition: opacity .2s, background .2s;
-    z-index: 3;
+    -webkit-transition: all .2s;
+    transition: all .2s;
     /* top position and height will be set using js */
     width: calc(100% + 2px);
     left: -1px;
@@ -301,7 +320,7 @@ $columns: 5;
       }
     }
 
-    .pin {
+    .pin, .options-icon {
       display: none;
       position: absolute;
       top: .3rem;
@@ -310,10 +329,81 @@ $columns: 5;
       color: white;
     }
 
+    .options {
+      display: none;
+      list-style-type: none;
+      margin: 0;
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 0;
+      z-index: 30;
+
+      li {
+        background: white;
+        padding: .8rem;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: .5rem;
+        box-shadow: 0 6px 24px -2px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        transition: all .2s;
+        position: absolute;
+        right: 0;
+        z-index: 1;
+
+        fa-icon {
+          font-size: .8rem;
+        }
+
+        .unpin-icon-wrapper {
+          position: absolute;
+          height: .8rem;
+          width: .8rem;
+
+          svg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+
+            .unpin-thumbtack {
+              fill: $gh-darkGray;
+            }
+
+            .unpin-slash {
+              fill: $gh-red;
+            }
+          }
+        }
+      }
+
+      &.open {
+        display: block;
+
+        li {
+          bottom: 0;
+
+          &:nth-child(1) { transform: translateX(0); }
+          &:nth-child(2) { transform: translateX(-2rem); }
+
+          &:hover {
+            fa-icon {
+              color: $gh-blue;
+              &.exclude { color: $gh-red; }
+            }
+
+            .unpin-icon-wrapper svg .unpin-thumbtack { fill: $gh-blue; }
+          }
+        }
+      }
+    }
+
     &:hover, &:focus {
       cursor: pointer;
       box-shadow: $selected-shadow;
-      .pin { display: block; }
+      &:not(.pinned) .options:not(.open) + .options-icon { display: block; }
     }
   }
 }
@@ -416,7 +506,6 @@ $columns: 5;
 .schedule .events .single-event.pinned {
   border: 2px solid rgba(235, 87, 87, 0.8);
   box-shadow: $pinned-shadow;
-  z-index: 10;
 
   .pin {
     display: block;

@@ -1,6 +1,8 @@
 export enum ClassType {
   // Portuguese
   THEORY_PT = 'Teórico',
+  PRACTICE_PT = 'Prático',
+  TP_PT = 'Teórico-Prático',
   LAB_PT = 'Laboratório',
   PROBLEMS_PT = 'Problemas',
   SEMINARY_PT = 'Seminário',
@@ -10,6 +12,8 @@ export enum ClassType {
 
   // English
   THEORY_EN = 'Theory',
+  PRACTICE_EN = 'Practice',
+  TP_EN = 'Theoretical-Practical',
   LAB_EN = 'Lab',
   PROBLEMS_EN = 'Problems',
   SEMINARY_EN = 'Seminary',
@@ -25,6 +29,14 @@ export function minifyClassType(type: ClassType): string {
     case ClassType.THEORY_PT:
     case ClassType.THEORY_EN:
       return 'T';
+
+    case ClassType.PRACTICE_PT:
+    case ClassType.PRACTICE_EN:
+      return 'P';
+
+    case ClassType.TP_PT:
+    case ClassType.TP_EN:
+      return 'TP';
 
     case ClassType.LAB_PT:
     case ClassType.LAB_EN:
@@ -62,32 +74,40 @@ export function getClassTypeOrder(type: ClassType): number {
     case ClassType.THEORY_EN:
       return 0;
 
+    case ClassType.PRACTICE_PT:
+    case ClassType.PRACTICE_EN:
+      return 1;
+
+    case ClassType.TP_PT:
+    case ClassType.TP_EN:
+      return 2;
+
     case ClassType.LAB_PT:
     case ClassType.LAB_EN:
-      return 1;
+      return 3;
 
     case ClassType.PROBLEMS_PT:
     case ClassType.PROBLEMS_EN:
-      return 2;
+      return 4;
 
     case ClassType.SEMINARY_PT:
     case ClassType.SEMINARY_EN:
-      return 3;
+      return 5;
 
     case ClassType.TUTORIAL_ORIENTATION_PT:
     case ClassType.TUTORIAL_ORIENTATION_EN:
-      return 4;
+      return 6;
 
     case ClassType.TRAINING_PERIOD_PT:
     case ClassType.TRAINING_PERIOD_EN:
-      return 5;
+      return 7;
 
     case ClassType.FIELD_WORK_PT:
     case ClassType.FIELD_WORK_EN:
-      return 6;
+      return 8;
 
     case ClassType.NONE:
     default:
-      return 7;
+      return 9;
   }
 }

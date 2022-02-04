@@ -10,6 +10,7 @@ export class Course {
     private _acronym: string,
     private _credits: number,
     private _semester: number,
+    private _period: string,
     private _types?: ClassType[],
     private _campus?: string[],
     private _shifts?: Shift[],
@@ -31,6 +32,9 @@ export class Course {
 
   get semester(): number { return this._semester; }
   set semester(value: number) { this._semester = value; }
+
+  get period(): string { return this._period; }
+  set period(value: string) { this._period = value; }
 
   get types(): ClassType[] { return this._types; }
   set types(value: ClassType[]) { this._types = value; }

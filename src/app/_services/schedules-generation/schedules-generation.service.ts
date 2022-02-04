@@ -258,7 +258,7 @@ export class SchedulesGenerationService {
         let workersLeft = 0;
 
         const allWorkersFinished = new EventEmitter<void>();
-        const allFinished = new Promise((resolve) => allWorkersFinished.subscribe(() => resolve()));
+        const allFinished = new Promise<void>((resolve) => allWorkersFinished.subscribe(() => resolve()));
 
         let i = 0;
         let workerIndex = 0;

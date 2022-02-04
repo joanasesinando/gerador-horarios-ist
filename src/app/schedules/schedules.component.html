@@ -71,6 +71,8 @@
               <!-- Timetable -->
               <app-timetable *ngIf="generatedSchedules.length !== 0"
                              [schedules]="generatedSchedules" (scheduleSelected)="scheduleInViewID = $event"
+                             [onExcludedShiftsChanged]="excludedShiftsSubject.asObservable()" (excludedShiftsChanged)="this.excludedShifts = $event"
+                             [onExcludedTimeframesChanged]="excludedTimeframesSubject.asObservable()" (excludedTimeframesChanged)="this.excludedTimeframes = $event"
                              [keydownEvents]="keyDownSubject.asObservable()"></app-timetable>
 
               <!-- Add btn -->
@@ -79,6 +81,28 @@
                         type="button" (click)="addSchedule(scheduleInViewID)">{{'schedules.addSchedule' | translate}}</button>
                 <a *ngIf="mobileView" href="#selected-schedules"
                    class="d-block text-center mt-4">{{'schedules.see' | translate}} {{'schedules.selected.more' | translate}}</a>
+              </div>
+
+              <!-- Excluded shifts -->
+              <div *ngIf="excludedShifts.length > 0" class="excluded-shifts mt-4">
+                <p class=""><b>{{'schedules.excludedShifts' | translate}}</b></p>
+                <div class="d-flex flex-wrap align-items-center">
+                  <app-pill *ngFor="let shift of excludedShifts; let last = last"
+                            [label]="shift" [marginRight]="!last"
+                            (deleteClicked)="removeExcludedShift(shift)">
+                  </app-pill>
+                </div>
+              </div>
+
+              <!-- Excluded timeframes -->
+              <div *ngIf="excludedTimeframes.length > 0" class="excluded-timeframes mt-4">
+                <p class=""><b>{{'schedules.excludedTimeframes' | translate}}</b></p>
+                <div class="d-flex flex-wrap align-items-center">
+                  <app-pill *ngFor="let timeframe of excludedTimeframes; let last = last"
+                            [label]="getTimeframeLabel(timeframe)" [marginRight]="!last"
+                            (deleteClicked)="removeExcludedTimeframe(timeframe)">
+                  </app-pill>
+                </div>
               </div>
 
             </div>

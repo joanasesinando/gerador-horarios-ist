@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import {DebugElement} from '@angular/core';
 import {of} from 'rxjs';
 import _ from 'lodash';
@@ -34,7 +34,7 @@ describe('HomepageComponent', () => {
   let degrees: Degree[];
   let courses: Course[];
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     academicTerms = ['2020/2021', '2021/2022'];
     degrees = [
       new Degree(1, 'Degree #1', 'D1'),

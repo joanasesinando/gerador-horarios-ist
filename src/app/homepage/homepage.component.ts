@@ -296,6 +296,14 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         return;
       }
 
+      if (!this.isSamePeriod(courseToAdd)) {
+        this.translateService.currentLang === 'pt-PT' ?
+          this.alertService.showAlert('Atenção', 'Esta cadeira é lecionada num período diferente das cadeiras que já foram selecionadas.', 'warning') :
+          this.alertService.showAlert('Attention', 'This course is taught in a different term than the courses already added.', 'warning');
+        addBtn.attr('disabled', false);
+        return;
+      }
+
       if (courseToAdd.hasFullInfo()) {
         this.addCourseHelper(courseToAdd, courseIndex, addBtn);
 
@@ -347,6 +355,13 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   isSameSemester(course: Course): boolean {
     for (const c of this.selectedCourses) {
       if (c.semester !== course.semester) return false;
+    }
+    return true;
+  }
+
+  isSamePeriod(course: Course): boolean {
+    for (const c of this.selectedCourses) {
+      if (c.period !== course.period && c.period && course.period) return false;
     }
     return true;
   }
@@ -532,7 +547,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   isMEPPAcademicTerm(): boolean {
-    return parseInt(this.selectedAcademicTerm.split('/')[0], 10) >= 2021;
+    return this.fenixService.isMEPPAcademicTerm(this.selectedAcademicTerm);
   }
 
   @HostListener('window:resize', [])
