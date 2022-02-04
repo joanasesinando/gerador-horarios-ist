@@ -236,7 +236,7 @@ $columns: 5;
   }
 
   .events-group {
-    width: 100% / $columns;
+    width: calc(100% / #{$columns});
     float: left;
     border: 1px solid #EAEAEA;
     margin-bottom: 0;

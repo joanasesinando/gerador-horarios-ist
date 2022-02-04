@@ -226,7 +226,7 @@ export class SchedulesGenerationService {
     const workers: Worker[] = [];
     if (browserSupportsWebWorkers) {
       for (let i = 0; i < optimalNumberWorkers; i++) {
-        const worker = new Worker('../../_workers/generation-worker.worker', {type: 'module'});
+        const worker = new Worker(new URL('../../_workers/generation-worker.worker', import.meta.url), {type: 'module'});
         workers.push(worker);
       }
     }
@@ -258,7 +258,7 @@ export class SchedulesGenerationService {
         let workersLeft = 0;
 
         const allWorkersFinished = new EventEmitter<void>();
-        const allFinished = new Promise((resolve) => allWorkersFinished.subscribe(() => resolve()));
+        const allFinished = new Promise<void>((resolve) => allWorkersFinished.subscribe(() => resolve()));
 
         let i = 0;
         let workerIndex = 0;

@@ -1,4 +1,4 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import {DebugElement} from '@angular/core';
 import {of} from 'rxjs';
 
@@ -82,7 +82,7 @@ describe('TimetableComponent', () => {
   const stateService: StateService = new StateService(logger);
   const scheduleGenerationService: SchedulesGenerationService = new SchedulesGenerationService(logger, stateService);
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         TranslateModule.forRoot({
