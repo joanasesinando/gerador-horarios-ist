@@ -61,7 +61,10 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   noShiftsFound = false;
 
-  tempIDsForIArt = { orig: 846035542880601, P3: 8460355428806013, P4: 8460355428806014 };
+  tempIDsForIArt = {
+    LEICA: { orig: 846035542880601, P3: 301, P4: 401 },
+    LEICT: { orig: 846035542880663, P3: 302, P4: 402 },
+  };
 
   // FontAwesome icons
   faGithub = faGithub;
@@ -266,7 +269,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
       // NOTE: Temporary patch for IArt2 LEIC 2021/2022
       // tslint:disable-next-line:triple-equals
-      if ((degreeID == 2761663971474 || degreeID == 2761663971567) && academicTerm === '2021/2022')
+      if ((degreeID == 2761663971474 || degreeID == 2761663971567) && academicTerm === '2021/2022' &&
+        !this.courses.find(course => course.id === this.tempIDsForIArt.LEICA.P3 || course.id === this.tempIDsForIArt.LEICT.P3))
         this.insertIArtInP3();
 
       this.stateService.saveCoursesState(academicTerm, degreeID, this.courses);
@@ -312,16 +316,23 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      // NOTE: force IArt to always update
-      if (courseToAdd.hasFullInfo() && courseToAdd.id !== this.tempIDsForIArt.P3 && courseToAdd.id !== this.tempIDsForIArt.P4) {
+      // tslint:disable-next-line:max-line-length
+      if (courseToAdd.hasFullInfo() && courseToAdd.id !== this.tempIDsForIArt.LEICA.P3 && courseToAdd.id !== this.tempIDsForIArt.LEICT.P3 &&
+        // tslint:disable-next-line:max-line-length
+        courseToAdd.id !== this.tempIDsForIArt.LEICA.P4 && courseToAdd.id !== this.tempIDsForIArt.LEICA.P4) { // NOTE: force IArt to always update
         this.addCourseHelper(courseToAdd, courseIndex, addBtn);
 
       } else {
 
         // Load rest of info
         this.spinners.course = true;
+
         const origID = courseToAdd.id;
-        if (origID === this.tempIDsForIArt.P3 || origID === this.tempIDsForIArt.P4) courseToAdd.id = this.tempIDsForIArt.orig;
+        // tslint:disable-next-line:max-line-length
+        if (origID === this.tempIDsForIArt.LEICA.P3 || origID === this.tempIDsForIArt.LEICA.P4) courseToAdd.id = this.tempIDsForIArt.LEICA.orig;
+        // tslint:disable-next-line:max-line-length
+        else if (origID === this.tempIDsForIArt.LEICT.P3 || origID === this.tempIDsForIArt.LEICT.P4) courseToAdd.id = this.tempIDsForIArt.LEICT.orig;
+
         this.fenixService.getMissingCourseInfo(courseToAdd).then(course => {
           if (!course) {
             this.spinners.course = false;
@@ -332,7 +343,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           courseToAdd = course;
 
           // NOTE: Temporary patch for IArt2 LEIC 2021/2022
-          if (courseToAdd.id === this.tempIDsForIArt.orig) {
+          if (courseToAdd.id === this.tempIDsForIArt.LEICA.orig || this.tempIDsForIArt.LEICT.orig) {
             courseToAdd.id = origID;
             courseToAdd = this.filterIArtShiftsBasedOnPeriod(courseToAdd);
           }
@@ -573,15 +584,17 @@ export class HomepageComponent implements OnInit, AfterViewInit {
    * Updates courses so that IArt appears in both P3 and P4.
    * ----------------------------------------------------------- */
   insertIArtInP3(): void {
-    this.logger.log('Patching IArt 2021/2022');
+    this.logger.log('Patching IArt 2021/2022 - Duplicating');
 
-    const index = this.courses.findIndex(course => course.id === 846035542880601 && course.acronym === 'IArt2');
+    // tslint:disable-next-line:max-line-length
+    const index = this.courses.findIndex(course => course.id === this.tempIDsForIArt.LEICA.orig || course.id === this.tempIDsForIArt.LEICT.orig);
     const IArt = this.courses[index];
-    this.courses[index].id = this.tempIDsForIArt.P4;
+    // tslint:disable-next-line:max-line-length
+    this.courses[index].id = this.courses[index].id === this.tempIDsForIArt.LEICA.orig ? this.tempIDsForIArt.LEICA.P4 : this.tempIDsForIArt.LEICT.P4;
 
     const IArtP3 = _.cloneDeep(IArt) as Course;
     IArtP3.period = 'P3';
-    IArtP3.id = this.tempIDsForIArt.P3;
+    IArtP3.id = IArt.id === this.tempIDsForIArt.LEICA.P4 ? this.tempIDsForIArt.LEICA.P3 : this.tempIDsForIArt.LEICT.P3;
     this.courses.push(IArtP3);
   }
 
