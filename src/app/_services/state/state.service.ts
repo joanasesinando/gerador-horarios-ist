@@ -32,7 +32,6 @@ export class StateService {
   constructor(private logger: LoggerService) { }
 
   get selectedLanguage(): string { return this._selectedLanguage; }
-
   set selectedLanguage(value: string) { this._selectedLanguage = value; }
 
   get academicTermsRepository(): string[] { return this._academicTermsRepository; }

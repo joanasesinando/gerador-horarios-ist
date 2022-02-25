@@ -53,6 +53,7 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "/joanasesinando/gerador-horarios/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",

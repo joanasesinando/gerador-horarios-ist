@@ -14,14 +14,14 @@ import {StateService} from '../_services/state/state.service';
 
 import {faGithub} from '@fortawesome/free-brands-svg-icons';
 import {
-  faCommentAlt,
+  faBolt,
   faChevronDown,
-  faTh,
-  faThumbtack,
+  faCommentAlt,
   faFileExport,
-  faQuestion,
   faGlobeEurope,
-  faBolt
+  faQuestion,
+  faTh,
+  faThumbtack
 } from '@fortawesome/free-solid-svg-icons';
 
 declare let $;
@@ -60,6 +60,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   };
 
   noShiftsFound = false;
+
+  tempIDsForIArt = { orig: 846035542880601, P3: 8460355428806013, P4: 8460355428806014 };
 
   // FontAwesome icons
   faGithub = faGithub;
@@ -261,6 +263,12 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       this.logger.log('no courses found');
       this.courses = (await this.fenixService.getCoursesBasicInfo(academicTerm, degreeID))
         .filter((course) => !this.selectedCoursesIDs.has(course.id));
+
+      // NOTE: Temporary patch for IArt2 LEIC 2021/2022
+      // tslint:disable-next-line:triple-equals
+      if ((degreeID == 2761663971474 || degreeID == 2761663971567) && academicTerm === '2021/2022')
+        this.insertIArtInP3();
+
       this.stateService.saveCoursesState(academicTerm, degreeID, this.courses);
     }
 
@@ -285,7 +293,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       const addBtn = $('#addBtn');
       addBtn.attr('disabled', true);
 
-      let courseToAdd = _.cloneDeep(this.courses[courseIndex]);
+      let courseToAdd = _.cloneDeep(this.courses[courseIndex]) as Course;
       courseToAdd.degree = this.degrees[degreeIndex];
 
       if (!this.isSameSemester(courseToAdd)) {
@@ -304,13 +312,16 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      if (courseToAdd.hasFullInfo()) {
+      // NOTE: force IArt to always update
+      if (courseToAdd.hasFullInfo() && courseToAdd.id !== this.tempIDsForIArt.P3 && courseToAdd.id !== this.tempIDsForIArt.P4) {
         this.addCourseHelper(courseToAdd, courseIndex, addBtn);
 
       } else {
 
         // Load rest of info
         this.spinners.course = true;
+        const origID = courseToAdd.id;
+        if (origID === this.tempIDsForIArt.P3 || origID === this.tempIDsForIArt.P4) courseToAdd.id = this.tempIDsForIArt.orig;
         this.fenixService.getMissingCourseInfo(courseToAdd).then(course => {
           if (!course) {
             this.spinners.course = false;
@@ -319,6 +330,13 @@ export class HomepageComponent implements OnInit, AfterViewInit {
             return;
           }
           courseToAdd = course;
+
+          // NOTE: Temporary patch for IArt2 LEIC 2021/2022
+          if (courseToAdd.id === this.tempIDsForIArt.orig) {
+            courseToAdd.id = origID;
+            courseToAdd = this.filterIArtShiftsBasedOnPeriod(courseToAdd);
+          }
+
           this.spinners.course = false;
           this.addCourseHelper(courseToAdd, courseIndex, addBtn);
         });
@@ -548,6 +566,41 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   isMEPPAcademicTerm(): boolean {
     return this.fenixService.isMEPPAcademicTerm(this.selectedAcademicTerm);
+  }
+
+  /* -----------------------------------------------------------
+   * [Patching - Artificial Intelligence LEIC 2021/2022]
+   * Updates courses so that IArt appears in both P3 and P4.
+   * ----------------------------------------------------------- */
+  insertIArtInP3(): void {
+    this.logger.log('Patching IArt 2021/2022');
+
+    const index = this.courses.findIndex(course => course.id === 846035542880601 && course.acronym === 'IArt2');
+    const IArt = this.courses[index];
+    this.courses[index].id = this.tempIDsForIArt.P4;
+
+    const IArtP3 = _.cloneDeep(IArt) as Course;
+    IArtP3.period = 'P3';
+    IArtP3.id = this.tempIDsForIArt.P3;
+    this.courses.push(IArtP3);
+  }
+
+  /* -----------------------------------------------------------
+   * [Patching - Artificial Intelligence LEIC 2021/2022]
+   * Filters shifts based on IArt course period.
+   * ----------------------------------------------------------- */
+  filterIArtShiftsBasedOnPeriod(course: Course): Course {
+    this.logger.log('Patching IArt 2021/2022');
+    const P3 = { start: new Date('2022/03/07 00:00:00'), end: new Date('2022/04/22 23:59:59') };
+    const P4 = { start: new Date('2022/05/09 00:00:00'), end: new Date('2022/06/24 23:59:59') };
+
+    course.shifts = course.shifts.filter(shift => {
+      if (course.period === 'P3')
+        return shift.lessons[0].start.getTime() >= P3.start.getTime() && shift.lessons[0].end.getTime() <= P3.end.getTime();
+      else if (course.period === 'P4')
+        return shift.lessons[0].start.getTime() >= P4.start.getTime() && shift.lessons[0].end.getTime() <= P4.end.getTime();
+    });
+    return course;
   }
 
   @HostListener('window:resize', [])
