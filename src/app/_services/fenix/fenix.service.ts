@@ -76,11 +76,11 @@ export class FenixService {
   }
 
   parseCourseMissingInfo(scheduleJson): void {
-    if (!scheduleJson.shifts) throw new Error('No shifts found');
+    if (!scheduleJson.shifts || scheduleJson.shifts.length === 0) throw new Error('No shifts found');
     scheduleJson.shifts.forEach(shift => {
-      if (!shift.name) throw new Error('No name found for shift');
+      if (!shift.name || shift.name.isEmpty()) throw new Error('No name found for shift');
       if (!shift.types || shift.types.length === 0) throw new Error('No type found for shift ' + shift.name);
-      if (!shift.lessons) throw new Error('No lessons found for shift ' + shift.name);
+      if (!shift.lessons || shift.lessons.length === 0) throw new Error('No lessons found for shift ' + shift.name);
 
       shift.lessons.forEach(lesson => {
         if (!lesson.start) throw new Error('No start found for lesson');

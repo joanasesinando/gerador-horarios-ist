@@ -343,7 +343,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
           courseToAdd = course;
 
           // NOTE: Temporary patch for IArt2 LEIC 2021/2022
-          if (courseToAdd.id === this.tempIDsForIArt.LEICA.orig || this.tempIDsForIArt.LEICT.orig) {
+          if (courseToAdd.id === this.tempIDsForIArt.LEICA.orig || courseToAdd.id === this.tempIDsForIArt.LEICT.orig) {
             courseToAdd.id = origID;
             courseToAdd = this.filterIArtShiftsBasedOnPeriod(courseToAdd);
           }

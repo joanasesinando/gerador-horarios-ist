@@ -2,6 +2,8 @@ import {Component} from '@angular/core';
 
 import { faBolt, faCheck, faExclamation, faQuestion } from '@fortawesome/free-solid-svg-icons';
 
+import '@extensions/string.extensions';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
