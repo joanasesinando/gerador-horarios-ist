@@ -183,9 +183,16 @@ export class FenixService {
     return this.httpGet('https://fenix.tecnico.ulisboa.pt/cursos/' + acronym + '/curriculo', false)
       .then(r => r.text())
       .then(html => {
-        const el = document.createElement( 'html' );
-        el.innerHTML = html;
-        return el;
+        // Request curriculum on selected academic term
+        const year = ($('div#content-block ul.dropdown-menu a:contains(\'' + academicTerm + '\')', html)[0].href).match(/year=(\d+)/)[1];
+
+        return this.httpGet('https://fenix.tecnico.ulisboa.pt/cursos/' + acronym + '/curriculo?year=' + year, false)
+          .then(r => r.text())
+          .then(curriculumHTML => {
+            const el = document.createElement( 'html' );
+            el.innerHTML = curriculumHTML;
+            return el;
+          });
       });
   }
 
