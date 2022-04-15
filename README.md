@@ -96,7 +96,7 @@ You can add schedules you like to the queue and when you're done print them to a
 
 # Development
 
-*This project was generated with [Angular CLI](https://cli.angular.io/) version 10.0.6.*
+*This project was generated with [Angular CLI](https://cli.angular.io/) version 13.2.2.*
 <hr>
 
 ### Run
