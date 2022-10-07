@@ -61,11 +61,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   noShiftsFound = false;
 
-  tempIDsForIArt = {
-    LEICA: { orig: 846035542880601, P3: 301, P4: 401 },
-    LEICT: { orig: 846035542880663, P3: 302, P4: 402 },
-  };
-
   // FontAwesome icons
   faGithub = faGithub;
   faCommentAlt = faCommentAlt;
@@ -266,13 +261,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       this.logger.log('no courses found');
       this.courses = (await this.fenixService.getCoursesBasicInfo(academicTerm, degreeID))
         .filter((course) => !this.selectedCoursesIDs.has(course.id));
-
-      // NOTE: Temporary patch for IArt2 LEIC 2021/2022
-      // tslint:disable-next-line:triple-equals
-      if ((degreeID == 2761663971474 || degreeID == 2761663971567) && academicTerm === '2021/2022' &&
-        !this.courses.find(course => course.id === this.tempIDsForIArt.LEICA.P3 || course.id === this.tempIDsForIArt.LEICT.P3))
-        this.insertIArtInP3();
-
       this.stateService.saveCoursesState(academicTerm, degreeID, this.courses);
     }
 
@@ -316,23 +304,13 @@ export class HomepageComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      // tslint:disable-next-line:max-line-length
-      if (courseToAdd.hasFullInfo() && courseToAdd.id !== this.tempIDsForIArt.LEICA.P3 && courseToAdd.id !== this.tempIDsForIArt.LEICT.P3 &&
-        // tslint:disable-next-line:max-line-length
-        courseToAdd.id !== this.tempIDsForIArt.LEICA.P4 && courseToAdd.id !== this.tempIDsForIArt.LEICA.P4) { // NOTE: force IArt to always update
+      if (courseToAdd.hasFullInfo()) {
         this.addCourseHelper(courseToAdd, courseIndex, addBtn);
 
       } else {
 
         // Load rest of info
         this.spinners.course = true;
-
-        const origID = courseToAdd.id;
-        // tslint:disable-next-line:max-line-length
-        if (origID === this.tempIDsForIArt.LEICA.P3 || origID === this.tempIDsForIArt.LEICA.P4) courseToAdd.id = this.tempIDsForIArt.LEICA.orig;
-        // tslint:disable-next-line:max-line-length
-        else if (origID === this.tempIDsForIArt.LEICT.P3 || origID === this.tempIDsForIArt.LEICT.P4) courseToAdd.id = this.tempIDsForIArt.LEICT.orig;
-
         this.fenixService.getMissingCourseInfo(courseToAdd).then(course => {
           if (!course) {
             this.spinners.course = false;
@@ -341,12 +319,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
             return;
           }
           courseToAdd = course;
-
-          // NOTE: Temporary patch for IArt2 LEIC 2021/2022
-          if (courseToAdd.id === this.tempIDsForIArt.LEICA.orig || courseToAdd.id === this.tempIDsForIArt.LEICT.orig) {
-            courseToAdd.id = origID;
-            courseToAdd = this.filterIArtShiftsBasedOnPeriod(courseToAdd);
-          }
 
           this.spinners.course = false;
           this.addCourseHelper(courseToAdd, courseIndex, addBtn);
@@ -466,7 +438,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   prepareCoursesToGenerate(): void {
-    this.removeABDifferencesInShifts();
     this.removeDuplicatedShifts();
     this.updateCampus();
     this.updateTypesOfClasses();
@@ -474,26 +445,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     for (const course of this.stateService.selectedCourses) {
       if (course.campus) this.removeShiftsBasedOnCampus(course);
       this.removeShiftsBasedOnTypesOfClasses(course);
-    }
-  }
-
-  /* -----------------------------------------------------------
-   * [Patching - Covid-19 Social Distancing]
-   * Updates courses so that A and B merges into one shift.
-   * ----------------------------------------------------------- */
-  removeABDifferencesInShifts(): void {
-    for (const course of this.stateService.selectedCourses) {
-      for (let i = course.shifts.length - 1; i >= 0; i--) {
-        const shift = course.shifts[i];
-
-        // Keep As & remove Bs
-        if (shift.name.startsWith('a_')) {
-          shift.name = shift.name.substring(2);
-
-        } else if (shift.name.startsWith('b_')) {
-          course.shifts.splice(i, 1);
-        }
-      }
     }
   }
 
@@ -577,43 +528,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   isMEPPAcademicTerm(): boolean {
     return this.fenixService.isMEPPAcademicTerm(this.selectedAcademicTerm);
-  }
-
-  /* -----------------------------------------------------------
-   * [Patching - Artificial Intelligence LEIC 2021/2022]
-   * Updates courses so that IArt appears in both P3 and P4.
-   * ----------------------------------------------------------- */
-  insertIArtInP3(): void {
-    this.logger.log('Patching IArt 2021/2022 - Duplicating');
-
-    // tslint:disable-next-line:max-line-length
-    const index = this.courses.findIndex(course => course.id === this.tempIDsForIArt.LEICA.orig || course.id === this.tempIDsForIArt.LEICT.orig);
-    const IArt = this.courses[index];
-    // tslint:disable-next-line:max-line-length
-    this.courses[index].id = this.courses[index].id === this.tempIDsForIArt.LEICA.orig ? this.tempIDsForIArt.LEICA.P4 : this.tempIDsForIArt.LEICT.P4;
-
-    const IArtP3 = _.cloneDeep(IArt) as Course;
-    IArtP3.period = 'P3';
-    IArtP3.id = IArt.id === this.tempIDsForIArt.LEICA.P4 ? this.tempIDsForIArt.LEICA.P3 : this.tempIDsForIArt.LEICT.P3;
-    this.courses.push(IArtP3);
-  }
-
-  /* -----------------------------------------------------------
-   * [Patching - Artificial Intelligence LEIC 2021/2022]
-   * Filters shifts based on IArt course period.
-   * ----------------------------------------------------------- */
-  filterIArtShiftsBasedOnPeriod(course: Course): Course {
-    this.logger.log('Patching IArt 2021/2022');
-    const P3 = { start: new Date('2022/03/07 00:00:00'), end: new Date('2022/04/22 23:59:59') };
-    const P4 = { start: new Date('2022/05/09 00:00:00'), end: new Date('2022/06/24 23:59:59') };
-
-    course.shifts = course.shifts.filter(shift => {
-      if (course.period === 'P3')
-        return shift.lessons[0].start.getTime() >= P3.start.getTime() && shift.lessons[0].end.getTime() <= P3.end.getTime();
-      else if (course.period === 'P4')
-        return shift.lessons[0].start.getTime() >= P4.start.getTime() && shift.lessons[0].end.getTime() <= P4.end.getTime();
-    });
-    return course;
   }
 
   @HostListener('window:resize', [])
