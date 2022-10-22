@@ -8,7 +8,9 @@
       "@extensions/*": [
         "./src/app/_util/extensions/*"
       ]
-    }
+    },
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
   },
   "files": [
     "src/main.ts",

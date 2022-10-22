@@ -294,60 +294,46 @@ $scrollbarColor: #B0BEC5;
 $scrollbarBgColor: #f5f5f5;
 $scrollbarWidth: 10px;
 
-@include media-breakpoint-up(lg) {
-  ::-webkit-scrollbar {
-    width: $scrollbarWidth;
-    background-color: $scrollbarBgColor;
+::-webkit-scrollbar {
+  width: $scrollbarWidth;
+  background-color: $scrollbarBgColor;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+  background-color: $scrollbarBgColor;
+  @include border-radius($scrollbarWidth);
+}
+
+::-webkit-scrollbar-thumb {
+  @include border-radius($scrollbarWidth);
+  background-color: $scrollbarColor;
+
+  &:hover {
+    background-color: darken($scrollbarColor, 10%);
   }
+}
 
-  ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
-    background-color: $scrollbarBgColor;
-    @include border-radius($scrollbarWidth);
-  }
+.schedules-deck::-webkit-scrollbar,
+.ng-dropdown-panel .scroll-host::-webkit-scrollbar {
+  width: $scrollbarWidth - 5px;
+  height: $scrollbarWidth - 5px;
+  background-color: transparent;
+}
 
-  ::-webkit-scrollbar-thumb {
-    @include border-radius($scrollbarWidth);
-    background-color: $scrollbarColor;
+.schedules-deck::-webkit-scrollbar-track,
+.ng-dropdown-panel .scroll-host::-webkit-scrollbar-track {
+  background-color: transparent;
+  @include border-radius($scrollbarWidth);
+}
 
-    &:hover {
-      background-color: darken($scrollbarColor, 10%);
-    }
-  }
+.schedules-deck::-webkit-scrollbar-thumb,
+.ng-dropdown-panel .scroll-host::-webkit-scrollbar-thumb {
+  @include border-radius($scrollbarWidth);
+  background-color: $scrollbarColor;
 
-  //.bootstrap-select .dropdown-menu .inner::-webkit-scrollbar {
-  //  width: calc(#{$scrollbarWidth} - 5);
-  //}
-  //
-  //.bootstrap-select .dropdown-menu .inner::-webkit-scrollbar-track {
-  //  @include border-radius(calc(#{$scrollbarWidth} - 5));
-  //}
-  //
-  //.bootstrap-select .dropdown-menu .inner::-webkit-scrollbar-thumb {
-  //  @include border-radius(calc(#{$scrollbarWidth} - 5));
-  //}
-
-  .schedules-deck::-webkit-scrollbar,
-  .ng-dropdown-panel .scroll-host::-webkit-scrollbar {
-    width: $scrollbarWidth - 5px;
-    height: $scrollbarWidth - 5px;
-    background-color: transparent;
-  }
-
-  .schedules-deck::-webkit-scrollbar-track,
-  .ng-dropdown-panel .scroll-host::-webkit-scrollbar-track {
-    background-color: transparent;
-    @include border-radius($scrollbarWidth);
-  }
-
-  .schedules-deck::-webkit-scrollbar-thumb,
-  .ng-dropdown-panel .scroll-host::-webkit-scrollbar-thumb {
-    @include border-radius($scrollbarWidth);
-    background-color: $scrollbarColor;
-
-    &:hover {
-      background-color: darken($scrollbarColor, 10%);
-    }
+  &:hover {
+    background-color: darken($scrollbarColor, 10%);
   }
 }
 

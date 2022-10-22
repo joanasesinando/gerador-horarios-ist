@@ -108,8 +108,13 @@
   }
 
   .content {
+    position: relative;
     padding-top: 5rem;
     padding-bottom: 5rem;
+
+    .container:first-child {
+      margin-bottom: 2rem;
+    }
 
     @include media-breakpoint-down(md) {
       padding-top: 3rem;
@@ -144,7 +149,11 @@
 .links {
   position: absolute;
   top: 1.5rem;
-  right: 1.5rem;
+  right: 0.5rem;
+
+  @include media-breakpoint-down(xs) {
+    top: -1.5rem;
+  }
 
   .btn-lang {
     fa-icon { color: $gh-darkGray; }
@@ -180,4 +189,13 @@
       border: none;
     }
   }
+}
+
+.version {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 0.5rem;
+  text-align: right;
+  font-size: .8rem;
+  color: lighten($gh-gray, 30);
 }

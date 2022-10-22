@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, HostListener, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
+import {environment} from '../../environments/environment';
 import _ from 'lodash';
 
 import {LoggerService} from '../_util/logger.service';
@@ -33,6 +34,8 @@ declare let $;
   styleUrls: ['./homepage.component.scss']
 })
 export class HomepageComponent implements OnInit, AfterViewInit {
+
+  projectVersion: string = environment.projectVersion;
 
   mobileView = false;
   featuresHorizontal = false;
