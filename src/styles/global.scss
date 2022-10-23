@@ -9,6 +9,7 @@
  *    6. Alerts
  *    7. Scrollbar
  *    8. Loading page
+ *    9. Color Picker
  *
  * =================================================================== */
 
@@ -350,3 +351,32 @@ $scrollbarWidth: 10px;
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+
+
+/* ===================================================================
+ *  9. Color Picker
+ *
+ * ------------------------------------------------------------------- */
+
+.pcr-swatches {
+  overflow-y: auto !important;
+  height: 6rem !important;
+}
+
+.pcr-color-chooser {
+  margin-top: .7rem !important;
+}
+
+.pcr-interaction {
+  flex-direction: row-reverse !important;
+
+  .pcr-result {
+    min-width: unset !important;
+  }
+
+  .pcr-save, .pcr-cancel {
+    width: 47.5% !important;
+  }
+}
+

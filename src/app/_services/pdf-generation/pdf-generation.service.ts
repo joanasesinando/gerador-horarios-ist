@@ -48,9 +48,9 @@ export class PdfGenerationService {
     return acronym.replace(/[0-9]/g, '') + ' (' + minifyClassType(type) + ')';
   }
 
-  generateSchedulesPdf(schedules: Schedule[]): void {
+  generateSchedulesPdf(schedules: Schedule[], colors: {[tag: number]: string}): void {
     this.createPdf();
-    schedules.forEach(schedule => this.drawSchedule(schedule));
+    schedules.forEach(schedule => this.drawSchedule(schedule, colors));
     this.savePdf();
   }
 
@@ -86,13 +86,13 @@ export class PdfGenerationService {
     this.doc.save(fileName);
   }
 
-  private drawSchedule(schedule: Schedule): void {
+  private drawSchedule(schedule: Schedule, colors: {[tag: number]: string}): void {
     this.doc.addPage();
     this.drawTitle(schedule.id + 1);
     this.drawGrid();
     this.drawWeekdays();
     this.drawTimelineHours();
-    this.drawClasses(schedule.classes);
+    this.drawClasses(schedule.classes, colors);
   }
 
   private drawTitle(scheduleID: number): void {
@@ -166,20 +166,18 @@ export class PdfGenerationService {
     }
   }
 
-  private drawClasses(classes: Class[]): void {
-    const colors = [
-      { r: 87, g: 127, b: 146},
-      { r: 68, g: 52, b: 83 },
-      { r: 162, g: 185, b: 178 },
-      { r: 246, g: 176, b: 103 },
-      { r: 162, g: 104, b: 133 },
-      { r: 66, g: 81, b: 109 },
-      { r: 150, g: 125, b: 160 },
-      { r: 97, g: 129, b: 110 },
-    ];
+  private drawClasses(classes: Class[], colors: {[tag: number]: string}): void {
+    // Parse colors to RGB
+    const colorsRGB: {[tag: number]: {r: number, g: number, b: number}} = {};
+    for (const [tag, color] of Object.entries(colors)) {
+      const r = parseInt(color.substring(1, 3), 16);
+      const g = parseInt(color.substring(3, 5), 16);
+      const b = parseInt(color.substring(5), 16);
+      colorsRGB[tag] = {r, g, b};
+    }
 
     for (let i = 0; i < classes.length; i++) {
-      const color = colors[i];
+      const color = colorsRGB[i + 1];
       const cl = classes[i];
 
       cl.shifts.forEach(shift => {

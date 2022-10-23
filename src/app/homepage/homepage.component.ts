@@ -91,21 +91,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     const browserLang = translateService.getBrowserLang();
     translateService.use(browserLang.match(/pt-PT|en-GB/) ? browserLang : 'pt-PT');
 
-    // Widgets translation subscription
-    this.translateService.stream('sidebar.widgets.repo').subscribe(value => {
-      const widget = $('#widget-github');
-      widget.attr('title', value);
-      widget.tooltip('dispose');
-      widget.tooltip();
-    });
-
-    this.translateService.stream('sidebar.widgets.help').subscribe(value => {
-      const widget = $('#widget-help');
-      widget.attr('title', value);
-      widget.tooltip('dispose');
-      widget.tooltip();
-    });
-
     // Selects translation subscription
     this.translateService.stream('main-content.labels.placeholder').subscribe(value => {
       translateSelect('inputAcademicTerm', value, 'main-content.labels.term', this.translateService);
@@ -155,7 +140,22 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.onWindowResize();
   }
 
-  ngAfterViewInit(): void {
+  async ngAfterViewInit(): Promise<void> {
+    // Widgets translation subscription
+    this.translateService.stream('sidebar.widgets.repo').subscribe(value => {
+      const widget = $('#widget-github');
+      widget.attr('title', value);
+      widget.tooltip('dispose');
+      widget.tooltip();
+    });
+
+    this.translateService.stream('sidebar.widgets.help').subscribe(value => {
+      const widget = $('#widget-help');
+      widget.attr('title', value);
+      widget.tooltip('dispose');
+      widget.tooltip();
+    });
+
     $('[data-toggle="tooltip"]').tooltip();
   }
 

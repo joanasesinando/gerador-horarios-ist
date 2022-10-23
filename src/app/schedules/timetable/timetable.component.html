@@ -180,14 +180,15 @@
 <!-- Event Template -->
 <ng-template #event let-ev='event'>
   <li [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
-      class="single-event event-{{ev.tag}}" [attr.data-start]="ev.start" [attr.data-end]="ev.end" [attr.data-day]="ev.weekday"
+      class="single-event" [attr.data-start]="ev.start" [attr.data-end]="ev.end" [attr.data-day]="ev.weekday"
       [ngClass]="{'pinned': ev.pinned}"
       [attr.data-shift]="ev.shiftName" (click)="toggleOptions(ev, ev.pinned)"
       clickedOutside (clickedOutside)="closeOptions($event)">
-    <div class="single-event-div">
+    <div class="single-event-div" [ngStyle]="{'background': getColor(ev.tag)}">
       <span class="event-date">{{ev.start}} - {{ev.end}}</span>
       <em class="event-name">{{ev.name}}</em>
       <span class="event-place" [ngClass]="{'event-place-small': !isTallEnough(ev.start, ev.end)}">{{ev.place}}</span>
+      <div class="event-inner-shadow"></div>
     </div>
     <ul class="options">
       <li data-toggle="tooltip" data-placement="top" (click)="togglePin(ev.shiftName)">
@@ -201,6 +202,9 @@
       </li>
       <li data-toggle="tooltip" data-placement="top" (click)="toggleExcludeShift(ev.shiftName)">
         <fa-icon class="exclude" [icon]="faTimes"></fa-icon>
+      </li>
+      <li data-toggle="tooltip" data-placement="top" (click)="toggleColorPicker(ev)">
+        <fa-icon class="paint" [icon]="faTint"></fa-icon>
       </li>
     </ul>
     <fa-icon [icon]="faCog" class="options-icon"></fa-icon>

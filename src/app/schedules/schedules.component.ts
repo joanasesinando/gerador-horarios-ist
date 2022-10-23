@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, HostListener, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {Subject} from 'rxjs';
 
@@ -31,6 +31,7 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
 
   generatedSchedules: Schedule[] = [];
   selectedCourses: Course[] = [];
+  eventColors: {[tag: number]: string};
 
   scheduleInViewID: number;
   schedulesPicked: Schedule[] = [];
@@ -213,7 +214,7 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
   }
 
   save(): void {
-    this.pdfService.generateSchedulesPdf(this.schedulesPicked);
+    this.pdfService.generateSchedulesPdf(this.schedulesPicked, this.eventColors);
     this.logger.log('PDF generated');
   }
 

@@ -20,7 +20,15 @@ import {AlertService} from '../../_util/alert.service';
 import {TranslateService} from '@ngx-translate/core';
 import {SchedulesGenerationService} from '../../_services/schedules-generation/schedules-generation.service';
 
-import {faCaretRight, faCaretLeft, faThumbtack, faEllipsisV, faTimes, faCog} from '@fortawesome/free-solid-svg-icons';
+import {
+  faCaretRight,
+  faCaretLeft,
+  faThumbtack,
+  faEllipsisV,
+  faTimes,
+  faCog,
+  faTint
+} from '@fortawesome/free-solid-svg-icons';
 
 import {Schedule} from '../../_domain/Schedule/Schedule';
 import {Event} from '../../_domain/Event/Event';
@@ -28,6 +36,8 @@ import {Lesson} from '../../_domain/Lesson/Lesson';
 
 import {getDateFromTimeAndDay, getTimestamp, getWeekday} from '../../_util/Time';
 import {numberWithCommas} from '../../_util/Number';
+
+import Pickr from '@simonwep/pickr';
 
 declare let $;
 
@@ -63,6 +73,20 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
   excludedShifts: string[] = [];
   excludedTimeframes: Lesson[] = []; // use special null Lesson for simplicity
 
+  eventColors: {[tag: number]: string} = {
+    1: '#577F92',
+    2: '#443453',
+    3: '#A2B9B2',
+    4: '#f6b067',
+    5: '#a26885',
+    6: '#42516D',
+    7: '#967da0',
+    8: '#61816e'
+  };
+  eventOriginalColor: string;
+  colorPicker: Pickr;
+  @Output() eventColorsChanged: EventEmitter<{[tag: number]: string}> = new EventEmitter<{[tag: number]: string}>();
+
   @ViewChild('f', { static: false }) f: NgForm;
 
   // For excluding timeframes
@@ -83,6 +107,7 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
   faTimes = faTimes;
   faEllipsisV = faEllipsisV;
   faCog = faCog;
+  faTint = faTint;
 
   constructor(
     private logger: LoggerService,
@@ -251,6 +276,10 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
     return eventSlotHeight * duration / this.TIMELINE_UNIT_DURATION + 'px';
   }
 
+  getColor(tag: string): string {
+    return this.eventColors[tag];
+  }
+
   isTallEnough(start, end): boolean {
     const height = parseInt(this.getHeight(start, end).replace('px', ''), 10);
     return this.mobileView ? height > this.SLOT_HEIGHT_MOBILE * 2 : height > this.SLOT_HEIGHT_DESKTOP * 2;
@@ -282,6 +311,11 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
     excludeOption.attr('title', this.translateService.instant('schedules.eventOptions.exclude'));
     excludeOption.tooltip('dispose');
     excludeOption.tooltip();
+
+    const paintOption = optionsMenu.children().eq(2);
+    paintOption.attr('title', this.translateService.instant('schedules.eventOptions.paint'));
+    paintOption.tooltip('dispose');
+    paintOption.tooltip();
   }
 
   togglePin(shiftName: string): void { // TODO: testing
@@ -301,6 +335,105 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
     } else { this.errorService.showError('Something went wrong while pinning shifts.'); }
 
     this.logger.log((this.pinnedShifts.includes(shiftName) ? 'Pinned' : 'Unpinned') + ' shift ' + shiftName);
+  }
+
+  toggleExcludeShift(shiftName): void {
+    this.onExcludedShiftsChanged.subscribe(excludedShifts => {
+      this.excludedShifts = excludedShifts;
+      this.toggleExcludeShift(null);
+    });
+
+    if (shiftName) {
+      this.excludedShifts.includes(shiftName) ?
+        this.excludedShifts.splice(this.excludedShifts.indexOf(shiftName), 1) :
+        this.excludedShifts.push(shiftName);
+    }
+
+    // Select which schedules to show
+    this.schedulesToShow = this.filterSchedules();
+
+    // Update timetable
+    this.scheduleInViewIndex = this.schedulesToShow.length > 0 ? 0 : -1;
+    this.scheduleInViewID = this.schedulesToShow.length > 0 ? this.schedulesToShow[0].id : -1;
+    this.organizeEventsPerWeekday(this.scheduleInViewID);
+    if (this.schedulesToShow.length === 0) {
+      this.translateService.currentLang === 'pt-PT' ?
+        this.alertService.showAlert('Sem horários', 'Não existe nenhum horário com as opções escolhidas.', 'warning') :
+        this.alertService.showAlert('No schedules', 'No schedules with your options.', 'warning');
+    }
+
+    this.excludedShiftsChanged.emit(this.excludedShifts);
+    $('[data-toggle="tooltip"]').tooltip('hide');
+
+    this.logger.log((shiftName ? 'Excluded' : 'Included') + ' shift ' + (shiftName || ''));
+  }
+
+  toggleColorPicker(ev: Event): void {
+    // Init color picker
+    this.translateService.stream('schedules.save').subscribe(saveBtnText => {
+      this.translateService.stream('cancel').subscribe(cancelBtnText => {
+        setTimeout(() => {
+          this.colorPicker = Pickr.create({
+            el: '.single-event[data-start="' + ev.start + '"][data-end="' + ev.end + '"][data-day="' + ev.weekday + '"]',
+            theme: 'nano',
+            useAsButton: true,
+            position: 'top-middle',
+            lockOpacity: true,
+            comparison: true,
+            components: {
+              preview: true,
+              hue: true,
+              interaction: {
+                input: true,
+                cancel: true,
+                save: true
+              }
+            },
+            i18n: {
+              'btn:save': saveBtnText,
+              'btn:cancel': cancelBtnText
+            },
+            swatches: [
+              '#E57373', '#EF5350', '#F44336', '#E53935', '#D32F2F', '#C62828', '#B71C1C',
+              '#F06292', '#EC407A', '#E91E63', '#D81B60', '#C2185B', '#AD1457', '#880E4F',
+              '#BA68C8', '#AB47BC', '#9C27B0', '#8E24AA', '#7B1FA2', '#6A1B9A', '#4A148C',
+              '#9575CD', '#7E57C2', '#673AB7', '#5E35B1', '#512DA8', '#4527A0', '#311B92',
+              '#7986CB', '#5C6BC0', '#3F51B5', '#3949AB', '#303F9F', '#283593', '#1A237E',
+              '#64B5F6', '#42A5F5', '#2196F3', '#1E88E5', '#1976D2', '#1565C0', '#0D47A1',
+              '#4FC3F7', '#29B6F6', '#03A9F4', '#039BE5', '#0288D1', '#0277BD', '#01579B',
+              '#4DD0E1', '#26C6DA', '#00BCD4', '#00ACC1', '#0097A7', '#00838F', '#006064',
+              '#4DB6AC', '#26A69A', '#009688', '#00897B', '#00796B', '#00695C', '#004D40',
+              '#81C784', '#66BB6A', '#4CAF50', '#43A047', '#388E3C', '#2E7D32', '#1B5E20',
+              '#AED581', '#9CCC65', '#8BC34A', '#7CB342', '#689F38', '#558B2F', '#33691E',
+              '#DCE775', '#D4E157', '#CDDC39', '#C0CA33', '#AFB42B', '#9E9D24', '#827717',
+              '#FFF176', '#FFEE58', '#FFEB3B', '#FDD835', '#FBC02D', '#F9A825', '#F57F17',
+              '#FFD54F', '#FFCA28', '#FFC107', '#FFB300', '#FFA000', '#FF8F00', '#FF6F00',
+              '#FFB74D', '#FFA726', '#FF9800', '#FB8C00', '#F57C00', '#EF6C00', '#E65100',
+              '#FF8A65', '#FF7043', '#FF5722', '#F4511E', '#E64A19', '#D84315', '#BF360C'
+            ],
+
+          }).on('init', pickr => {
+            this.eventOriginalColor = this.eventColors[ev.tag];
+
+          }).on('hide', pickr => {
+            this.colorPicker.destroy();
+
+          }).on('change', (color, source, instance) => {
+            this.eventColors[ev.tag] = color.toHEXA().toString(0);
+
+          }).on('save', (color, pickr) => {
+            this.eventColors[ev.tag] = color.toHEXA().toString(0);
+            this.colorPicker.hide();
+            this.eventColorsChanged.emit(this.eventColors);
+
+          }).on('cancel', pickr => {
+            this.eventColors[ev.tag] = this.eventOriginalColor;
+            this.colorPicker.hide();
+          });
+          this.colorPicker.show();
+        }, 0);
+      });
+    });
   }
 
   filterSchedules(): Schedule[] { // TODO: testing
@@ -362,37 +495,6 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
     return schedules;
-  }
-
-  toggleExcludeShift(shiftName): void {
-    this.onExcludedShiftsChanged.subscribe(excludedShifts => {
-      this.excludedShifts = excludedShifts;
-      this.toggleExcludeShift(null);
-    });
-
-    if (shiftName) {
-      this.excludedShifts.includes(shiftName) ?
-        this.excludedShifts.splice(this.excludedShifts.indexOf(shiftName), 1) :
-        this.excludedShifts.push(shiftName);
-    }
-
-    // Select which schedules to show
-    this.schedulesToShow = this.filterSchedules();
-
-    // Update timetable
-    this.scheduleInViewIndex = this.schedulesToShow.length > 0 ? 0 : -1;
-    this.scheduleInViewID = this.schedulesToShow.length > 0 ? this.schedulesToShow[0].id : -1;
-    this.organizeEventsPerWeekday(this.scheduleInViewID);
-    if (this.schedulesToShow.length === 0) {
-      this.translateService.currentLang === 'pt-PT' ?
-        this.alertService.showAlert('Sem horários', 'Não existe nenhum horário com as opções escolhidas.', 'warning') :
-        this.alertService.showAlert('No schedules', 'No schedules with your options.', 'warning');
-    }
-
-    this.excludedShiftsChanged.emit(this.excludedShifts);
-    $('.tooltip').remove();
-
-    this.logger.log((shiftName ? 'Excluded' : 'Included') + ' shift ' + (shiftName || ''));
   }
 
   updateScheduleInViewIndex(schedules: Schedule[]): void {

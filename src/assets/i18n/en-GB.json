@@ -59,7 +59,8 @@
     "eventOptions": {
       "pin": "Pin shift",
       "unpin": "Unpin shift",
-      "exclude": "Exclude shift"
+      "exclude": "Exclude shift",
+      "paint": "Change color"
     },
     "excludedShifts": "Excluded shifts",
     "excludedTimeframes": "Excluded timeframes",

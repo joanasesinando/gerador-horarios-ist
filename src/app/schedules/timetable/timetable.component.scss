@@ -315,8 +315,19 @@ $columns: 5;
       display: block;
       height: 100%;
       padding: .7em;
+
       @include media-breakpoint-down(sm) {
         padding: .5em;
+      }
+
+      .event-inner-shadow {
+        position: absolute;
+        bottom: 0;
+        height: 3.5px;
+        width: 100%;
+        left: 0;
+        background-color: black;
+        opacity: .15;
       }
     }
 
@@ -387,11 +398,13 @@ $columns: 5;
 
           &:nth-child(1) { transform: translateX(0); }
           &:nth-child(2) { transform: translateX(-2rem); }
+          &:nth-child(3) { transform: translateX(-4rem); }
 
           &:hover {
             fa-icon {
               color: $gh-blue;
               &.exclude { color: $gh-red; }
+              &.paint { color: $gh-purple; }
             }
 
             .unpin-icon-wrapper svg .unpin-thumbtack { fill: $gh-blue; }
@@ -404,6 +417,9 @@ $columns: 5;
       cursor: pointer;
       box-shadow: $selected-shadow;
       &:not(.pinned) .options:not(.open) + .options-icon { display: block; }
+      .single-event-div {
+        filter: brightness(110%);
+      }
     }
   }
 }
@@ -454,50 +470,6 @@ $columns: 5;
       right: .5em;
     }
   }
-}
-
-
-/* --------------------------
-   event colors
-   -------------------------- */
-.schedule .single-event.event-1 {
-  background: #577F92;
-  &:hover { background: #618da1; }
-}
-
-.schedule .single-event.event-2 {
-  background: #443453;
-  &:hover { background: #513e63; }
-}
-
-.schedule .single-event.event-3 {
-  background: #A2B9B2;
-  &:hover { background: #b1c4be; }
-}
-
-.schedule .single-event.event-4 {
-  background: #f6b067;
-  &:hover { background: #f7bd7f; }
-}
-
-.schedule .single-event.event-5 {
-  background: #a26885;
-  &:hover { background: #bf7c9d; }
-}
-
-.schedule .single-event.event-6 {
-  background: $gh-darkBlue;
-  &:hover { background: lighten($gh-darkBlue, 5%); }
-}
-
-.schedule .single-event.event-7 {
-  background: #967da0;
-  &:hover { background: #ad91b9; }
-}
-
-.schedule .single-event.event-8 {
-  background: #61816e;
-  &:hover { background: #6d917c; }
 }
 
 /* --------------------------

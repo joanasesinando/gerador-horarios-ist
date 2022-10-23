@@ -70,10 +70,12 @@
 
               <!-- Timetable -->
               <app-timetable *ngIf="generatedSchedules.length !== 0"
-                             [schedules]="generatedSchedules" (scheduleSelected)="scheduleInViewID = $event"
-                             [onExcludedShiftsChanged]="excludedShiftsSubject.asObservable()" (excludedShiftsChanged)="this.excludedShifts = $event"
-                             [onExcludedTimeframesChanged]="excludedTimeframesSubject.asObservable()" (excludedTimeframesChanged)="this.excludedTimeframes = $event"
-                             [keydownEvents]="keyDownSubject.asObservable()"></app-timetable>
+                 [schedules]="generatedSchedules" (scheduleSelected)="scheduleInViewID = $event"
+                 [onExcludedShiftsChanged]="excludedShiftsSubject.asObservable()" (excludedShiftsChanged)="this.excludedShifts = $event"
+                 [onExcludedTimeframesChanged]="excludedTimeframesSubject.asObservable()" (excludedTimeframesChanged)="this.excludedTimeframes = $event"
+                 [keydownEvents]="keyDownSubject.asObservable()"
+                 (eventColorsChanged)="eventColors = $event"
+              ></app-timetable>
 
               <!-- Add btn -->
               <div class="btn-add d-flex flex-column align-items-center">
