@@ -94,6 +94,7 @@
     }
   },
   "help": {
+    "title": "Tutoriais",
     "select-options": {
       "title": "Escolher opções",
       "text": "Escolhe o ano letivo, o curso e adiciona cadeiras. Podes também escolher o campus onde queres ter uma determinada cadeira e os tipos de turno."
@@ -118,13 +119,17 @@
       "title": "Excluir período de tempo",
       "text": "Para excluir um período de tempo, clica no icon no canto superior direito, preenche todos os campos, e clica em 'Excluir'."
     },
+    "change-colors": {
+      "title": "Mudar cor das aulas",
+      "text": "Podes customizar as cores do teu horário. Basta clicares numa aula da cadeira que queres mudar a cor e definires uma nova."
+    },
     "add": {
       "title": "Escolher horários",
-      "text": "Quando encontrares um horário que gostes, podes adicioná-lo á lista de horários escolhidos. Se o quiseres remover clica no 'X'."
+      "text": "Quando encontrares um horário que gostes, podes adicioná-lo á lista de horários escolhidos. Se o quiseres remover clica no 'x'."
     },
     "save": {
       "title": "Guardar horários",
-      "text": "Se quiseres imprimir os horários que escolheste clicando no botão de 'Guardar'."
+      "text": "Podes imprimir os horários que escolheste clicando no botão de 'Guardar'."
     }
   },
 

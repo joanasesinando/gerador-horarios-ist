@@ -29,8 +29,21 @@
 
 </p>
 
+<h4 align="center">
+  <a href="https://web.tecnico.ulisboa.pt/joanasesinando/gerador-horarios">Gerador de Horários | IST</a>
+</h4>
+
+<p align="center" style="display: flex; justify-content: center; align-items: center">
+    <a href="https://www.paypal.com/paypalme/joanasesinando" target="_blank" style="margin-right: .5rem">
+        <img src="https://ubuntubudgie.org/wp-content/uploads/2021/10/support_paypal.svg" alt="Support on Paypal" style="height: 41px !important;width: 180px !important;" />
+    </a>
+    <a href="https://www.buymeacoffee.com/joanasesinando" target="_blank" style="margin-left: .5rem">
+      <img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 37px !important;width: 170px !important;" />
+    </a>
+</p>
+
 <hr>
-<h1>Gerador Horários | IST</h1>
+<h1>Gerador de Horários | IST</h1>
 
 A schedule generator for [IST](https://tecnico.ulisboa.pt/en/ )'s students to plan their student schedule for the upcoming semester.
 
@@ -57,8 +70,8 @@ A schedule generator for [IST](https://tecnico.ulisboa.pt/en/ )'s students to pl
 
 You can sort the generated schedules to favor a specific characteristic.
 There are 3 sorting options:
- - <strong>Most compact</strong> - favours schedules with fewer wholes and closer classes;
- - <strong>Most balanced</strong> - favours schedules that are more balanced through the week (avoid strenuous days);
+ - <strong>Most compact</strong> - favours schedules with fewer holes and closer classes;
+ - <strong>Most balanced</strong> - favours schedules that are more balanced throughout the week (avoid strenuous days);
  - <strong>More free days</strong> - favours schedules that have more free days.
 
 <p align="center">
@@ -75,15 +88,23 @@ Once you've found a class you like you can pin it. This way only schedules with 
 
 ### Exclude classes & timeframes
 
-If you don't want a certain class on your schedule, or are busy on a particular day and timeframe you can exclude them.
+If you don't want a certain class on your schedule or are busy on a particular day and timeframe you can exclude them.
 Only schedules in those conditions will be shown.
 
 <p align="center">
-  <img alt="Pin classes" src="https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/src/assets/readme/feature3.gif">
+  <img alt="Exclude class" src="https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/src/assets/readme/feature3.gif">
 </p>
 
 <p align="center">
-  <img alt="Pin classes" src="https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/src/assets/readme/feature4.gif">
+  <img alt="Exclude timeframe" src="https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/src/assets/readme/feature4.gif">
+</p>
+
+### Change colors
+
+You can customize how your schedule looks by changing its classes' colors.
+
+<p align="center">
+  <img alt="Change colors" src="https://raw.githubusercontent.com/joanasesinando/gerador-horarios-ist/master/src/assets/readme/feature6.gif">
 </p>
 
 ### Save for later
@@ -123,16 +144,6 @@ ng generate component component-name
 ```
 
 You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-<hr>
-
-### Build
-To build the project run:
-
-```sh
-ng build
-```
-
-The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
 <hr>
 
 ### Test

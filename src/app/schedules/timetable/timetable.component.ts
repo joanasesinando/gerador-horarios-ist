@@ -376,6 +376,7 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
           this.colorPicker = Pickr.create({
             el: '.single-event[data-start="' + ev.start + '"][data-end="' + ev.end + '"][data-day="' + ev.weekday + '"]',
             theme: 'nano',
+            default: this.eventColors[ev.tag],
             useAsButton: true,
             position: 'top-middle',
             lockOpacity: true,

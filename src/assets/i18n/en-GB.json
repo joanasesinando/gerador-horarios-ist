@@ -95,6 +95,7 @@
   },
 
   "help": {
+    "title": "Tutorials",
     "select-options": {
       "title": "Select options",
       "text": "Select an academic term, a degree and add courses. You can also pick the campus you want to have a specific course and the types of classes."
@@ -119,9 +120,13 @@
       "title": "Exclude timeframe",
       "text": "To exclude a timeframe click on the upper-right icon in the corner, fill in all the fields and click 'Exclude'."
     },
+    "change-colors": {
+      "title": "Change colors",
+      "text": "You can customize your schedule by changing its colors. Simply click on any class of the course you'd like to customize and set a new color."
+    },
     "add": {
       "title": "Add schedules",
-      "text": "When you've found a schedule you like, you can add it to the queue of selected schedules. If you'd like to remove an added schedule, simply click on the 'X'."
+      "text": "When you've found a schedule you like, you can add it to the queue of selected schedules. If you'd like to remove an added schedule, simply click on the 'x'."
     },
     "save": {
       "title": "Save schedules",
