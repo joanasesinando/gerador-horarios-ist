@@ -167,6 +167,7 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
       this.organizeEventsPerWeekday(this.scheduleInViewID);
 
     this.onWindowResize();
+    this.eventColorsChanged.emit(this.eventColors);
 
     this.keydownEventsSubscription = this.keydownEvents.subscribe(direction => {
       if (direction === 'right') this.next();

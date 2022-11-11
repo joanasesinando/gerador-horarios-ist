@@ -50,7 +50,7 @@ export class PdfGenerationService {
 
   generateSchedulesPdf(schedules: Schedule[], colors: {[tag: number]: string}): void {
     this.createPdf();
-    schedules.forEach(schedule => this.drawSchedule(schedule, colors));
+    schedules.forEach((schedule, index) => this.drawSchedule(schedule, colors, index));
     this.savePdf();
   }
 
@@ -86,9 +86,9 @@ export class PdfGenerationService {
     this.doc.save(fileName);
   }
 
-  private drawSchedule(schedule: Schedule, colors: {[tag: number]: string}): void {
+  private drawSchedule(schedule: Schedule, colors: {[tag: number]: string}, index: number): void {
     this.doc.addPage();
-    this.drawTitle(schedule.id + 1);
+    this.drawTitle(index + 1);
     this.drawGrid();
     this.drawWeekdays();
     this.drawTimelineHours();

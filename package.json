@@ -1,6 +1,6 @@
 {
   "name": "gerador-horarios-ist",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Gerador de horários para o Instituto Superior Técnico.",
   "homepage": "https://web.tecnico.ulisboa.pt/joanasesinando/gerador-horarios",
   "license": "MIT. See license in https://github.com/joanasesinando/gerador-horarios-ist/blob/master/LICENSE",
