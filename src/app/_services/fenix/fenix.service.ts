@@ -22,7 +22,7 @@ const NO_ROOM_FOUND = 'NO ROOM FOUND';
 })
 export class FenixService {
 
-  cors = 'https://ist-corsaway.herokuapp.com/';
+  cors = 'https://ist-corsaway.onrender.com/';
   api = 'https://fenix.tecnico.ulisboa.pt/api/fenix/v1/';
   currentAcademicTerm: string;
 
