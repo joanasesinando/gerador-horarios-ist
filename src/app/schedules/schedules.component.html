@@ -81,8 +81,8 @@
               <div class="btn-add d-flex flex-column align-items-center">
                 <button class="btn btn-primary mt-4" [ngClass]="{'btn-block': mobileView}"
                         type="button" (click)="addSchedule(scheduleInViewID)">{{'schedules.addSchedule' | translate}}</button>
-                <a *ngIf="mobileView" href="#selected-schedules"
-                   class="d-block text-center mt-4">{{'schedules.see' | translate}} {{'schedules.selected.more' | translate}}</a>
+                <a *ngIf="mobileView" href="javascript:void(0)" class="d-block text-center mt-4" (click)="scrollTo('selected-schedules')">
+                  {{'schedules.see' | translate}} {{'schedules.selected.more' | translate}}</a>
               </div>
 
               <!-- Excluded shifts -->

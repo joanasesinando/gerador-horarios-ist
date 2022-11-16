@@ -249,6 +249,12 @@ export class SchedulesComponent implements OnInit, AfterViewInit {
       formatTime(timeframe.start) + ' -> ' + formatTime(timeframe.end);
   }
 
+  scrollTo(elementID: string): void {
+    const element = $('#' + elementID);
+    const position = element.offset().top;
+    document.documentElement.scrollTop = document.body.scrollTop = position;
+  }
+
   @HostListener('window:resize', [])
   onWindowResize(): void {
     this.mobileView = window.innerWidth <= 991.98; // phones & tablets

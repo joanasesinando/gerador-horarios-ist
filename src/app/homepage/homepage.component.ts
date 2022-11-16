@@ -242,7 +242,8 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       this.stateService.saveDegreesState(academicTerm, this.degrees);
     }
 
-    setTimeout(() => $('#inputDegree').selectpicker('refresh'), 0);
+    this.refreshSelectAndMaintainPosition('inputDegree');
+
     this.spinners.degree = false;
     this.logger.log('degrees', this.degrees);
   }
@@ -267,7 +268,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       this.stateService.saveCoursesState(academicTerm, degreeID, this.courses);
     }
 
-    setTimeout(() => $('#inputCourse').selectpicker('refresh'), 0);
+    this.refreshSelectAndMaintainPosition('inputCourse');
 
     this.spinners.course = false;
     this.logger.log('courses', this.courses);
@@ -340,7 +341,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.totalCredits += course.credits;
 
     // Update select
-    setTimeout(() => $('#inputCourse').selectpicker('refresh'), 0);
+    this.refreshSelectAndMaintainPosition('inputCourse');
     this.selectedCourse = null;
 
     // Show warning for total credits
@@ -383,7 +384,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
       const courseToRemove = this.selectedCourses[courseIndex];
       this.courses.push(courseToRemove);
       this.courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
-      setTimeout(() => $('#inputCourse').selectpicker('refresh'), 0);
+      this.refreshSelectAndMaintainPosition('inputCourse');
     }
 
     this.totalCredits -= this.selectedCourses[courseIndex].credits;
@@ -521,16 +522,32 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   }
 
   removePortugueseCharacters(s: string): string {
-    return s.replace(/[ãáâà]/ig, 'a')
-            .replace(/[óôõ]/ig, 'o')
-            .replace(/ç/ig, 'c')
-            .replace(/[éê]/ig, 'e')
-            .replace(/í/ig, 'i')
-            .replace(/ú/ig, 'u');
+    return s.replaceAll(/[ãáâà]/ig, 'a')
+            .replaceAll(/[óôõ]/ig, 'o')
+            .replaceAll(/ç/ig, 'c')
+            .replaceAll(/[éê]/ig, 'e')
+            .replaceAll(/í/ig, 'i')
+            .replaceAll(/ú/ig, 'u');
   }
 
   isMEPPAcademicTerm(): boolean {
     return this.fenixService.isMEPPAcademicTerm(this.selectedAcademicTerm);
+  }
+
+  refreshSelectAndMaintainPosition(selectID: string): void {
+    const select = $('#' + selectID);
+    const position = document.documentElement.scrollTop || document.body.scrollTop;
+    const html = $('html');
+
+    setTimeout(() => {
+      // Refresh select
+      select.selectpicker('refresh');
+
+      // Prevent page from jumping
+      html.css('scroll-behavior', 'unset');
+      document.documentElement.scrollTop = document.body.scrollTop = position;
+      html.css('scroll-behavior', 'smooth');
+    }, 0);
   }
 
   @HostListener('window:resize', [])
