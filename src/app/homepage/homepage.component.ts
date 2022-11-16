@@ -344,15 +344,6 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.refreshSelectAndMaintainPosition('inputCourse');
     this.selectedCourse = null;
 
-    // Show warning for total credits
-    if (this.totalCredits > 42) {
-      this.translateService.currentLang === 'pt-PT' ?
-        this.alertService.showAlert('Atenção',
-          'Limite máximo de créditos por semestre atingido. Máximo: 42 ECTS, Atual: ' + this.totalCredits + ' ECTS', 'warning') :
-        this.alertService.showAlert('Attention',
-          'Maximum limit of credits per semester reached. Maximum: 42 ECTS, Current: ' + this.totalCredits + ' ECTS', 'warning');
-    }
-
     addBtn.attr('disabled', false);
     this.logger.log('selected courses', this.selectedCourses);
   }
