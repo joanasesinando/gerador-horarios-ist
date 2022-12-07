@@ -80,7 +80,10 @@ export class FenixService {
     scheduleJson.shifts.forEach(shift => {
       if (!shift.name || shift.name.isEmpty()) throw new Error('No name found for shift');
       if (!shift.types || shift.types.length === 0) throw new Error('No type found for shift ' + shift.name);
-      if (!shift.lessons || shift.lessons.length === 0) throw new Error('No lessons found for shift ' + shift.name);
+      if (!shift.lessons || shift.lessons.length === 0) {
+        this.alertService.showAlert('Warning', 'No lessons found for shift ' + shift.name, 'warning');
+        return;
+      }
 
       shift.lessons.forEach(lesson => {
         if (!lesson.start) throw new Error('No start found for lesson');
