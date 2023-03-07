@@ -59,6 +59,6 @@ export class Course {
   }
 
   formatAcronym(): string {
-    return this.acronym.replace(/[0-9]/g, '');
+    return this.acronym.replace(/[0-9-]+$/g, '');
   }
 }
