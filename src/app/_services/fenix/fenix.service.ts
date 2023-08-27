@@ -68,6 +68,9 @@ export class FenixService {
     // NOTE: Temporary patch for MSim-2 LEEC 2023/2024
     if (courseID == 283085589465593 && academicTerm === '2023/2024') return 'P2';
 
+    // NOTE: patch for Microelectrónica <-> Microeletrónica
+    if (courseName === 'Microelectrónica') courseName = 'Microeletrónica';
+
     const text = $('a:contains(\'' + courseName + '\') + div', htmlCurriculum)[0].innerText;
     let period = text.split(',')[1].replace(/[ \t]/g, '');
 
