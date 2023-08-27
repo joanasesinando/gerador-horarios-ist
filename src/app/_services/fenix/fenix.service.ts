@@ -51,7 +51,7 @@ export class FenixService {
     if (!course.academicTerm) throw new Error('No academic term found for course ' + course.id);
 
     const isLangPT = this.translateService.currentLang === 'pt-PT';
-    const period = await this.parseCoursePeriod(academicTerm, htmlCurriculum, isLangPT ? course.name : null, !isLangPT ? course.id : null);
+    const period = await this.parseCoursePeriod(academicTerm, htmlCurriculum, isLangPT ? course.name : null, course.id);
 
     return new Course(parseInt(course.id, 10), course.name, course.acronym, parseFloat(course.credits),
       parseInt(course.academicTerm[0], 10), period);
@@ -64,6 +64,9 @@ export class FenixService {
       await this.httpGet('courses/' + courseID)
         .then(r => r.json())
         .then(course => courseName = course.name);
+
+    // NOTE: Temporary patch for MSim-2 LEEC 2023/2024
+    if (courseID == 283085589465593 && academicTerm === '2023/2024') return 'P2';
 
     const text = $('a:contains(\'' + courseName + '\') + div', htmlCurriculum)[0].innerText;
     let period = text.split(',')[1].replace(/[ \t]/g, '');
