@@ -179,7 +179,10 @@ export class FenixService {
               degree = this.parseDegree(degree);
               degrees.push(degree);
             }
-          } catch (error) { this.errorService.showError(error); }
+          } catch (error) { this.errorService.showError(error, {
+            While: 'Getting degress',
+            academicTerm
+          }); }
         }
         return degrees.sort((a, b) => a.acronym.localeCompare(b.acronym));
       });
@@ -221,7 +224,11 @@ export class FenixService {
 
             courses.push(course);
           } catch (error) {
-            this.errorService.showError(error);
+            this.errorService.showError(error, {
+              While: 'Getting courses basic info',
+              academicTerm,
+              degreeId
+            });
           }
         }
         return courses.sort((a, b) => a.acronym.localeCompare(b.acronym));
@@ -270,7 +277,12 @@ export class FenixService {
             else
               this.alertService.showAlert('No schedule', 'No schedule yet available for course \'' + course.name + '\'', 'danger');
 
-          } else this.errorService.showError(error);
+          } else this.errorService.showError(error, {
+            While: 'Getting missing course info',
+            courseId: course.id,
+            courseName: course.name,
+            courseAcronym: course.acronym
+          });
         }
       });
   }
