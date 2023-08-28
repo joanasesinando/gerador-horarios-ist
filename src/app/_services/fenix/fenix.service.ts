@@ -68,6 +68,7 @@ export class FenixService {
     // NOTE: Temporary patch for MSim-2 LEEC 2023/2024
     if (courseID == 283085589465593 && academicTerm === '2023/2024') return 'P2';
 
+    courseName = courseName.trim();
     let text;
     try {
       text = $('a:contains(\'' + courseName + '\') + div', htmlCurriculum)[0].innerText;
@@ -95,6 +96,9 @@ export class FenixService {
       if (name === 'Projecto de Componentes Mecânicos') return 'Projeto de Componentes Mecânicos';
       if (name === 'Projecto em Engenharia Aeroespacial') return 'Projeto em Engenharia Aeroespacial';
       if (name === 'Projecto Integrador de 1º Ciclo em Engenharia Electrotécnica e de Computadores') return 'Projeto Integrador de 1º Ciclo em Engenharia Electrotécnica e de Computadores';
+      if (name === 'Competências Comunicacionais em Engenharia Informática e de Computadores II') return 'Competências Comunicacionais em Engenharia de Telecomunicações e Informática II';
+      if (name === 'Mundos Alternativos: a ficção como prática (P1)') return 'Mundos Alternativos: a Ficção Como Prática (P1)';
+      if (name === 'Mundos Alternativos: a ficção como prática (P2)') return 'Mundos Alternativos: a Ficção Como Prática (P2)';
       return name;
     }
   }
