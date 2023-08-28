@@ -68,8 +68,8 @@ export class FenixService {
     // NOTE: Temporary patch for MSim-2 LEEC 2023/2024
     if (courseID == 283085589465593 && academicTerm === '2023/2024') return 'P2';
 
-    // NOTE: patch for Microelectrónica <-> Microeletrónica
-    if (courseName === 'Microelectrónica') courseName = 'Microeletrónica';
+    // Patch name mismatch between API and curriculum info
+    courseName = patchMismatchInCourseNames(courseName);
 
     const text = $('a:contains(\'' + courseName + '\') + div', htmlCurriculum)[0].innerText;
     let period = text.split(',')[1].replace(/[ \t]/g, '');
@@ -79,6 +79,19 @@ export class FenixService {
       period = null;
 
     return period;
+
+    function patchMismatchInCourseNames(name: string): string {
+      if (name === 'Concepção Optimizada de Aeronaves') return 'Conceção Otimizada de Aeronaves';
+      if (name === 'Fenómenos Interactivos') return 'Fenómenos Interativos';
+      if (name === 'Mecânica de Fluídos Computacional') return 'Mecânica dos Fluídos Computacional';
+      if (name === 'Microelectrónica') return 'Microeletrónica';
+      if (name === 'Oscilações Electromecânicas') return 'Oscilações Eletromecânicas';
+      if (name === 'Projecto e Produção Sustentáveis') return 'Projeto e Produção Sustentáveis';
+      if (name === 'Projecto de Componentes Mecânicos') return 'Projeto de Componentes Mecânicos';
+      if (name === 'Projecto em Engenharia Aeroespacial') return 'Projeto em Engenharia Aeroespacial';
+      if (name === 'Projecto Integrador de 1º Ciclo em Engenharia Electrotécnica e de Computadores') return 'Projeto Integrador de 1º Ciclo em Engenharia Electrotécnica e de Computadores';
+      return name;
+    }
   }
 
   parseCourseMissingInfo(scheduleJson): void {
