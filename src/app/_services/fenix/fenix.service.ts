@@ -68,10 +68,15 @@ export class FenixService {
     // NOTE: Temporary patch for MSim-2 LEEC 2023/2024
     if (courseID == 283085589465593 && academicTerm === '2023/2024') return 'P2';
 
-    // Patch name mismatch between API and curriculum info
-    courseName = patchMismatchInCourseNames(courseName);
+    let text;
+    try {
+      text = $('a:contains(\'' + courseName + '\') + div', htmlCurriculum)[0].innerText;
 
-    const text = $('a:contains(\'' + courseName + '\') + div', htmlCurriculum)[0].innerText;
+    } catch (error) {
+      // Patch name mismatch between API and curriculum info
+      courseName = patchMismatchInCourseNames(courseName);
+      text = $('a:contains(\'' + courseName + '\') + div', htmlCurriculum)[0].innerText;
+    }
     let period = text.split(',')[1].replace(/[ \t]/g, '');
 
     // If course spans whole semester
