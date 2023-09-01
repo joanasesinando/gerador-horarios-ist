@@ -248,6 +248,22 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.logger.log('degrees', this.degrees);
   }
 
+  getDegressByType(type: string): Degree[] {
+    if (type === 'bachelor') return this.degrees.filter(degree => this.translateService.currentLang === 'pt-PT' ?
+      degree.name.toLowerCase().includes('licenciatura') : degree.name.toLowerCase().includes('bologna degree'));
+
+    if (type === 'master') return this.degrees.filter(degree => this.translateService.currentLang === 'pt-PT' ?
+      degree.name.toLowerCase().includes('mestrado') : degree.name.toLowerCase().includes('master'));
+
+    if (type === 'minor') return this.degrees.filter(degree => degree.name.toLowerCase().includes('minor'));
+
+    if (type === 'advanced-studies') return this.degrees.filter(degree => degree.name.toLowerCase().includes('diploma'));
+
+    if (type === 'hacs') return this.degrees.filter(degree => degree.acronym.toLowerCase().includes('hacs'));
+
+    return this.degrees;
+  }
+
   async loadCoursesBasicInfo(academicTerm: string, degreeID: number): Promise<void> {
     this.spinners.course = true;
     this.selectedCourse = null;

@@ -23,6 +23,11 @@
       "degree": "Curso",
       "course": "Cadeira",
       "placeholder": "Escolher",
+      "advanced-studies": "Diploma de Estudos Avançados",
+      "bachelor": "Licenciatura",
+      "master": "Mestrado",
+      "minor": "Minor",
+      "hacs": "HACS",
       "first-semester": "1º Semestre",
       "second-semester": "2º Semestre",
       "not-found": "Sem semestre definido"

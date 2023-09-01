@@ -141,8 +141,26 @@
                               data-style="custom-select" data-size="10"
                               data-live-search="true" data-live-search-placeholder="Search..."
                               [disabled]="this.degrees.length === 0" (change)="loadCoursesBasicInfo(selectedAcademicTerm, selectedDegree)">
-                        <option *ngFor="let degree of degrees" value="{{degree.id}}"
-                                [attr.data-tokens]="removePortugueseCharacters(degree.name)">{{degree.acronym}} - {{degree.name}}</option>
+                        <optgroup label="{{'main-content.labels.bachelor' | translate}}">
+                          <option *ngFor="let degree of getDegressByType('bachelor')" value="{{degree.id}}"
+                                  [attr.data-tokens]="removePortugueseCharacters(degree.name)">[{{degree.acronym}}] {{degree.name}}</option>
+                        </optgroup>
+                        <optgroup label="{{'main-content.labels.master' | translate}}">
+                          <option *ngFor="let degree of getDegressByType('master')" value="{{degree.id}}"
+                                  [attr.data-tokens]="removePortugueseCharacters(degree.name)">[{{degree.acronym}}] {{degree.name}}</option>
+                        </optgroup>
+                        <optgroup label="{{'main-content.labels.minor' | translate}}">
+                          <option *ngFor="let degree of getDegressByType('minor')" value="{{degree.id}}"
+                                  [attr.data-tokens]="removePortugueseCharacters(degree.name)">[{{degree.acronym}}] {{degree.name}}</option>
+                        </optgroup>
+                        <optgroup label="{{'main-content.labels.advanced-studies' | translate}}">
+                          <option *ngFor="let degree of getDegressByType('advanced-studies')" value="{{degree.id}}"
+                                  [attr.data-tokens]="removePortugueseCharacters(degree.name)">[{{degree.acronym}}] {{degree.name}}</option>
+                        </optgroup>
+                        <optgroup label="{{'main-content.labels.hacs' | translate}}">
+                          <option *ngFor="let degree of getDegressByType('hacs')" value="{{degree.id}}"
+                                  [attr.data-tokens]="removePortugueseCharacters(degree.name)">[{{degree.acronym}}] {{degree.name}}</option>
+                        </optgroup>
                       </select>
                     </div>
                     <div *ngIf="spinners.degree" class="spinner-degree spinner-border spinner-border-sm text-primary" role="status">

@@ -23,6 +23,11 @@
       "degree": "Degree",
       "course": "Course",
       "placeholder": "Select",
+      "advanced-studies": "Advanced Studies Diploma",
+      "bachelor": "Bachelor",
+      "master": "Master",
+      "minor": "Minor",
+      "hacs": "HACS",
       "first-semester": "1st Semester",
       "second-semester": "2nd Semester",
       "not-found": "Undefined semester"
