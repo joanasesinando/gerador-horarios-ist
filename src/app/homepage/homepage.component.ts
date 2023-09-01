@@ -315,7 +315,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
         // Load rest of info
         this.spinners.course = true;
-        this.fenixService.getMissingCourseInfo(courseToAdd).then(course => {
+        this.fenixService.getMissingCourseInfo(this.selectedAcademicTerm, courseToAdd).then(course => {
           if (!course) {
             this.spinners.course = false;
             addBtn.attr('disabled', false);

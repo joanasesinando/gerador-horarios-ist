@@ -124,38 +124,47 @@ export class FenixService {
   formatType(type: string): ClassType {
     switch (type) {
       case 'TEORICA':
+      case 'T':
         if (this.translateService.currentLang === 'pt-PT') return ClassType.THEORY_PT;
         return ClassType.THEORY_EN;
 
       case 'PRATICA':
+      case 'P':
         if (this.translateService.currentLang === 'pt-PT') return ClassType.PRACTICE_PT;
         return ClassType.PRACTICE_EN;
 
       case 'LABORATORIAL':
+      case 'L':
         if (this.translateService.currentLang === 'pt-PT') return ClassType.LAB_PT;
         return ClassType.LAB_EN;
 
       case 'PROBLEMS':
+      case 'PB':
         if (this.translateService.currentLang === 'pt-PT') return ClassType.PROBLEMS_PT;
         return ClassType.PROBLEMS_EN;
 
       case 'TEORICO_PRATICA':
+      case 'TP':
         if (this.translateService.currentLang === 'pt-PT') return ClassType.TP_PT;
         return ClassType.TP_EN;
 
       case 'SEMINARY':
+      case 'S':
         if (this.translateService.currentLang === 'pt-PT') return ClassType.SEMINARY_PT;
         return ClassType.SEMINARY_EN;
 
       case 'TUTORIAL_ORIENTATION':
+      case 'OT':
         if (this.translateService.currentLang === 'pt-PT') return ClassType.TUTORIAL_ORIENTATION_PT;
         return ClassType.TUTORIAL_ORIENTATION_EN;
 
       case 'TRAINING_PERIOD':
+      case 'E':
         if (this.translateService.currentLang === 'pt-PT') return ClassType.TRAINING_PERIOD_PT;
         return ClassType.TRAINING_PERIOD_EN;
 
       case 'FIELD_WORK':
+      case 'TC':
         if (this.translateService.currentLang === 'pt-PT') return ClassType.FIELD_WORK_PT;
         return ClassType.FIELD_WORK_EN;
 
@@ -168,8 +177,7 @@ export class FenixService {
   fillMissingInfo(course: Course): Course {
     if (course.campus.length === 0) course.campus = null;
     if (course.types.length === 0) course.types = [ClassType.NONE];
-    if (course.shifts.length === 0)
-      throw new Error('No shifts found');
+    if (course.shifts.length === 0) throw new Error('No shifts found');
     return course;
   }
 
@@ -257,15 +265,62 @@ export class FenixService {
       });
   }
 
-  getMissingCourseInfo(course: Course): Promise<Course> {
+  getMissingCourseInfo(academicTerm: string, course: Course): Promise<Course> {
     return this.httpGet('courses/' + course.id + '/schedule' + '?lang=' + this.translateService.currentLang)
-      .then(r => r.json())
-      .then(scheduleJson => {
+      .then(async r => {
         try {
-          this.parseCourseMissingInfo(scheduleJson);
+          let shifts: Shift[] = [];
 
-          // Get shifts
-          const shifts = this.getShifts(scheduleJson.shifts);
+          if (r.status !== 200) {
+            // Try to get schedule information through website
+            const lessonsHTML = await this.httpGet('https://fenix.tecnico.ulisboa.pt/disciplinas/' + course.acronym + '/' +
+              academicTerm.replace('/', '-') + '/' + course.semester + '-semestre/turnos', false)
+              .then(res => res.text())
+              .then(html => {
+                const el = document.createElement('html');
+                el.innerHTML = html;
+                return el;
+            });
+
+            const that = this;
+            const rows = $('tbody tr', lessonsHTML);
+            const lessonsOfShifts: {[shiftName: string]: Lesson[]} = {};
+            for (const row of rows) {
+              const shiftName: string = $('td:nth-child(1)', row)[0].innerText;
+              if (!shiftName || shiftName.isEmpty()) throw new Error('No name found for shift');
+              if (!(shiftName in lessonsOfShifts)) lessonsOfShifts[shiftName] = [];
+
+              const date: string = $('td:nth-child(3)', row)[0].innerText;
+              if (!date || date.isEmpty()) {
+                that.alertService.showAlert('Warning', 'No lessons found for shift ' + shiftName, 'warning');
+                continue;
+              }
+
+              const room = $('td:nth-child(4) a', row)[0];
+              let roomName: string = room.innerText;
+              if (!roomName || roomName.isEmpty()) roomName = NO_ROOM_FOUND;
+
+              const roomID = room.href.split('/').at(-1);
+              const roomCampus = await that.httpGet('spaces/' + roomID)
+                .then(s => s.json())
+                .then(roomJson => roomJson.topLevelSpace.name);
+
+              lessonsOfShifts[shiftName].push(that.getShiftLesson(date.split(',')[0].trim(), date.split(',')[1].trim(),
+                roomName, roomCampus));
+            }
+
+            for (const [shiftName, shiftLessons] of Object.entries(lessonsOfShifts)) {
+              const shiftType = that.formatType(shiftName.replace(course.acronym, '').replace(/[0-9]+$/g, ''));
+              shifts.push(new Shift(shiftName, shiftType, shiftLessons, shiftLessons.length > 0 ? shiftLessons[0].campus : null));
+            }
+
+          } else {
+            const scheduleJson = await r.json();
+            this.parseCourseMissingInfo(scheduleJson);
+
+            // Get shifts
+            shifts = this.getShifts(scheduleJson.shifts);
+          }
 
           // Get types
           const types: ClassType[] = this.getCourseTypes(shifts);
@@ -420,6 +475,47 @@ export class FenixService {
     }
 
     return shiftLessons;
+  }
+
+  getShiftLesson(weekday: string, time: string, room: string, campus: string): Lesson {
+    let day: number;
+    switch (weekday.toLowerCase()) {
+      case 'segunda':
+        day = 1;
+        break;
+
+      case 'terça':
+        day = 2;
+        break;
+
+      case 'quarta':
+        day = 3;
+        break;
+
+      case 'quinta':
+        day = 4;
+        break;
+
+      case 'sexta':
+        day = 5;
+        break;
+
+      default:
+        throw new Error('Couldn\' match weekday.');
+    }
+
+    // Get the closest lesson weekday
+    const start = new Date();
+    start.setDate(start.getDate() + (day + 7 - start.getDay()) % 7);
+    const end = new Date(start.valueOf());
+
+    // Set lesson start and end times
+    const startTime = time.split('—')[0].trim();
+    const endTime = time.split('—')[1].trim();
+    start.setHours(parseInt(startTime.split(':')[0], 10), parseInt(startTime.split(':')[1], 10), 0);
+    end.setHours(parseInt(endTime.split(':')[0], 10), parseInt(endTime.split(':')[1], 10), 0);
+
+    return new Lesson(start, end, room, campus);
   }
 
   getShifts(shiftsJson): Shift[] {

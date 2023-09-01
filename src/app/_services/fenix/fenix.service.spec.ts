@@ -456,7 +456,7 @@ describe('FenixService', () => {
       for (let course of courses) {
         // tslint:disable-next-line:triple-equals
         if (course.id == 846035542878562) {
-          course = await service.getMissingCourseInfo(course);
+          course = await service.getMissingCourseInfo(currentAcademicTerm, course);
           expect(course).toBeTruthy();
           expect(course.types).toEqual([ClassType.THEORY_PT, ClassType.LAB_PT]);
           expect(course.campus).toEqual(['Alameda', 'Taguspark']);
@@ -474,7 +474,7 @@ describe('FenixService', () => {
       expect(courses).toBeTruthy();
 
       for (let i = 0; i < courses.length; i++) {
-        const course = await service.getMissingCourseInfo(courses[i]);
+        const course = await service.getMissingCourseInfo(currentAcademicTerm, courses[i]);
         expect(course).toBeTruthy();
         expect(course.constructor.name).toEqual(Course.name);
         expect(course.types).toBeTruthy();
