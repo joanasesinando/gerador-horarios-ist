@@ -43,64 +43,81 @@ export class FenixService {
     return new Degree(parseInt(degreeJson.id, 10), degreeJson.name, degreeJson.acronym);
   }
 
-  async parseCourseBasicInfo(academicTerm: string, course, htmlCurriculum: HTMLHtmlElement): Promise<Course> {
+  async parseCourseBasicInfo(academicTerm: string, course, htmlCurriculum: HTMLHtmlElement, coursesNames): Promise<Course> {
     if (!course.id) throw new Error('No ID found for course');
     if (!course.name) throw new Error('No name found for course ' + course.id);
     if (!course.acronym) throw new Error('No acronym found for course ' + course.id);
     if (!course.credits) throw new Error('No credits found for course ' + course.id);
     if (!course.academicTerm) throw new Error('No academic term found for course ' + course.id);
 
-    const isLangPT = this.translateService.currentLang === 'pt-PT';
-    const period = await this.parseCoursePeriod(academicTerm, htmlCurriculum, isLangPT ? course.name : null, course.id);
+    const period = await this.parseCoursePeriod(academicTerm, htmlCurriculum, course, coursesNames);
 
     return new Course(parseInt(course.id, 10), course.name, course.acronym, parseFloat(course.credits),
       parseInt(course.academicTerm[0], 10), period);
   }
 
-  async parseCoursePeriod(academicTerm, htmlCurriculum: HTMLHtmlElement, courseName, courseID): Promise<string> {
+  async parseCoursePeriod(academicTerm: string, htmlCurriculum: HTMLHtmlElement, course, coursesNames: string[]): Promise<string> {
     if (!this.isMEPPAcademicTerm(academicTerm)) return null;
 
-    if (!courseName)
-      await this.httpGet('courses/' + courseID)
-        .then(r => r.json())
-        .then(course => courseName = course.name);
+    let courseName = course.name;
+    let courseURL = '';
 
-    // NOTE: Temporary patch for MSim-2 LEEC 2023/2024
-    if (courseID == 283085589465593 && academicTerm === '2023/2024') return 'P2';
+    if (this.translateService.currentLang !== 'pt-PT')
+      await this.httpGet('courses/' + course.id)
+        .then(r => r.json())
+        .then(coursePT => {
+          courseName = coursePT.name;
+          courseURL = coursePT.url;
+        });
 
     courseName = courseName.trim();
-    let text;
+    let text: string;
     try {
       text = $('a:contains(\'' + courseName + '\') + div', htmlCurriculum)[0].innerText;
-
     } catch (error) {
-      // Patch name mismatch between API and curriculum info
-      courseName = patchMismatchInCourseNames(courseName);
-      text = $('a:contains(\'' + courseName + '\') + div', htmlCurriculum)[0].innerText;
+      const courseInfo: {[id: string]: string} = {};
+      if (courseURL === '') {
+        await this.httpGet('courses/' + course.id)
+          .then(r => r.json())
+          .then(c => courseURL = c.url);
+      }
+
+      const divs: HTMLDivElement[] = $('#bySemesters div.col-md-5', htmlCurriculum).toArray();
+
+      const promises: Promise<any>[] = [];
+      for (const div of divs) {
+        const linkElement: HTMLAnchorElement = div.children[0] as HTMLAnchorElement;
+        const link: string = linkElement.href;
+        const name: string = linkElement.innerText;
+
+        if (coursesNames.includes(name.trim())) continue;
+
+        const textElement: HTMLElement = div.children[1] as HTMLElement;
+        const info = textElement.innerText;
+
+        promises.push(this.getCourseCurriculumPage(link).then(htmlLink => {
+          if ($('a[href$="' + courseURL + '"]', htmlLink).length > 0) {
+            courseInfo[course.id] = info;
+          }
+        }));
+      }
+
+      await Promise.all(promises);
+
+      if (course.id in courseInfo) {
+        text = courseInfo[course.id];
+      } else {
+        return null;
+      }
+
     }
-    let period = text.split(',')[1].replace(/[ \t]/g, '');
+    let period: string = text.split(',')[1].replace(/[ \t]/g, '');
 
     // If course spans whole semester
-    if (period.startsWith('S') || period.startsWith('s'))
-      period = null;
+    if (period.toLowerCase().startsWith('s'))
+      period = 'Sem';
 
     return period;
-
-    function patchMismatchInCourseNames(name: string): string {
-      if (name === 'Concepção Optimizada de Aeronaves') return 'Conceção Otimizada de Aeronaves';
-      if (name === 'Fenómenos Interactivos') return 'Fenómenos Interativos';
-      if (name === 'Mecânica de Fluídos Computacional') return 'Mecânica dos Fluídos Computacional';
-      if (name === 'Microelectrónica') return 'Microeletrónica';
-      if (name === 'Oscilações Electromecânicas') return 'Oscilações Eletromecânicas';
-      if (name === 'Projecto e Produção Sustentáveis') return 'Projeto e Produção Sustentáveis';
-      if (name === 'Projecto de Componentes Mecânicos') return 'Projeto de Componentes Mecânicos';
-      if (name === 'Projecto em Engenharia Aeroespacial') return 'Projeto em Engenharia Aeroespacial';
-      if (name === 'Projecto Integrador de 1º Ciclo em Engenharia Electrotécnica e de Computadores') return 'Projeto Integrador de 1º Ciclo em Engenharia Electrotécnica e de Computadores';
-      if (name === 'Competências Comunicacionais em Engenharia Informática e de Computadores II') return 'Competências Comunicacionais em Engenharia de Telecomunicações e Informática II';
-      if (name === 'Mundos Alternativos: a ficção como prática (P1)') return 'Mundos Alternativos: a Ficção Como Prática (P1)';
-      if (name === 'Mundos Alternativos: a ficção como prática (P2)') return 'Mundos Alternativos: a Ficção Como Prática (P2)';
-      return name;
-    }
   }
 
   parseCourseMissingInfo(scheduleJson): void {
@@ -219,6 +236,7 @@ export class FenixService {
   }
 
   getDegreeCurriculum(academicTerm: string, degreeId): Promise<HTMLHtmlElement> {
+    const parser = new DOMParser();
     const acronym = this.stateService.degreesRepository.get(academicTerm)
       .find(degree => degree.id === parseInt(degreeId, 10)).acronym.toLowerCase();
 
@@ -226,15 +244,23 @@ export class FenixService {
       .then(r => r.text())
       .then(html => {
         // Request curriculum on selected academic term
-        const year = ($('div#content-block ul.dropdown-menu a:contains(\'' + academicTerm + '\')', html)[0].href).match(/year=(\d+)/)[1];
+        const htmlEl = parser.parseFromString(html, 'text/html').getElementsByTagName('html')[0];
+        const year = ($('div#content-block ul.dropdown-menu a:contains(\'' + academicTerm + '\')', htmlEl)[0].href).match(/year=(\d+)/)[1];
 
         return this.httpGet('https://fenix.tecnico.ulisboa.pt/cursos/' + acronym + '/curriculo?year=' + year, false)
           .then(r => r.text())
           .then(curriculumHTML => {
-            const el = document.createElement( 'html' );
-            el.innerHTML = curriculumHTML;
-            return el;
+            return parser.parseFromString(curriculumHTML, 'text/html').getElementsByTagName('html')[0];
           });
+      });
+  }
+
+  getCourseCurriculumPage(url: string): Promise<HTMLHtmlElement> {
+    return this.httpGet(url, false)
+      .then(r => r.text())
+      .then(html => {
+        const parser = new DOMParser();
+        return parser.parseFromString(html, 'text/html').getElementsByTagName('html')[0];
       });
   }
 
@@ -245,9 +271,10 @@ export class FenixService {
         const htmlCurriculum = await this.getDegreeCurriculum(academicTerm, degreeId);
 
         const courses: Course[] = [];
+        const coursesNames: string[] = coursesJson.map(c => c.name);
         for (let course of coursesJson) {
           try {
-            course = await this.parseCourseBasicInfo(academicTerm, course, htmlCurriculum);
+            course = await this.parseCourseBasicInfo(academicTerm, course, htmlCurriculum, coursesNames);
 
             // Remove optional courses (example acronym: O32)
             if (course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9') continue;
@@ -277,9 +304,8 @@ export class FenixService {
               academicTerm.replace('/', '-') + '/' + course.semester + '-semestre/turnos', false)
               .then(res => res.text())
               .then(html => {
-                const el = document.createElement('html');
-                el.innerHTML = html;
-                return el;
+                const parser = new DOMParser();
+                return parser.parseFromString(html, 'text/html').getElementsByTagName('html')[0];
             });
 
             const that = this;

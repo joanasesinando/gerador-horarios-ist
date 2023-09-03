@@ -373,7 +373,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
 
   isSamePeriod(course: Course): boolean {
     for (const c of this.selectedCourses) {
-      if (c.period !== course.period && c.period && course.period) return false;
+      if (c.period !== course.period && c.period !== 'Sem' && course.period !== 'Sem' && c.period && course.period) return false;
     }
     return true;
   }

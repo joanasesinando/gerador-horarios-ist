@@ -180,21 +180,21 @@
                             [disabled]="this.courses.length === 0" (change)="noShiftsFound = false">
                       <optgroup label="{{'main-content.labels.first-semester' | translate}}">
                         <option *ngFor="let course of getCoursesBySemester(1)" value="{{course.id}}"
-                                [attr.data-subtext]="isMEPPAcademicTerm() ? course.period ? course.period : 'Sem' : ''"
+                                [attr.data-subtext]="isMEPPAcademicTerm() ? course.period : ''"
                                 [attr.data-tokens]="removePortugueseCharacters(course.name)">[{{course.formatAcronym()}}]
                           {{course.name}}
                         </option>
                       </optgroup>
                       <optgroup label="{{'main-content.labels.second-semester' | translate}}">
                         <option *ngFor="let course of getCoursesBySemester(2)" value="{{course.id}}"
-                                [attr.data-subtext]="isMEPPAcademicTerm() ? course.period ? course.period : 'Sem' : ''"
+                                [attr.data-subtext]="isMEPPAcademicTerm() ? course.period : ''"
                                 [attr.data-tokens]="removePortugueseCharacters(course.name)">[{{course.formatAcronym()}}]
                           {{course.name}}
                         </option>
                       </optgroup>
                       <optgroup label="{{'main-content.labels.not-found' | translate}}">
                         <option *ngFor="let course of getCoursesBySemester(0)" value="{{course.id}}"
-                                [attr.data-subtext]="isMEPPAcademicTerm() ? course.period ? course.period : 'Sem' : ''"
+                                [attr.data-subtext]="isMEPPAcademicTerm() ? course.period : ''"
                                 [attr.data-tokens]="removePortugueseCharacters(course.name)">[{{course.formatAcronym()}}]
                           {{course.name}}
                         </option>
