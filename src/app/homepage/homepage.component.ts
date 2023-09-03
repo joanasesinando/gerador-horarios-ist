@@ -229,6 +229,11 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.spinners.degree = true;
     this.selectedDegree = null;
     this.selectedCourse = null;
+    this.noShiftsFound = false;
+    this.courses = [];
+    this.degrees = [];
+    this.refreshSelectAndMaintainPosition('inputDegree');
+    this.refreshSelectAndMaintainPosition('inputCourse');
 
     // If state saved, don't call APIs
     if (this.stateService.degreesRepository.has(academicTerm)) {
@@ -267,6 +272,9 @@ export class HomepageComponent implements OnInit, AfterViewInit {
   async loadCoursesBasicInfo(academicTerm: string, degreeID: number): Promise<void> {
     this.spinners.course = true;
     this.selectedCourse = null;
+    this.courses = [];
+    this.noShiftsFound = false;
+    this.refreshSelectAndMaintainPosition('inputCourse');
 
     // If state saved, don't call APIs
     if (this.stateService.coursesRepository.has(academicTerm)
