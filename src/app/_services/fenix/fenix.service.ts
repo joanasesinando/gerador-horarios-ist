@@ -323,13 +323,15 @@ export class FenixService {
               }
 
               const room = $('td:nth-child(4) a', row)[0];
-              let roomName: string = room.innerText;
+              let roomName: string = room?.innerText;
+              let roomCampus: string = null;
               if (!roomName || roomName.isEmpty()) roomName = NO_ROOM_FOUND;
-
-              const roomID = room.href.split('/').at(-1);
-              const roomCampus = await that.httpGet('spaces/' + roomID)
-                .then(s => s.json())
-                .then(roomJson => roomJson.topLevelSpace.name);
+              else {
+                const roomID = room.href.split('/').at(-1);
+                roomCampus = await that.httpGet('spaces/' + roomID)
+                  .then(s => s.json())
+                  .then(roomJson => roomJson.topLevelSpace.name);
+              }
 
               lessonsOfShifts[shiftName].push(that.getShiftLesson(date.split(',')[0].trim(), date.split(',')[1].trim(),
                 roomName, roomCampus));
