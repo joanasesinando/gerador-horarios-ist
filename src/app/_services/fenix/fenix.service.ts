@@ -43,20 +43,22 @@ export class FenixService {
     return new Degree(parseInt(degreeJson.id, 10), degreeJson.name, degreeJson.acronym);
   }
 
-  async parseCourseBasicInfo(academicTerm: string, course, htmlCurriculum: HTMLHtmlElement, coursesNames): Promise<Course> {
+  async parseCourseBasicInfo(academicTerm: string, course, htmlCurriculum: HTMLHtmlElement, coursesNames,
+                             cachedLinksHtml: {}): Promise<Course> {
     if (!course.id) throw new Error('No ID found for course');
     if (!course.name) throw new Error('No name found for course ' + course.id);
     if (!course.acronym) throw new Error('No acronym found for course ' + course.id);
     if (!course.credits) throw new Error('No credits found for course ' + course.id);
     if (!course.academicTerm) throw new Error('No academic term found for course ' + course.id);
 
-    const period = await this.parseCoursePeriod(academicTerm, htmlCurriculum, course, coursesNames);
+    const period = await this.parseCoursePeriod(academicTerm, htmlCurriculum, course, coursesNames, cachedLinksHtml);
 
     return new Course(parseInt(course.id, 10), course.name, course.acronym, parseFloat(course.credits),
       parseInt(course.academicTerm[0], 10), period);
   }
 
-  async parseCoursePeriod(academicTerm: string, htmlCurriculum: HTMLHtmlElement, course, coursesNames: string[]): Promise<string> {
+  async parseCoursePeriod(academicTerm: string, htmlCurriculum: HTMLHtmlElement, course, coursesNames: string[],
+                          cachedLinksHtml: {}): Promise<string> {
     if (!this.isMEPPAcademicTerm(academicTerm)) return null;
 
     let courseName = course.name;
@@ -75,7 +77,7 @@ export class FenixService {
     try {
       text = $('a:contains(\'' + courseName + '\') + div', htmlCurriculum)[0].innerText;
     } catch (error) {
-      const courseInfo: {[id: string]: string} = {};
+      let courseInfo = '';
       if (courseURL === '') {
         await this.httpGet('courses/' + course.id)
           .then(r => r.json())
@@ -95,17 +97,29 @@ export class FenixService {
         const textElement: HTMLElement = div.children[1] as HTMLElement;
         const info = textElement.innerText;
 
+        if (link in cachedLinksHtml) {
+          if ($('a[href$="' + courseURL + '"]', cachedLinksHtml[link]).length > 0) {
+            courseInfo = info;
+            break;
+          } else {
+            continue;
+          }
+        }
+
         promises.push(this.getCourseCurriculumPage(link).then(htmlLink => {
+          cachedLinksHtml[link] = htmlLink;
           if ($('a[href$="' + courseURL + '"]', htmlLink).length > 0) {
-            courseInfo[course.id] = info;
+            courseInfo = info;
+          } else {
+            return Promise.reject();
           }
         }));
       }
 
-      await Promise.all(promises);
+      await Promise.any(promises).catch(() => null);
 
-      if (course.id in courseInfo) {
-        text = courseInfo[course.id];
+      if (courseInfo) {
+        text = courseInfo;
       } else {
         return null;
       }
@@ -272,9 +286,10 @@ export class FenixService {
 
         const courses: Course[] = [];
         const coursesNames: string[] = coursesJson.map(c => c.name);
+        const cachedLinksHtml: {} = {};
         for (let course of coursesJson) {
           try {
-            course = await this.parseCourseBasicInfo(academicTerm, course, htmlCurriculum, coursesNames);
+            course = await this.parseCourseBasicInfo(academicTerm, course, htmlCurriculum, coursesNames, cachedLinksHtml);
 
             // Remove optional courses (example acronym: O32)
             if (course.acronym[0] === 'O' && course.acronym[1] >= '0' && course.acronym[1] <= '9') continue;
