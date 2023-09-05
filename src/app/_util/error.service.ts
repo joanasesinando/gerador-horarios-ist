@@ -31,7 +31,7 @@ export class ErrorService {
       type: 'POST',
       url: environment.googleScript,
       crossDomain: true,
-      data: Object.assign({Error: error}, context),
+      data: Object.assign({Version: environment.projectVersion, Error: error}, context),
       cache: false
     });
   }
