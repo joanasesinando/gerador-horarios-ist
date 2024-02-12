@@ -71,12 +71,53 @@ export class FenixService {
           courseName = coursePT.name;
           courseURL = coursePT.url;
         });
-
     courseName = courseName.trim();
+
     let text: string;
+    let period: string;
+
     try {
-      text = $('a:contains(\'' + courseName + '\') + div', htmlCurriculum)[0].innerText;
-    } catch (error) {
+      const uniquePeriods: string[] = [];
+      const matches = $('a:contains(\'' + courseName + '\')', htmlCurriculum).filter((i, el) => {
+        // Filter partial name matches
+        const name: string = el.innerText.trim();
+        return name === courseName || (name.startsWith(courseName) && name.endsWith(')'));
+
+      }).filter((i, el) => {
+        // Filter unique period matches
+        const p: string = getPeriodFromText($(' + div', el).text());
+        if (!uniquePeriods.includes(p)) {
+          uniquePeriods.push(p);
+          return true;
+        }
+        return false;
+      });
+      const nrMatches: number = matches.length;
+
+      if (nrMatches === 0) {  // No matches found
+        throw new Error('No matches found for course \'' + courseName + '\'');
+
+      } else if (nrMatches === 1) { // Exactly one match found
+        text = $(' + div', matches[0])[0].innerText;
+
+      } else {  // Multiple matches found: course lectured in multiple periods
+        // Find period based on semester
+        // e.g. 1st semester -> P1 or P2
+        //      2nd semester -> P3 or P4
+        const semester: number = parseInt(course.academicTerm[0], 10);
+        let notFound = false;
+        matches.each((i, el) => {
+          const p: string = $(' + div', el).text().split(',')[1].replace(/[ \t]/g, '');
+          if ((semester === 1 && (p === 'P1' || p === 'P2' || (p.toLowerCase().startsWith('s') && p.includes('1')))) ||
+            (semester === 2 && (p === 'P3' || p === 'P4' || (p.toLowerCase().startsWith('s') && p.includes('2'))))) {
+            if (!period) period = p;
+            else notFound = true;
+          }
+        });
+        if (notFound) throw new Error('No period found for course \'' + courseName + '\'');
+      }
+
+    } catch (noMatchesFound) {
       let courseInfo = '';
       if (courseURL === '') {
         await this.httpGet('courses/' + course.id)
@@ -125,13 +166,24 @@ export class FenixService {
       }
 
     }
-    let period: string = text.split(',')[1].replace(/[ \t]/g, '');
+
+    if (text && period) {
+      // NOTE: if course name is the same across periods,
+      //       it might be necessary to fix the found period
+      const p = text.split(',')[1].replace(/[ \t]/g, '');
+      if (period !== p) period = p;
+
+    } else if (!period) period = text.split(',')[1].replace(/[ \t]/g, '');
 
     // If course spans whole semester
     if (period.toLowerCase().startsWith('s'))
       period = 'Sem';
 
     return period;
+
+    function getPeriodFromText(txt: string): string {
+      return txt.split(',')[1].replace(/[ \t]/g, '');
+    }
   }
 
   parseCourseMissingInfo(scheduleJson): void {
