@@ -14,6 +14,7 @@ export class CoursesBannerComponent implements OnInit {
   @Output() campusSelected = new EventEmitter<{courseID: number, campus: string}>();
   @Output() typesOfClassesSelected = new EventEmitter<{courseID: number, types: ClassType[]}>();
   @Output() removeBtn = new EventEmitter<number>();
+  @Output() individualLessonsToggled = new EventEmitter<{courseID: number, type: ClassType, enabled: boolean}>();
 
   constructor() { }
 
@@ -27,6 +28,11 @@ export class CoursesBannerComponent implements OnInit {
   typesOfClassesPicked(typesSelected: {courseID: number, types: ClassType[]}): void {
     this.typesOfClassesSelected.emit(typesSelected);
   }
+
+  individualLessonsPicked(event: {courseID: number, type: ClassType, enabled: boolean}): void {
+    this.individualLessonsToggled.emit(event);
+  }
+
 
   removeBtnClicked(courseID: number): void {
     this.removeBtn.emit(courseID);

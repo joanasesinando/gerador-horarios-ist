@@ -442,6 +442,13 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.typesOfClassesPicked.set(selected.courseID, selected.types);
   }
 
+  pickIndividualLessons(event: {courseID: number, type: ClassType, enabled: boolean}): void {
+    const course = this.selectedCourses.find(c => c.id === event.courseID);
+    if (!course) return;
+
+    course.setIndividualLessonEnabled(event.type, event.enabled);
+  }
+
   generateSchedules(): void {
     if (this.selectedCourses.length > 0) {
       // Save state

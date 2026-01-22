@@ -38,6 +38,14 @@
     "no-more-courses": "Não existem mais cadeiras"
   },
 
+  "courseCard": {
+    "individualPerSession": "Aulas de diferentes turnos"
+  },
+
+  "homepage": {
+    "mixShifts": "Aulas de Diferentes Turnos"
+  },
+
   "order-by": {
     "most-compact": "Favorece horários com menos buracos e aulas mais juntas entre si",
     "most-balanced": "Favorece horários mais uniformemente distribuídos ao longo da semana (evitar dias concentrados)",

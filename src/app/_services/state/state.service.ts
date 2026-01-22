@@ -15,6 +15,10 @@ export class StateService {
 
   private _selectedLanguage = 'pt-PT';
 
+  // Global toggle: it allows classes from different shifts
+  // (did the toggle because not everyone might want it)
+  private _mixShiftsEnabled = false;
+
   private _academicTermsRepository: string[] = null;
   private _degreesRepository: Map<string, Degree[]>
     = new Map<string, Degree[]>(); // academicTerm -> Degree[]
@@ -33,6 +37,9 @@ export class StateService {
 
   get selectedLanguage(): string { return this._selectedLanguage; }
   set selectedLanguage(value: string) { this._selectedLanguage = value; }
+
+  get mixShiftsEnabled(): boolean { return this._mixShiftsEnabled; }
+  set mixShiftsEnabled(value: boolean) { this._mixShiftsEnabled = !!value; }
 
   get academicTermsRepository(): string[] { return this._academicTermsRepository; }
   set academicTermsRepository(value: string[]) { this._academicTermsRepository = value; }

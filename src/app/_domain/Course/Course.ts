@@ -18,6 +18,27 @@ export class Course {
     private _degree?: Degree // degree this course was selected from
   ) {}
 
+
+  // Types (T / TP / PL / …) for which this course allows "individual lesson" selection mode
+  // Default is disabled for all types
+  private _individualLessonTypes: ClassType[] = [];
+
+  get individualLessonTypes(): ClassType[] { return this._individualLessonTypes; }
+  set individualLessonTypes(value: ClassType[]) { this._individualLessonTypes = value ?? []; }
+
+  isIndividualLessonEnabled(type: ClassType): boolean {
+    return this._individualLessonTypes?.includes(type) ?? false;
+  }
+
+  setIndividualLessonEnabled(type: ClassType, enabled: boolean): void {
+    if (!this._individualLessonTypes) this._individualLessonTypes = [];
+    const idx = this._individualLessonTypes.indexOf(type);
+
+    if (enabled && idx === -1) this._individualLessonTypes.push(type);
+    if (!enabled && idx !== -1) this._individualLessonTypes.splice(idx, 1);
+  }
+
+  
   get id(): number { return this._id; }
   set id(value: number) { this._id = value; }
 

@@ -182,7 +182,8 @@
   <li [ngStyle]="{'top': getTop(ev.start), 'height': getHeight(ev.start, ev.end)}"
       class="single-event" [attr.data-start]="ev.start" [attr.data-end]="ev.end" [attr.data-day]="ev.weekday"
       [ngClass]="{'pinned': ev.pinned}"
-      [attr.data-shift]="ev.shiftName" (click)="toggleOptions(ev, ev.pinned)"
+      [attr.data-shift]="ev.shiftName" [attr.title]="formatShiftName(ev.shiftName)"
+      (click)="toggleOptions(ev, ev.pinned)"
       clickedOutside (clickedOutside)="closeOptions($event)">
     <div class="single-event-div" [ngStyle]="{'background': getColor(ev.tag)}">
       <span class="event-date">{{ev.start}} - {{ev.end}}</span>
