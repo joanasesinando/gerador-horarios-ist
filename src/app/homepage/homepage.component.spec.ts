@@ -363,6 +363,61 @@ describe('HomepageComponent', () => {
 
     });
 
+    describe('Restoring saved state', () => {
+
+      it('should restore selected courses from multiple degrees', () => {
+        const degreeX = degrees[0];
+        const degreeY = degrees[1];
+        const degreeZ = degrees[2];
+
+        const courseX = _.cloneDeep(courses[0]);
+        courseX.id = 101;
+        courseX.acronym = 'X1';
+        courseX.degree = degreeX;
+
+        const courseY = _.cloneDeep(courses[1]);
+        courseY.id = 102;
+        courseY.acronym = 'Y1';
+        courseY.degree = degreeY;
+
+        const courseZ = _.cloneDeep(courses[2]);
+        courseZ.id = 103;
+        courseZ.acronym = 'Z1';
+        courseZ.degree = degreeZ;
+
+        const otherCourseFromZ = _.cloneDeep(courses[0]);
+        otherCourseFromZ.id = 104;
+        otherCourseFromZ.acronym = 'Z2';
+        otherCourseFromZ.degree = degreeZ;
+
+        component.stateService.academicTermsRepository = _.cloneDeep(academicTerms);
+        component.stateService.degreesRepository.set(selectedAcademicTerm, _.cloneDeep(degrees));
+        component.stateService.saveCoursesState(selectedAcademicTerm, degreeZ.id, [courseZ, otherCourseFromZ]);
+        component.stateService.academicTermSelected = selectedAcademicTerm;
+        component.stateService.degreeIDSelected = degreeZ.id;
+
+        // The working copy may already have been filtered by schedule generation.
+        component.stateService.selectedCourses = _.cloneDeep([courseZ]);
+
+        // The homepage snapshot must remain complete and is what resetState restores.
+        component.stateService.selectedCoursesSnapshot = _.cloneDeep([courseZ, courseY, courseX]);
+
+        component.resetState();
+
+        expect(component.selectedCourses.map(course => course.id)).toEqual([103, 102, 101]);
+        expect(component.selectedCoursesIDs.has(courseX.id)).toBeTrue();
+        expect(component.selectedCoursesIDs.has(courseY.id)).toBeTrue();
+        expect(component.selectedCoursesIDs.has(courseZ.id)).toBeTrue();
+        expect(component.totalCredits).toBe(courseX.credits + courseY.credits + courseZ.credits);
+
+        // The currently selected degree is still Z, and already selected Z courses
+        // must not reappear in its course dropdown.
+        expect(component.selectedDegree).toBe(degreeZ.id);
+        expect(component.courses.map(course => course.id)).toEqual([otherCourseFromZ.id]);
+      });
+
+    });
+
     describe('Preparing courses to generate schedules for', () => {
       let course: Course;
 

@@ -188,11 +188,80 @@ export class SchedulesGenerationService {
   }
 
   combineShifts(course: Course): Class[] {
+    if (course.shifts) {
+      for (const shift of course.shifts) {
+        if (!shift.lessons || shift.lessons.length < 2) continue;
+
+        shift.lessons.sort((a, b) => {
+          const dayA = a.start.getDay();
+          const dayB = b.start.getDay();
+          if (dayA !== dayB) return dayA - dayB;
+
+          return a.start.getTime() - b.start.getTime();
+        });
+      }
+    }
+
+    
     const shiftsMap = new Map<string, Shift[]>();
 
-    // Group shifts based on type of class
-    for (const shift of course.shifts)
-      shiftsMap.has(shift.type) ? shiftsMap.get(shift.type).push(shift) : shiftsMap.set(shift.type, [shift]);
+    const addToMap = (key: string, s: Shift) => {
+      const arr = shiftsMap.get(key);
+      if (arr) arr.push(s);
+      else shiftsMap.set(key, [s]);
+    };
+
+    // Group shifts by type first
+    const byType = new Map<string, Shift[]>();
+    for (const shift of course.shifts ?? []) {
+      const arr = byType.get(shift.type);
+      if (arr) arr.push(shift);
+      else byType.set(shift.type, [shift]);
+    }
+
+    const maxSlotsForType = (shifts: Shift[]): number => {
+      let max = 0;
+      for (const s of shifts ?? []) {
+        const c = s.lessons ? s.lessons.length : 0;
+        if (c > max) max = c;
+      }
+      return max;
+    };
+
+    // Build shiftsMap (normal mode or individual-slot mode)
+    for (const [type, shifts] of byType.entries()) {
+
+      if (!this.stateService.mixShiftsEnabled || !course.isIndividualLessonEnabled(type as any)) {
+        // Choose one shift for this type
+        for (const shift of shifts) addToMap(type, shift);
+        continue;
+      }
+
+      // Individual enabled: allow splitting into per-weekly-slot choices (if there are >=2 slots)
+      const maxSlots = maxSlotsForType(shifts);
+
+      if (maxSlots < 2) {
+        // Nothing to split -> fallback to normal
+        for (const shift of shifts) addToMap(type, shift);
+        continue;
+      }
+
+      for (let slot = 0; slot < maxSlots; slot++) {
+        const key = `${type}__slot${slot}`;
+
+        // Only shifts that actually have this slot contribute candidates
+        const candidates = shifts.filter(s => s.lessons && s.lessons[slot]);
+        if (candidates.length === 0) continue;
+
+        for (const shift of candidates) {
+          const lesson = shift.lessons[slot];
+          const slotShift = new Shift(`${shift.name}#${slot + 1}`, type as any, [lesson], shift.campus);
+          addToMap(key, slotShift);
+        }
+      }
+    }
+
+
 
     // Get combinations of shifts
     let combinations: Shift[][] = [];

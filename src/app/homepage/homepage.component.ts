@@ -189,6 +189,7 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.stateService.degreesRepository = new Map<string, Degree[]>();
     this.stateService.coursesRepository = new Map<string, Map<number, Course[]>>();
     this.stateService.selectedCourses = null;
+    this.stateService.selectedCoursesSnapshot = null;
   }
 
   resetState(): void {
@@ -208,13 +209,21 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.loadDegrees(academicTerm);
     this.selectedDegree = degreeID;
 
-    // Reset courses state
-    this.loadCoursesBasicInfo(academicTerm, degreeID);
+    // Restore the pristine homepage selection directly. Do not use addCourse()
+    // here: addCourse() only searches the courses of the currently selected
+    // degree, which would drop selected courses that belong to other degrees.
+    this.selectedCourses = _.cloneDeep(this.stateService.selectedCoursesSnapshot);
+    this.selectedCoursesIDs.clear();
+    this.totalCredits = 0;
 
-    // Reset selected courses state
-    for (const course of this.stateService.selectedCourses) {
-      this.addCourse(course.id);
+    for (const course of this.selectedCourses) {
+      this.selectedCoursesIDs.set(course.id, true);
+      this.totalCredits += course.credits;
     }
+
+    // Load the dropdown only after rebuilding selectedCoursesIDs so courses
+    // already selected from the current degree are filtered out correctly.
+    this.loadCoursesBasicInfo(academicTerm, degreeID);
 
     // Reset selects
     setTimeout(() => {
@@ -442,11 +451,23 @@ export class HomepageComponent implements OnInit, AfterViewInit {
     this.typesOfClassesPicked.set(selected.courseID, selected.types);
   }
 
+  pickIndividualLessons(event: {courseID: number, type: ClassType, enabled: boolean}): void {
+    const course = this.selectedCourses.find(c => c.id === event.courseID);
+    if (!course) return;
+
+    course.setIndividualLessonEnabled(event.type, event.enabled);
+  }
+
   generateSchedules(): void {
     if (this.selectedCourses.length > 0) {
       // Save state
       this.stateService.academicTermSelected = this.selectedAcademicTerm;
       this.stateService.degreeIDSelected = this.selectedDegree;
+
+      // Keep a pristine snapshot for restoring the homepage after navigating
+      // back. selectedCourses is a separate working copy that is intentionally
+      // mutated by prepareCoursesToGenerate().
+      this.stateService.selectedCoursesSnapshot = _.cloneDeep(this.selectedCourses);
       this.stateService.selectedCourses = _.cloneDeep(this.selectedCourses);
       this.stateService.selectedLanguage = this.translateService.currentLang;
 

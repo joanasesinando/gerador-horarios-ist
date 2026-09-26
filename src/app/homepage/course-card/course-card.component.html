@@ -23,12 +23,41 @@
     <!-- Types of classes -->
     <div *ngIf="course.types" class="d-flex flex-wrap">
       <div *ngFor="let type of course.types; let i = index; let last = last"
-           class="custom-control custom-checkbox mb-2" [ngClass]="{'mr-3': !last}">
-        <input type="checkbox" [checked]="true" name="checkTypeClass-{{formatName(course.acronym)}}" class="custom-control-input"
-               id="checkTypeClass-{{formatName(course.acronym)}}-{{i}}" (change)="typesOfClassesPicked(course)">
-        <label class="custom-control-label" for="checkTypeClass-{{formatName(course.acronym)}}-{{i}}">{{type}}</label>
+          class="mb-2" [ngClass]="{'mr-4': !last}">
+
+        <!-- Main type checkbox -->
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox"
+                [checked]="true"
+                name="checkTypeClass-{{formatName(course.acronym)}}"
+                class="custom-control-input"
+                id="checkTypeClass-{{formatName(course.acronym)}}-{{i}}"
+                (change)="typesOfClassesPicked(course)">
+          <label class="custom-control-label"
+                for="checkTypeClass-{{formatName(course.acronym)}}-{{i}}">
+            {{type}}
+          </label>
+        </div>
+
+        <!-- Nested option: only appears when the type is selected -->
+        <div *ngIf="isTypeSelected(type) && stateService.mixShiftsEnabled"
+            class="custom-control custom-checkbox individual-option">
+          <input type="checkbox"
+                [checked]="course.isIndividualLessonEnabled(type) && canEnableIndividualLessons(course, type)"
+                [disabled]="!canEnableIndividualLessons(course, type)"
+                name="checkIndividualLessons-{{formatName(course.acronym)}}"
+                class="custom-control-input"
+                id="checkIndividualLessons-{{formatName(course.acronym)}}-{{i}}"
+                (change)="onIndividualLessonsToggle(course, type, $event.target.checked)">
+          <label class="custom-control-label text-muted"
+                for="checkIndividualLessons-{{formatName(course.acronym)}}-{{i}}">
+            {{ 'courseCard.individualPerSession' | translate }}
+          </label>
+        </div>
+
       </div>
     </div>
+
 
     <!-- Remove btn -->
     <button class="btn btn-danger btn-remove" (click)="removeBtnClicked()">

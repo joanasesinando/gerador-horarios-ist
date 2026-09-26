@@ -84,25 +84,39 @@
 
         <div class="container">
 
-          <div class="links d-flex align-items-center">
-            <!-- About -->
-            <a class="btn btn-outline-primary btn-about mr-2"
-               data-toggle="modal" data-target="#aboutModal">{{'main-content.about' | translate}}</a>
+          <div class="links d-flex flex-column align-items-end">
+            <div class="d-flex align-items-center">
+              <!-- About -->
+              <a class="btn btn-outline-primary btn-about mr-2"
+                 data-toggle="modal" data-target="#aboutModal">{{'main-content.about' | translate}}</a>
 
-            <!-- Language -->
-            <div class="btn-lang">
-              <fa-icon [icon]="faGlobeEurope" class="fa-lg dropdown-toggle" type="button" data-toggle="dropdown"></fa-icon>
-              <div class="dropdown-menu">
-                <a class="dropdown-item d-flex align-items-center" (click)="changeLanguage('pt-PT')">
-                  <img class="mr-2" src="assets/imgs/pt.svg" alt="portuguese">
-                  PT
-                </a>
+              <!-- Language -->
+              <div class="btn-lang">
+                <fa-icon [icon]="faGlobeEurope" class="fa-lg dropdown-toggle" type="button" data-toggle="dropdown"></fa-icon>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item d-flex align-items-center" (click)="changeLanguage('pt-PT')">
+                    <img class="mr-2" src="assets/imgs/pt.svg" alt="portuguese">
+                    PT
+                  </a>
 
-                <a class="dropdown-item d-flex align-items-center" (click)="changeLanguage('en-GB')">
-                  <img class="mr-2" src="assets/imgs/en.svg" alt="english">
-                  EN
-                </a>
+                  <a class="dropdown-item d-flex align-items-center" (click)="changeLanguage('en-GB')">
+                    <img class="mr-2" src="assets/imgs/en.svg" alt="english">
+                    EN
+                  </a>
+                </div>
               </div>
+            </div>
+
+            <!-- Global toggle -->
+            <div class="custom-control custom-checkbox mt-2 mix-shifts-toggle">
+              <input type="checkbox"
+                     class="custom-control-input"
+                     id="mixShiftsToggle"
+                     [checked]="stateService.mixShiftsEnabled"
+                     (change)="stateService.mixShiftsEnabled = $event.target.checked">
+              <label class="custom-control-label" for="mixShiftsToggle">
+                {{ 'homepage.mixShifts' | translate }}
+              </label>
             </div>
           </div>
 
@@ -227,6 +241,7 @@
                 [courses]="selectedCourses"
                 (campusSelected)="pickCourseCampus($event)"
                 (typesOfClassesSelected)="pickTypesOfClasses($event)"
+                (individualLessonsToggled)="pickIndividualLessons($event)"
                 (removeBtn)="removeCourse($event)"></app-course-banner>
 
               <!-- Generate btn -->

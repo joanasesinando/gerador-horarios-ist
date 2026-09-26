@@ -38,6 +38,14 @@
     "no-more-courses": "No more courses available"
   },
 
+  "courseCard": {
+    "individualPerSession": "Classes from different shifts"
+  },
+
+  "homepage": {
+    "mixShifts": "Classes from Different Shifts"
+  },
+
   "order-by": {
     "most-compact": "Favours schedules with fewer wholes and closer classes",
     "most-balanced": "Favours schedules that are more balanced through the week (avoid strenuous days)",

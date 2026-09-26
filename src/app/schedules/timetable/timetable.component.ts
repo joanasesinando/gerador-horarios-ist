@@ -158,6 +158,14 @@ export class TimetableComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  formatShiftName(shiftName: string): string {
+    if (!shiftName) return '';
+    const parts = shiftName.split('#');
+    if (parts.length === 2) return `${parts[0]} (${parts[1]})`;
+    return shiftName;
+  }
+
+
   ngOnInit(): void {
     this.scheduleInViewIndex = 0;
     this.scheduleInViewID = this.schedules[0].id;
